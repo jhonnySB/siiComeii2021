@@ -1,0 +1,48 @@
+// If you edit this file you need to compile the theme. See README.md for details.
+
+// Global variable overrides. Must be declared before importing Valo.
+
+// Defines the plaintext font size, weight and family. Font size affects general component sizing.
+
+$v-app-loading-text: "==> Siscloud 2 by Tiamex <==";
+
+$v-font-size: 10px;
+//$v-font-weight: 400;
+$v-font-family: "Montserrat","Open Sans", sans-serif;
+//$v-app-background-color: #24374b;
+
+//$v-background-color: #24374b;
+
+//$v-focus-color: #0072C6;
+//$v-focus-color: #0081E0;
+//$v-focus-style: 0 0 0 1px $v-focus-color;
+//$valo-menu-background-color: darken($v-focus-color, 10%);
+//$v-border: 0 solid v-shade;
+//$v-border-radius: 5px;
+//$v-bevel: false;
+//$v-gradient: true;
+//$v-shadow: true;
+//$v-textfield-bevel: false;
+//$v-textfield-shadow: false;
+//$v-textfield-border: 1px solid v-shade;
+//$v-link-text-decoration: none;
+//$v-overlay-shadow: 0 0 0 1px #000;
+//$v-overlay-border-width: 1px; // For IE8
+//$v-window-shadow: $v-overlay-shadow;
+//$v-selection-overlay-background-color: #fff;
+//$v-selection-overlay-padding-horizontal: 0;
+//$v-selection-overlay-padding-vertical: 3px;
+//$v-panel-border: 1px solid v-shade;
+
+// For more information, see: https://vaadin.com/book/-/page/themes.valo.html
+// Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
+
+//----------> Extra Variables
+$font-white: #ffffff;
+
+@import "../valo/valo.scss";
+
+@mixin siiComeiiTheme{
+    @include valo;
+    // Insert your own theme rules here
+}
