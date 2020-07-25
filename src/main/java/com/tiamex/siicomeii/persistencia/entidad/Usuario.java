@@ -70,4 +70,8 @@ public class Usuario implements Serializable{
     /** Constructores **/
     public Usuario(){
     }
+    
+    /** Metodos **/
+    @Override
+    public String toString(){return nombre;}
 }

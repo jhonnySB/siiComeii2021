@@ -16,7 +16,7 @@ public class UsuarioDlg extends TemplateDlg<Usuario>{
     private void init(){
         grid.addColumn(Usuario::getNombre).setCaption("Nombre");
         grid.addColumn(Usuario::getCorreo).setCaption("Correo");
-        grid.addColumn(Usuario::getUsuarioGrupo).setCaption("Grupo");
+        grid.addColumn(Usuario::getObjUsuarioGrupo).setCaption("Grupo");
         
         buttonSearchEvent();
     }

@@ -40,4 +40,8 @@ public class UsuarioGrupo implements Serializable{
     /** Constructores **/
     public UsuarioGrupo(){
     }
+    
+    /** Metodos **/
+    @Override
+    public String toString(){return nombre;}
 }
