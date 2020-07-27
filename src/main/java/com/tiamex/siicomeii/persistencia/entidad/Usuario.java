@@ -1,7 +1,9 @@
 package com.tiamex.siicomeii.persistencia.entidad;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /** @author cerimice **/
@@ -67,11 +70,32 @@ public class Usuario implements Serializable{
     private UsuarioGrupo objUsuarioGrupo;
     public UsuarioGrupo getObjUsuarioGrupo(){return objUsuarioGrupo;}
     
+    @OneToMany(mappedBy="objUsuario",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
+    private List<AsistenciaWebinar> listaAsistenciaWebinar;
+    public List<AsistenciaWebinar> geListaAsistenciaWebinar(){return listaAsistenciaWebinar;}
+    
+    @OneToMany(mappedBy="objUsuario",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
+    private List<ProximoWebinar> listaProximoWebinar;
+    public List<ProximoWebinar> geListaProximoWebinar(){return listaProximoWebinar;}
+    
+    @OneToMany(mappedBy="objUsuario",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
+    private List<ProximoEvento> listaProximoEvento;
+    public List<ProximoEvento> getListaProximoEvento(){return listaProximoEvento;}
+    
+    @OneToMany(mappedBy="objUsuario",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
+    private List<Tutorial> listaTutorial;
+    public List<Tutorial> getListaTutorial(){return listaTutorial;}
+    
+    @OneToMany(mappedBy="objUsuario",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
+    private List<TutorialSesion> listaTutorialSesion;
+    public List<TutorialSesion> getListaTutorialSesion(){return listaTutorialSesion;}
+    
     /** Constructores **/
     public Usuario(){
     }
     
-    /** Metodos **/
+    /** Metodos
+     * @return  **/
     @Override
     public String toString(){return nombre;}
 }

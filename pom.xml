@@ -72,8 +72,23 @@
             <version>2.3.0</version>
             <type>jar</type>
         </dependency>
+        
+        <!--
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <version>${vaadin.version}</version>
+            <artifactId>vaadin-core</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <version>${vaadin.version}</version>
+            <artifactId>vaadin-login-flow</artifactId>
+        </dependency> -->
+ 
     </dependencies>
     
+
     <dependencyManagement>
         <dependencies>
             <dependency>

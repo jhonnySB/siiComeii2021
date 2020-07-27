@@ -23,4 +23,6 @@ public class FabricaVista{
         if(usuarioGrupoDlg == null){usuarioGrupoDlg = new UsuarioGrupoDlg();}
         return usuarioGrupoDlg;
     }
+    
+    
 }

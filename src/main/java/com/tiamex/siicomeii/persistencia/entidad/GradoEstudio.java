@@ -15,10 +15,10 @@ import javax.persistence.Table;
 /** @author cerimice **/
 
 @Entity
-@Table(name="usuarioGrupo")
+@Table(name="gradoEstudio")
 @NamedQueries({
 })
-public class UsuarioGrupo implements Serializable{
+public class GradoEstudio implements Serializable{
     @Id
     @Basic(optional=false)
     @Column(name="id",nullable=false)
@@ -33,12 +33,12 @@ public class UsuarioGrupo implements Serializable{
     public void setNombre(String valor){nombre = valor;}
     
     /** Relaciones **/
-    @OneToMany(mappedBy="objUsuarioGrupo",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
-    private List<Usuario> listaUsuarios;
-    public List<Usuario> getListaUsuarios(){return listaUsuarios;}
+    @OneToMany(mappedBy="objGradoEstudio",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
+    private List<Agremiado> listaAgremiados;
+    public List<Agremiado> getListaAgremiados(){return listaAgremiados;}
     
     /** Constructores **/
-    public UsuarioGrupo(){
+    public GradoEstudio(){
     }
     
     /** Metodos

@@ -1,5 +1,7 @@
 package com.tiamex.siicomeii;
 
+import com.jarektoro.responsivelayout.ResponsiveLayout;
+import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.vista.FabricaVista;
 import com.vaadin.annotations.PreserveOnRefresh;
@@ -9,6 +11,8 @@ import com.vaadin.annotations.Viewport;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import javax.servlet.annotation.WebServlet;
 
@@ -33,7 +37,7 @@ public class SiiComeiiUI extends UI{
     @Override
     protected void init(VaadinRequest request){
         
-        /*ResponsiveLayout contenido = new ResponsiveLayout();
+        ResponsiveLayout contenido = new ResponsiveLayout();
             contenido.setWidth("100%");
         
         TextField nombre = new TextField();
@@ -42,7 +46,7 @@ public class SiiComeiiUI extends UI{
             correo.setCaption("Correo");
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
             row1.addColumn().withDisplayRules(12,12,12,12).withComponent(nombre);
-            row1.addColumn().withDisplayRules(12,12,12,12).withComponent(correo);*/
+            row1.addColumn().withDisplayRules(12,12,12,12).withComponent(correo);
         
         setContent(getFabricaVista().getMainPanel());
     }
