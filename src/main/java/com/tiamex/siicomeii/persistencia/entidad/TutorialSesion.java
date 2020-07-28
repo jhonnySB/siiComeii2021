@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.Table;
@@ -44,8 +43,8 @@ public class TutorialSesion implements Serializable{
     public String getInstitucion(){return institucion;}
     public void setInstitucion(String valor){institucion = valor;} 
     
-    @Lob
-    @Column(name="urlYoutube",nullable=false,columnDefinition = "TEXT",length=512)
+    @Basic(optional=false)
+    @Column(name="urlYoutube",nullable=false,columnDefinition = "LONGTEXT")
     private String urlYoutube;
     public String getUrlYoutube(){return urlYoutube;}
     public void setUrlYoutube(String valor){urlYoutube = valor;}
@@ -55,6 +54,12 @@ public class TutorialSesion implements Serializable{
     private long usuario;
     public long getUsuario(){return usuario;}
     public void setUsuario(long valor){usuario = valor;}
+    
+    @Basic(optional=false)
+    @Column(name="tutorial",nullable=false)
+    private long tutorial;
+    public long getTutorial(){return tutorial;}
+    public void setTutorial(long valor){tutorial = valor;}
     
     /** Relaciones **/
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,6 +1,7 @@
 package com.tiamex.siicomeii.persistencia.entidad;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
@@ -9,9 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -51,19 +50,18 @@ public class WebinarRealizado implements Serializable{
     
     @Basic(optional=false)
     @Column(name="fecha",nullable=false)
-    @Temporal(javax.persistence.TemporalType.DATE)
-    private Date fecha;
-    public Date getFecha(){return fecha;}
-    public void setFecha(Date valor){fecha = valor;}
+    private LocalDateTime fecha;
+    public LocalDateTime getFecha(){return fecha;}
+    public void setFecha(LocalDateTime valor){fecha = valor;}
     
-    @Lob
-    @Column(name="presentacion",nullable=false,columnDefinition = "TEXT",length=512)
+    @Basic(optional=false)
+    @Column(name="presentacion",nullable=false,columnDefinition="TEXT")
     private String presentacion;
     public String getPresentacion(){return presentacion;}
     public void setPresentacion(String valor){presentacion = valor;}
     
-    @Lob
-    @Column(name="urlYoutube",nullable=false,columnDefinition = "TEXT",length=512)
+    @Basic(optional=false)
+    @Column(name="urlYoutube",nullable=false,columnDefinition = "TEXT")
     private String urlYoutube;
     public String getUrlYoutube(){return urlYoutube;}
     public void setUrlYoutube(String valor){urlYoutube = valor;}

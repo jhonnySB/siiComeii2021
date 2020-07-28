@@ -46,13 +46,13 @@ public class AsistenciaWebinar implements Serializable{
     /** Relaciones **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "webinar",referencedColumnName="id",insertable=false,updatable=false)
-    private Usuario objWebinarRealizado;
-    public Usuario getObjWebinarRealizado(){return objWebinarRealizado;}
+    private WebinarRealizado objWebinarRealizado;
+    public WebinarRealizado getObjWebinarRealizado(){return objWebinarRealizado;}
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agremaido",referencedColumnName="id",insertable=false,updatable=false)
-    private Usuario objAgremiado;
-    public Usuario getObjAgremiado(){return objAgremiado;}
+    private Agremiado objAgremiado;
+    public Agremiado getObjAgremiado(){return objAgremiado;}
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario",referencedColumnName="id",insertable=false,updatable=false)

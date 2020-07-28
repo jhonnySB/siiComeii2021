@@ -1,6 +1,7 @@
 package com.tiamex.siicomeii.persistencia.entidad;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -48,13 +49,12 @@ public class ProximoEvento implements Serializable{
     
     @Basic(optional=false)
     @Column(name="fecha",nullable=false)
-    @Temporal(javax.persistence.TemporalType.DATE)
-    private Date fecha;
-    public Date getFecha(){return fecha;}
-    public void setFecha(Date valor){fecha = valor;}
+    private LocalDateTime fecha;
+    public LocalDateTime getFecha(){return fecha;}
+    public void setFecha(LocalDateTime valor){fecha = valor;}
     
-    @Lob
-    @Column(name="imagen",nullable=false,columnDefinition = "TEXT",length=512)
+    @Basic(optional=false)
+    @Column(name="imagen",nullable=false,columnDefinition = "LONGTEXT")
     private String imagen;
     public String getImagen(){return imagen;}
     public void setImagen(String valor){imagen = valor;}

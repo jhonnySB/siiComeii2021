@@ -67,8 +67,8 @@ public class Agremiado implements Serializable{
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gradoEstudio",referencedColumnName="id",insertable=false,updatable=false)
-    private Pais objGradoEstudio;
-    public Pais getObjGradoEstudio(){return objGradoEstudio;}
+    private GradoEstudio objGradoEstudio;
+    public GradoEstudio getObjGradoEstudio(){return objGradoEstudio;}
     
     @OneToMany(mappedBy="objAgremiado",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
     private List<AsistenciaWebinar> listaAsistenciaWebinar;

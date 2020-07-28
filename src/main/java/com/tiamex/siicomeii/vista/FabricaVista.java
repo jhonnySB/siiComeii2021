@@ -1,5 +1,6 @@
 package com.tiamex.siicomeii.vista;
 
+import com.tiamex.siicomeii.vista.administracion.GradoEstudio.GradoEstudioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuario.UsuarioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuarioGrupo.UsuarioGrupoDlg;
 
@@ -24,5 +25,9 @@ public class FabricaVista{
         return usuarioGrupoDlg;
     }
     
-    
+    public GradoEstudioDlg gradoEstudioDlg;
+    public GradoEstudioDlg getGradoEstudioDlg(){
+        if(gradoEstudioDlg == null){gradoEstudioDlg = new GradoEstudioDlg();}
+        return gradoEstudioDlg;
+    }
 }

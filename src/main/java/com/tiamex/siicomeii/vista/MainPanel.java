@@ -56,6 +56,7 @@ public class MainPanel extends Panel{
         
         MenuBar.MenuItem administracion = menuPrincipal.addItem("Administración",VaadinIcons.TOOLBOX,null);
             MenuBar.MenuItem catalogos = administracion.addItem("Catalogos",VaadinIcons.CALC_BOOK,null);
+            MenuBar.MenuItem gradoEstudio = catalogos.addItem("Grado de estudios",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getGradoEstudioDlg());});
             MenuBar.MenuItem usuarioGrupo = catalogos.addItem("Usuario Grupo",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioGrupoDlg());});
             MenuBar.MenuItem usuario = catalogos.addItem("Usuarios",VaadinIcons.USER,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioDlg());});
         
