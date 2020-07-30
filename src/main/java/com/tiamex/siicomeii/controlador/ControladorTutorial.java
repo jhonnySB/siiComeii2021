@@ -1,10 +1,10 @@
 package com.tiamex.siicomeii.controlador;
 
-import com.tiamex.siicomeii.persistencia.entidad.Usuario;
-import com.tiamex.siicomeii.persistencia.servicio.ServicioUsuario;
+import com.tiamex.siicomeii.persistencia.entidad.Tutorial;
+import com.tiamex.siicomeii.persistencia.servicio.ServicioTutorial;
 
 /** @author cerimice **/
-public class ControladorTutorial extends GenericController<ServicioUsuario,Usuario,Long>{
+public class ControladorTutorial extends GenericController<ServicioTutorial,Tutorial,Long>{
     
     private static ControladorTutorial INSTANCE;
     public static ControladorTutorial getInstance(){
@@ -13,18 +13,18 @@ public class ControladorTutorial extends GenericController<ServicioUsuario,Usuar
     }
     
     private ControladorTutorial(){
-        service = ServicioUsuario.getInstance();
+        service = ServicioTutorial.getInstance();
     }
 
     @Override
-    protected boolean validate(Usuario obj) throws Exception{
+    protected boolean validate(Tutorial obj) throws Exception{
         if(obj.getId() < 0){throw new Exception("El ID no es valido");}
         
         return true;
     }
 
     @Override
-    public Usuario save(Usuario obj) throws Exception{
+    public Tutorial save(Tutorial obj) throws Exception{
         if(validate(obj)){
             if(obj.getId() == 0){
                 obj.setId(getService().generateId());
@@ -32,7 +32,7 @@ public class ControladorTutorial extends GenericController<ServicioUsuario,Usuar
             }
         }
         
-        Usuario oldObj = getService().getById(obj.getId());
+        Tutorial oldObj = getService().getById(obj.getId());
         if(oldObj == null){
             return getService().save(obj);
         }

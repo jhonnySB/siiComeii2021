@@ -1,39 +1,38 @@
-package com.tiamex.siicomeii.vista.administracion.usuario;
+package com.tiamex.siicomeii.vista.proximowebinar;
 
-import com.jarektoro.responsivelayout.ResponsiveLayout;
-import com.jarektoro.responsivelayout.ResponsiveRow;
-import com.tiamex.siicomeii.controlador.ControladorUsuario;
+import com.tiamex.siicomeii.controlador.ControladorProximoWebinar;
+import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.shared.Position;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.PasswordField;
-import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
 
 /** @author cerimice **/
-public class UsuarioDlg extends TemplateDlg<Usuario>{
+public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     
-    public UsuarioDlg(){
+    public ProximoWebinarDlg(){
         init();
     }
     
     private void init(){
-        grid.addColumn(Usuario::getNombre).setCaption("Nombre");
-        grid.addColumn(Usuario::getCorreo).setCaption("Correo");
-        grid.addColumn(Usuario::getObjUsuarioGrupo).setCaption("Grupo");
-        
+        grid.addColumn(ProximoWebinar::getImagen).setCaption("Imagen");
+        grid.addColumn(ProximoWebinar::getNombre).setCaption("Nombre");
+        grid.addColumn(ProximoWebinar::getTitulo).setCaption("Titulo");
+        grid.addColumn(ProximoWebinar::getPonente).setCaption("Ponente");
+        grid.addColumn(ProximoWebinar::getInstitucion).setCaption("Institución");
+        grid.addColumn(ProximoWebinar::getFecha).setCaption("Fecha");
+              
         buttonSearchEvent();
     }
     
     @Override
     protected void buttonSearchEvent(){
         try{
-            grid.setItems(ControladorUsuario.getInstance().getAll());
+            grid.setItems(ControladorProximoWebinar.getInstance().getAll());
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -44,12 +43,12 @@ public class UsuarioDlg extends TemplateDlg<Usuario>{
         TemplateModalWin ventana = new TemplateModalWin(){
             @Override
             protected void loadData(long id) {
-                
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             protected void buttonDeleteEvent() {
-                
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
@@ -71,8 +70,12 @@ public class UsuarioDlg extends TemplateDlg<Usuario>{
     protected void gridEvent() {
     }
     
-    @Override
     protected void eventEditButtonGrid(Usuario obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventEditButtonGrid(ProximoWebinar obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

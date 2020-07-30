@@ -3,6 +3,8 @@ package com.tiamex.siicomeii.vista;
 import com.tiamex.siicomeii.vista.administracion.GradoEstudio.GradoEstudioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuario.UsuarioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuarioGrupo.UsuarioGrupoDlg;
+import com.tiamex.siicomeii.vista.proximowebinar.ProximoWebinarDlg;
+import com.tiamex.siicomeii.vista.tutorial.TutorialDlg;
 
 /** @author cerimice **/
 public class FabricaVista{
@@ -29,5 +31,17 @@ public class FabricaVista{
     public GradoEstudioDlg getGradoEstudioDlg(){
         if(gradoEstudioDlg == null){gradoEstudioDlg = new GradoEstudioDlg();}
         return gradoEstudioDlg;
+    }
+    
+    public ProximoWebinarDlg proximoWebinarDlg;
+    public ProximoWebinarDlg getProximoWebinarDlg(){
+        if(proximoWebinarDlg == null){proximoWebinarDlg = new ProximoWebinarDlg();}
+        return proximoWebinarDlg;
+    }
+    
+    public TutorialDlg tutorialDlg;
+    public TutorialDlg getTutorialDlg(){
+        if(tutorialDlg == null){tutorialDlg = new TutorialDlg();}
+        return tutorialDlg;
     }
 }

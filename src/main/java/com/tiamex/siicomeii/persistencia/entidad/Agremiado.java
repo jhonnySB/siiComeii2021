@@ -53,10 +53,10 @@ public class Agremiado implements Serializable{
     public void setPais(String valor){pais = valor;}
 
     @Basic(optional=false)
-    @Column(name="gradoEstudios",nullable=false)
-    private String gradoEstudios;
-    public String getGradoEstudios(){return gradoEstudios;}
-    public void setGradoEstudios(String valor){gradoEstudios = valor;}
+    @Column(name="gradoEstudio",nullable=false)
+    private String gradoEstudio;
+    public String getGradoEstudios(){return gradoEstudio;}
+    public void setGradoEstudios(String valor){gradoEstudio = valor;}
     
     
     /** Relaciones **/
@@ -78,7 +78,8 @@ public class Agremiado implements Serializable{
     public Agremiado(){
     }
     
-    /** Metodos **/
+    /** Metodos
+     * @return  **/
     @Override
     public String toString(){return nombre;}
 }
