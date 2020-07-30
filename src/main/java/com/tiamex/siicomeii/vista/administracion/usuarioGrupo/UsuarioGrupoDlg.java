@@ -30,7 +30,8 @@ public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
     }
 
     @Override
-    protected void buttonAddEvent() {
+    protected void buttonAddEvent(){
+        ui.addWindow(new UsuarioGrupoModalWin());
     }
 
     @Override
@@ -38,8 +39,8 @@ public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
     }
     
     @Override
-    protected void eventEditButtonGrid(UsuarioGrupo obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    protected void eventEditButtonGrid(UsuarioGrupo obj){
+        ui.addWindow(new UsuarioGrupoModalWin(obj.getId()));
     }
     
 }
