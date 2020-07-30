@@ -50,7 +50,7 @@ public class AsistenciaWebinar implements Serializable{
     public WebinarRealizado getObjWebinarRealizado(){return objWebinarRealizado;}
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agremaido",referencedColumnName="id",insertable=false,updatable=false)
+    @JoinColumn(name = "agremiado",referencedColumnName="id",insertable=false,updatable=false)
     private Agremiado objAgremiado;
     public Agremiado getObjAgremiado(){return objAgremiado;}
     

@@ -23,7 +23,7 @@ public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
 
     @Override
     protected void buttonSearchEvent(){
-        grid.setItems(ControladorGradoEstudio.getInstance().getAll());
+        grid.setItems(ControladorGradoEstudio.getInstance().getByName(searchField.getValue()));
     }
     
     @Override

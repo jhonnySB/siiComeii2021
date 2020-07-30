@@ -35,7 +35,7 @@ public abstract class TemplateModalWin extends Window{
             Element.cfgComponent(delete);
             delete.addClickListener((Button.ClickEvent event) -> {buttonDeleteEvent();});
             delete.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-            delete.setVisible(false);
+            //delete.setVisible(false);
         accept = new Button("Aceptar");
             Element.cfgComponent(accept);
             accept.addClickListener((Button.ClickEvent event) -> {buttonAcceptEvent();});

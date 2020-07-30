@@ -23,7 +23,7 @@ public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
     @Override
     protected void buttonSearchEvent(){
         try{
-            grid.setItems(ControladorUsuarioGrupo.getInstance().getAll());
+            grid.setItems(ControladorUsuarioGrupo.getInstance().getByName(searchField.getValue()));
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
