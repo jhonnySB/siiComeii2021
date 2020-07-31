@@ -3,6 +3,7 @@ package com.tiamex.siicomeii;
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
+import com.tiamex.siicomeii.vista.EjemploLayout;
 import com.tiamex.siicomeii.vista.FabricaVista;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.annotations.PreserveOnRefresh;
@@ -57,6 +58,7 @@ public class SiiComeiiUI extends UI{
         
         //setContent(getFabricaVista().getMainPanel());
         setContent(contenido);
+        //setContent(new EjemploLayout());
     }
     
     @WebServlet(urlPatterns = "/*", name = "SiiComeiiUIServlet", asyncSupported = true)
