@@ -5,11 +5,7 @@ import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.Tutorial;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.utils.Utils;
-import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
-import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
-import com.vaadin.shared.Position;
-import com.vaadin.ui.Notification;
 import java.util.logging.Logger;
 
 /** @author cerimice **/
@@ -39,30 +35,7 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
 
     @Override
     protected void buttonAddEvent(){
-        TemplateModalWin ventana = new TemplateModalWin(){
-            @Override
-            protected void loadData(long id) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            protected void buttonDeleteEvent() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            protected void buttonAcceptEvent(){
-                Element.makeNotification("Datos guardados",Notification.Type.HUMANIZED_MESSAGE,Position.TOP_CENTER).show(ui.getPage());
-                close();
-            }
-
-            @Override
-            protected void buttonCancelEvent(){
-                close();
-            }
-        };
-        
-        ui.addWindow(ventana);
+        ui.addWindow(new TutorialModalWin());
     }
 
     @Override
