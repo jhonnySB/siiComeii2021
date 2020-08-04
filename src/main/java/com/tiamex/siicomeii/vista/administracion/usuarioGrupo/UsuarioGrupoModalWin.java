@@ -31,10 +31,10 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin{
     
     private void init(){
         ResponsiveLayout contenido = new ResponsiveLayout();
-            Element.cfgLayoutComponent(contenido);
+        Element.cfgLayoutComponent(contenido);
         
         nombre = new TextField();
-            Element.cfgComponent(nombre,"Nombre");
+        Element.cfgComponent(nombre,"Nombre");
         nombre2 = new TextField();
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
             row1.addColumn().withDisplayRules(12,12,12,12).withComponent(nombre);
@@ -77,7 +77,7 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin{
                 Element.makeNotification("Datos guardados",Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                 ui.getFabricaVista().getUsuarioGrupoDlg().updateDlg();
                 close();
-            }
+            }            
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

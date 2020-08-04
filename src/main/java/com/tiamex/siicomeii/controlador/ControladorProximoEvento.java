@@ -1,10 +1,10 @@
 package com.tiamex.siicomeii.controlador;
 
-import com.tiamex.siicomeii.persistencia.entidad.Usuario;
-import com.tiamex.siicomeii.persistencia.servicio.ServicioUsuario;
+import com.tiamex.siicomeii.persistencia.entidad.ProximoEvento;
+import com.tiamex.siicomeii.persistencia.servicio.ServicioProximoEvento;
 
 /** @author cerimice **/
-public class ControladorProximoEvento extends GenericController<ServicioUsuario,Usuario,Long>{
+public class ControladorProximoEvento extends GenericController<ServicioProximoEvento,ProximoEvento,Long>{
     
     private static ControladorProximoEvento INSTANCE;
     public static ControladorProximoEvento getInstance(){
@@ -13,18 +13,18 @@ public class ControladorProximoEvento extends GenericController<ServicioUsuario,
     }
     
     private ControladorProximoEvento(){
-        service = ServicioUsuario.getInstance();
+        service = ServicioProximoEvento.getInstance();
     }
 
     @Override
-    protected boolean validate(Usuario obj) throws Exception{
+    protected boolean validate(ProximoEvento obj) throws Exception{
         if(obj.getId() < 0){throw new Exception("El ID no es valido");}
         
         return true;
     }
 
     @Override
-    public Usuario save(Usuario obj) throws Exception{
+    public ProximoEvento save(ProximoEvento obj) throws Exception{
         if(validate(obj)){
             if(obj.getId() == 0){
                 obj.setId(getService().generateId());
@@ -32,7 +32,7 @@ public class ControladorProximoEvento extends GenericController<ServicioUsuario,
             }
         }
         
-        Usuario oldObj = getService().getById(obj.getId());
+        ProximoEvento oldObj = getService().getById(obj.getId());
         if(oldObj == null){
             return getService().save(obj);
         }

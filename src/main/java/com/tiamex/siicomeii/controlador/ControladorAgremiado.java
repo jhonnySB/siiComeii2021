@@ -1,10 +1,10 @@
 package com.tiamex.siicomeii.controlador;
 
-import com.tiamex.siicomeii.persistencia.entidad.Usuario;
-import com.tiamex.siicomeii.persistencia.servicio.ServicioUsuario;
+import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
+import com.tiamex.siicomeii.persistencia.servicio.ServicioAgremiado;
 
-/** @author cerimice **/
-public class ControladorAgremiado extends GenericController<ServicioUsuario,Usuario,Long>{
+/** @author fred **/
+public class ControladorAgremiado extends GenericController<ServicioAgremiado,Agremiado,Long>{
     
     private static ControladorAgremiado INSTANCE;
     public static ControladorAgremiado getInstance(){
@@ -13,18 +13,22 @@ public class ControladorAgremiado extends GenericController<ServicioUsuario,Usua
     }
     
     private ControladorAgremiado(){
-        service = ServicioUsuario.getInstance();
+        service = ServicioAgremiado.getInstance();
     }
 
     @Override
-    protected boolean validate(Usuario obj) throws Exception{
+    protected boolean validate(Agremiado obj) throws Exception{
         if(obj.getId() < 0){throw new Exception("El ID no es valido");}
+        if(obj.getGradoEstudios().isEmpty()){throw new Exception("Es necesario proporcionar");}
+        if(obj.getInstitucion().isEmpty()){throw new Exception("Es necesario proporcionar el nombre de la institución");}
+        if(obj.getNombre().isEmpty()){throw new Exception("Es necesario proporcionar");}
+        if(obj.getPais().isEmpty()){throw new Exception("Es necesario proporcionar");}
         
         return true;
     }
 
     @Override
-    public Usuario save(Usuario obj) throws Exception{
+    public Agremiado save(Agremiado obj) throws Exception{
         if(validate(obj)){
             if(obj.getId() == 0){
                 obj.setId(getService().generateId());
@@ -32,14 +36,17 @@ public class ControladorAgremiado extends GenericController<ServicioUsuario,Usua
             }
         }
         
-        Usuario oldObj = getService().getById(obj.getId());
+        Agremiado oldObj = getService().getById(obj.getId());
         if(oldObj == null){
             return getService().save(obj);
         }
         
-        //oldObj.setActivo(obj.getActivo());
-        //oldObj.setCambiarPassword(obj.getCambiarPassword());
-        //oldObj.setNombre(obj.getNombre());
+        oldObj.setGradoEstudios(obj.getGradoEstudios());
+        oldObj.setInstitucion(obj.getInstitucion());
+        oldObj.setNombre(obj.getGradoEstudios());
+        oldObj.setPais(obj.getPais());
+        oldObj.setSexo(obj.getSexo());
+        
         return getService().save(obj);
     }
     

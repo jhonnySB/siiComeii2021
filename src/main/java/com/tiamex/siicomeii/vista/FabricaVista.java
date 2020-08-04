@@ -1,6 +1,8 @@
 package com.tiamex.siicomeii.vista;
 
+import com.tiamex.siicomeii.vista.administracion.Agremiado.AgremiadoDlg;
 import com.tiamex.siicomeii.vista.administracion.GradoEstudio.GradoEstudioDlg;
+import com.tiamex.siicomeii.vista.administracion.ProximoEvento.ProximoEventoDlg;
 import com.tiamex.siicomeii.vista.administracion.usuario.UsuarioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuarioGrupo.UsuarioGrupoDlg;
 import com.tiamex.siicomeii.vista.proximowebinar.ProximoWebinarDlg;
@@ -43,5 +45,17 @@ public class FabricaVista{
     public TutorialDlg getTutorialDlg(){
         if(tutorialDlg == null){tutorialDlg = new TutorialDlg();}
         return tutorialDlg;
+    }
+    
+    public ProximoEventoDlg proximoEventoDlg;
+    public ProximoEventoDlg getProximoEventoDlg(){
+        if(proximoEventoDlg == null){proximoEventoDlg = new ProximoEventoDlg();}
+        return proximoEventoDlg;
+    }
+    
+    public AgremiadoDlg agremiadoDlg;
+    public AgremiadoDlg getAgremiadoDlg(){
+        if(agremiadoDlg == null){agremiadoDlg = new AgremiadoDlg();}
+        return agremiadoDlg;
     }
 }

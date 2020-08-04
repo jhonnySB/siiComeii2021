@@ -29,16 +29,10 @@ public class Agremiado implements Serializable{
     public void setId(long valor){id = valor;}
     
     @Basic(optional=false)
-    @Column(name="nombre",nullable=false)
-    private String  nombre;
-    public String getNombre(){return nombre;}
-    public void setNombre(String valor){nombre = valor;}
-    
-    @Basic(optional=false)
-    @Column(name="sexo",nullable=false)
-    private char  sexo;
-    public char getSexo(){return sexo;}
-    public void setSexo(char valor){sexo = valor;}
+    @Column(name="gradoEstudio",nullable=false)
+    private String gradoEstudio;
+    public String getGradoEstudios(){return gradoEstudio;}
+    public void setGradoEstudios(String valor){gradoEstudio = valor;}
     
     @Basic(optional=false)
     @Column(name="institucion",nullable=false)
@@ -47,16 +41,22 @@ public class Agremiado implements Serializable{
     public void setInstitucion(String valor){institucion = valor;}
     
     @Basic(optional=false)
+    @Column(name="nombre",nullable=false)
+    private String  nombre;
+    public String getNombre(){return nombre;}
+    public void setNombre(String valor){nombre = valor;}
+    
+    @Basic(optional=false)
     @Column(name="pais",nullable=false)
     private String pais;
     public String getPais(){return pais;}
     public void setPais(String valor){pais = valor;}
-
+    
     @Basic(optional=false)
-    @Column(name="gradoEstudio",nullable=false)
-    private String gradoEstudio;
-    public String getGradoEstudios(){return gradoEstudio;}
-    public void setGradoEstudios(String valor){gradoEstudio = valor;}
+    @Column(name="sexo",nullable=false)
+    private char  sexo;
+    public char getSexo(){return sexo;}
+    public void setSexo(char valor){sexo = valor;}
     
     
     /** Relaciones **/
@@ -81,5 +81,6 @@ public class Agremiado implements Serializable{
     /** Metodos
      * @return  **/
     @Override
-    public String toString(){return nombre;}
+    //return gradoEstudio + institucion + nombre + pais + sexo;
+    public String toString(){return gradoEstudio;}
 }

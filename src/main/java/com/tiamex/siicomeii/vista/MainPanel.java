@@ -52,16 +52,18 @@ public class MainPanel extends Panel{
     
     private MenuBar crearMenuPrincipal(){
         MenuBar menuPrincipal = new MenuBar();
-            menuPrincipal.setWidth("100%");
+        menuPrincipal.setWidth("100%");
         
         MenuBar.MenuItem administracion = menuPrincipal.addItem("Administración",VaadinIcons.TOOLBOX,null);
-            MenuBar.MenuItem catalogos = administracion.addItem("Catalogos",VaadinIcons.CALC_BOOK,null);
-            MenuBar.MenuItem gradoEstudio = catalogos.addItem("Grado de estudios",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getGradoEstudioDlg());});
-            MenuBar.MenuItem usuarioGrupo = catalogos.addItem("Usuario Grupo",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioGrupoDlg());});
-            MenuBar.MenuItem usuario = catalogos.addItem("Usuarios",VaadinIcons.USER,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioDlg());});
+        MenuBar.MenuItem catalogos = administracion.addItem("Catalogos",VaadinIcons.CALC_BOOK,null);
+        MenuBar.MenuItem gradoEstudio = catalogos.addItem("Grado de estudios",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getGradoEstudioDlg());});
+        MenuBar.MenuItem usuarioGrupo = catalogos.addItem("Usuario Grupo",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioGrupoDlg());});
+        MenuBar.MenuItem usuario = catalogos.addItem("Usuarios",VaadinIcons.USER,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioDlg());});
         //MenuBar.MenuItem proximoEvento = menuPrincipal.addItem("Proximos Eventos",VaadinIcons.CALENDAR_USER,null);
         MenuBar.MenuItem proximosWebinars = menuPrincipal.addItem("Proximos Webinars",VaadinIcons.CALENDAR_USER,comando -> {setContenidoPrincipal(ui.getFabricaVista().getProximoWebinarDlg());});
         MenuBar.MenuItem tutoriales = menuPrincipal.addItem("Tutoriales",VaadinIcons.DESKTOP,comando -> {setContenidoPrincipal(ui.getFabricaVista().getTutorialDlg());});
+        MenuBar.MenuItem evento = menuPrincipal.addItem("Proximos eventos",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getProximoEventoDlg());});
+        MenuBar.MenuItem agremiado = menuPrincipal.addItem("Agremiados",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getAgremiadoDlg());});
         
         //MenuBar.MenuItem usuario = menuPrincipal.addItem(ui.getUsuario().getNombre(),VaadinIcons.USER,null);
             //MenuBar.MenuItem cerrarSesion = usuario.addItem("Cerrar sesión",VaadinIcons.CLOSE,comando -> {ui.getSession().close(); ui.getPage().reload();});
