@@ -2,10 +2,12 @@ package com.tiamex.siicomeii.vista.administracion.GradoEstudio;
 
 import com.tiamex.siicomeii.controlador.ControladorGradoEstudio;
 import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
+import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Notification;
+import java.util.logging.Logger;
 
 /** @author cerimice **/
 public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
@@ -23,12 +25,16 @@ public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
 
     @Override
     protected void buttonSearchEvent(){
-        grid.setItems(ControladorGradoEstudio.getInstance().getByName(searchField.getValue()));
+        try{
+            grid.setItems(ControladorGradoEstudio.getInstance().getByName(searchField.getValue()));
+        }catch (Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+        }
     }
     
     @Override
     protected void buttonAddEvent(){
-        
+        ui.addWindow(new GradoEstudioDlgModalWin());
     }
     
     @Override
@@ -38,6 +44,7 @@ public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
     
     @Override
     protected void eventEditButtonGrid(GradoEstudio obj){
-        Element.makeNotification(obj.getId()+" | "+obj.getNombre(),Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+        ui.addWindow(new GradoEstudioDlgModalWin(obj.getId()));
     }
+    
 }

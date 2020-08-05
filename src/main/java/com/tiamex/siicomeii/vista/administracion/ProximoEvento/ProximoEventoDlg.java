@@ -3,14 +3,10 @@ package com.tiamex.siicomeii.vista.administracion.ProximoEvento;
 import com.tiamex.siicomeii.controlador.ControladorProximoEvento;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoEvento;
 import com.tiamex.siicomeii.utils.Utils;
-import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
-import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
-import com.vaadin.shared.Position;
-import com.vaadin.ui.Notification;
 import java.util.logging.Logger;
 
-/** @author cerimice **/
+/** @author fred **/
 public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
     
     public ProximoEventoDlg(){

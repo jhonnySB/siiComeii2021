@@ -1,9 +1,9 @@
-package com.tiamex.siicomeii.vista.administracion.usuarioGrupo;
+package com.tiamex.siicomeii.vista.administracion.GradoEstudio;
 
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
-import com.tiamex.siicomeii.controlador.ControladorUsuarioGrupo;
-import com.tiamex.siicomeii.persistencia.entidad.UsuarioGrupo;
+import com.tiamex.siicomeii.controlador.ControladorGradoEstudio;
+import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
@@ -13,19 +13,18 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
 
-/**
- * @author cerimice *
- */
-public final class UsuarioGrupoModalWin extends TemplateModalWin {
 
+/** @author fred **/
+public class GradoEstudioDlgModalWin extends TemplateModalWin {
+    
     private TextField nombre;
 
-    public UsuarioGrupoModalWin() {
+    public GradoEstudioDlgModalWin() {
         init();
         delete.setVisible(false);
     }
 
-    public UsuarioGrupoModalWin(long id) {
+    public GradoEstudioDlgModalWin(long id) {
         init();
         loadData(id);
         delete.setVisible(false);
@@ -42,14 +41,14 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
 
         contentLayout.addComponent(contenido);
 
-        setCaption("Usuario grupo");
+        setCaption("Grado de estudios");
         setWidth("50%");
     }
 
     @Override
     protected void loadData(long id) {
         try {
-            UsuarioGrupo obj = ControladorUsuarioGrupo.getInstance().getById(id);
+            GradoEstudio obj = ControladorGradoEstudio.getInstance().getById(id);
             this.id = obj.getId();
             nombre.setValue(obj.getNombre());
         } catch (Exception ex) {
@@ -60,7 +59,7 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
     @Override
     protected void buttonDeleteEvent() {
         try {
-            ControladorUsuarioGrupo.getInstance().delete(id);
+            ControladorGradoEstudio.getInstance().delete(id);
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -69,13 +68,13 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
     @Override
     protected void buttonAcceptEvent() {
         try {
-            UsuarioGrupo obj = new UsuarioGrupo();
+            GradoEstudio obj = new GradoEstudio();
             obj.setId(id);
             obj.setNombre(nombre.getValue());
-            obj = ControladorUsuarioGrupo.getInstance().save(obj);
+            obj = ControladorGradoEstudio.getInstance().save(obj);
             if (obj != null) {
                 Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                ui.getFabricaVista().getUsuarioGrupoDlg().updateDlg();
+                ui.getFabricaVista().getGradoEstudioDlg().updateDlg();
                 close();
             }
         } catch (Exception ex) {
@@ -87,5 +86,4 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
     protected void buttonCancelEvent() {
         close();
     }
-
 }

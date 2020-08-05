@@ -20,49 +20,61 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import javax.servlet.annotation.WebServlet;
 
-/** @author cerimice **/
-
+/**
+ * @author cerimice *
+ */
 @SpringUI
 @PreserveOnRefresh
 @Viewport("width=device-width, initial-scale=1")
 @StyleSheet({"https://fonts.googleapis.com/css?family=Montserrat&display=swap"})
-public class SiiComeiiUI extends UI{
-    
+public class SiiComeiiUI extends UI {
+
     private FabricaVista fabricaVista;
-    public FabricaVista getFabricaVista(){
-        if(fabricaVista == null){fabricaVista = new FabricaVista();}
+
+    public FabricaVista getFabricaVista() {
+        if (fabricaVista == null) {
+            fabricaVista = new FabricaVista();
+        }
         return fabricaVista;
     }
-    
+
     private Usuario usuario;
-    public Usuario getUsuario(){return usuario;}
-    public void setUsuario(Usuario valor){usuario = valor;}
-    
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario valor) {
+        usuario = valor;
+    }
+
     @Override
-    protected void init(VaadinRequest request){
-        
+    protected void init(VaadinRequest request) {
+
         ResponsiveLayout contenido = new ResponsiveLayout();
-            contenido.setWidth("100%");
-        
+        contenido.setWidth("100%");
+
         TextField user = new TextField();
-            Element.cfgComponent(user,"Usuario");
+        Element.cfgComponent(user, "Usuario");
         TextField pass = new PasswordField();
-            Element.cfgComponent(pass,"Password");
-        Button accesar = new Button("Accesar");
-            Element.cfgComponent(accesar);
-            accesar.addClickListener(event -> {setContent(getFabricaVista().getMainPanel());});
+        Element.cfgComponent(pass, "Password");
+        Button accesar = new Button("Login/Sign in");
+        Element.cfgComponent(accesar);
+        accesar.addClickListener(event -> {
+            setContent(getFabricaVista().getMainPanel());
+        });
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
-            row1.addColumn().withDisplayRules(12,12,10,8).withComponent(user);
-            row1.addColumn().withDisplayRules(12,12,10,8).withComponent(pass);
-            row1.addColumn().withDisplayRules(12,12,10,8).withComponent(accesar);
-        
+        row1.addColumn().withDisplayRules(12, 12, 10, 8).withComponent(user);
+        row1.addColumn().withDisplayRules(12, 12, 10, 8).withComponent(pass);
+        row1.addColumn().withDisplayRules(12, 12, 10, 8).withComponent(accesar);
+
         //setContent(getFabricaVista().getMainPanel());
         setContent(contenido);
         //setContent(new EjemploLayout());
     }
-    
+
     @WebServlet(urlPatterns = "/*", name = "SiiComeiiUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = SiiComeiiUI.class, productionMode = true)
-    public static class EsafMorelos2UIServlet extends VaadinServlet{
+    public static class EsafMorelos2UIServlet extends VaadinServlet {
     }
 }

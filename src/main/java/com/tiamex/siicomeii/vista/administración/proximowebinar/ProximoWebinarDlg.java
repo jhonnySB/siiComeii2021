@@ -1,4 +1,4 @@
-package com.tiamex.siicomeii.vista.proximowebinar;
+package com.tiamex.siicomeii.vista.administración.proximowebinar;
 
 import com.tiamex.siicomeii.controlador.ControladorProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
@@ -43,13 +43,9 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     protected void gridEvent() {
     }
     
-    protected void eventEditButtonGrid(Usuario obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     @Override
     protected void eventEditButtonGrid(ProximoWebinar obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ui.addWindow(new ProximoWebinarModalWin(obj.getId()));
     }
     
 }

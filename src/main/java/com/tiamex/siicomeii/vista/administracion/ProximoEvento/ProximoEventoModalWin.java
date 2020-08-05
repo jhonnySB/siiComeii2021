@@ -2,16 +2,12 @@ package com.tiamex.siicomeii.vista.administracion.ProximoEvento;
 
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
-import com.sun.tools.javac.resources.compiler;
 import com.tiamex.siicomeii.controlador.ControladorProximoEvento;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoEvento;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.shared.Position;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.DateTimeField;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.*;
 import java.util.logging.Logger;
 
@@ -32,6 +28,7 @@ public class ProximoEventoModalWin extends TemplateModalWin {
     public ProximoEventoModalWin(long id) {
         init();
         loadData(id);
+        delete.setVisible(false);
     }
 
     private void init() {
@@ -69,10 +66,7 @@ public class ProximoEventoModalWin extends TemplateModalWin {
     @Override
     protected void loadData(long id) {
         try {
-            ProximoEvento obj = ControladorProximoEvento.getInstance().getById(id);
-            //LocalDateTime currentDateTime = obj.getFecha();
-            //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            
+            ProximoEvento obj = ControladorProximoEvento.getInstance().getById(id);            
 
             this.id = obj.getId();
             descripcion.setValue(obj.getDescripcion());

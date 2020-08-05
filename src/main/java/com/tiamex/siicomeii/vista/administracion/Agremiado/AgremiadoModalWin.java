@@ -30,6 +30,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
     public AgremiadoModalWin(long id) {
         init();
         loadData(id);
+        delete.setVisible(false);
     }
 
     private void init() {

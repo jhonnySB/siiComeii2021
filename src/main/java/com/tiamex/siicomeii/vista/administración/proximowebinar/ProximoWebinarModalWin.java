@@ -1,12 +1,10 @@
-package com.tiamex.siicomeii.vista.proximowebinar;
+package com.tiamex.siicomeii.vista.administración.proximowebinar;
 
 import com.jarektoro.responsivelayout.ResponsiveColumn;
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorProximoWebinar;
-import com.tiamex.siicomeii.controlador.ControladorUsuarioGrupo;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
-import com.tiamex.siicomeii.persistencia.entidad.UsuarioGrupo;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
@@ -38,6 +36,7 @@ public final class ProximoWebinarModalWin extends TemplateModalWin{
     public ProximoWebinarModalWin(long id){
         init();
         loadData(id);
+        delete.setVisible(false);
     }
     
     private void init(){
@@ -86,6 +85,12 @@ public final class ProximoWebinarModalWin extends TemplateModalWin{
             ProximoWebinar obj = ControladorProximoWebinar.getInstance().getById(id);
             this.id = obj.getId();
             nombre.setValue(obj.getNombre());
+            titulo.setValue(obj.getTitulo());
+            ponente.setValue(obj.getPonente());
+            institucion.setValue(obj.getInstitucion());
+            //fecha.setValue(obj.getFecha());
+            usuario.setValue(obj.getUsuario());
+            //imagen.setValue(obj.getImagen());
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -94,7 +99,7 @@ public final class ProximoWebinarModalWin extends TemplateModalWin{
     @Override
     protected void buttonDeleteEvent(){
         try{
-            ControladorUsuarioGrupo.getInstance().delete(id);
+            ControladorProximoWebinar.getInstance().delete(id);
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -103,13 +108,13 @@ public final class ProximoWebinarModalWin extends TemplateModalWin{
     @Override
     protected void buttonAcceptEvent(){
         try{
-            UsuarioGrupo obj = new UsuarioGrupo();
+            ProximoWebinar obj = new ProximoWebinar();
                 obj.setId(id);
                 obj.setNombre(nombre.getValue());
-            obj = ControladorUsuarioGrupo.getInstance().save(obj);
+            obj = ControladorProximoWebinar.getInstance().save(obj);
             if(obj != null){
                 Element.makeNotification("Datos guardados",Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                ui.getFabricaVista().getUsuarioGrupoDlg().updateDlg();
+                ui.getFabricaVista().getProximoWebinarDlg().updateDlg();
                 close();
             }
         }catch (Exception ex){

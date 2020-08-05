@@ -1,14 +1,12 @@
-package com.tiamex.siicomeii.vista.tutorial;
+package com.tiamex.siicomeii.vista.administracion.tutorial;
 
 import com.tiamex.siicomeii.controlador.ControladorTutorial;
-import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.Tutorial;
-import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
 import java.util.logging.Logger;
 
-/** @author cerimice **/
+/** @author fred **/
 public class TutorialDlg extends TemplateDlg<Tutorial>{
     
     public TutorialDlg(){
@@ -42,17 +40,9 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
     protected void gridEvent() {
     }
     
-    protected void eventEditButtonGrid(Usuario obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    protected void eventEditButtonGrid(ProximoWebinar obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     @Override
     protected void eventEditButtonGrid(Tutorial obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ui.addWindow(new TutorialModalWin(obj.getId()));
     }
     
 }
