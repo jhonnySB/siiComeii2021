@@ -5,7 +5,7 @@ import com.tiamex.siicomeii.vista.administracion.GradoEstudio.GradoEstudioDlg;
 import com.tiamex.siicomeii.vista.administracion.ProximoEvento.ProximoEventoDlg;
 import com.tiamex.siicomeii.vista.administracion.usuario.UsuarioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuarioGrupo.UsuarioGrupoDlg;
-import com.tiamex.siicomeii.vista.administración.proximowebinar.ProximoWebinarDlg;
+import com.tiamex.siicomeii.vista.administracion.proximowebinar.ProximoWebinarDlg;
 import com.tiamex.siicomeii.vista.administracion.tutorial.TutorialDlg;
 
 /** @author fred **/
