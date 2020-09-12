@@ -84,7 +84,6 @@ public final class ProximoWebinarModalWin extends TemplateModalWin{
         try{
             ProximoWebinar obj = ControladorProximoWebinar.getInstance().getById(id);
             this.id = obj.getId();
-            nombre.setValue(obj.getNombre());
             titulo.setValue(obj.getTitulo());
             ponente.setValue(obj.getPonente());
             institucion.setValue(obj.getInstitucion());
@@ -110,7 +109,6 @@ public final class ProximoWebinarModalWin extends TemplateModalWin{
         try{
             ProximoWebinar obj = new ProximoWebinar();
                 obj.setId(id);
-                obj.setNombre(nombre.getValue());
             obj = ControladorProximoWebinar.getInstance().save(obj);
             if(obj != null){
                 Element.makeNotification("Datos guardados",Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());

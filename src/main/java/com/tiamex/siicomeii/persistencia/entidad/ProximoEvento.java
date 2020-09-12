@@ -27,12 +27,6 @@ public class ProximoEvento implements Serializable{
     public void setId(long valor){id = valor;}
     
     @Basic(optional=false)
-    @Column(name="nombre",nullable=false)
-    private String  nombre;
-    public String getNombre(){return nombre;}
-    public void setNombre(String valor){nombre = valor;}
-    
-    @Basic(optional=false)
     @Column(name="titulo",nullable=false)
     private String  titulo;
     public String getTitulo(){return titulo;}
@@ -75,5 +69,5 @@ public class ProximoEvento implements Serializable{
     /** Metodos
      * @return  **/
     @Override
-    public String toString(){return nombre;}
+    public String toString(){return titulo;}
 }

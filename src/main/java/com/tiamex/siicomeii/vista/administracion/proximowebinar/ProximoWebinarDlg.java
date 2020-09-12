@@ -15,9 +15,8 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     }
     
     private void init(){
-        grid.addColumn(ProximoWebinar::getImagen).setCaption("Imagen");
-        grid.addColumn(ProximoWebinar::getNombre).setCaption("Nombre");
         grid.addColumn(ProximoWebinar::getTitulo).setCaption("Titulo");
+        grid.addColumn(ProximoWebinar::getImagen).setCaption("Imagen");
         grid.addColumn(ProximoWebinar::getPonente).setCaption("Ponente");
         grid.addColumn(ProximoWebinar::getInstitucion).setCaption("Institución");
         grid.addColumn(ProximoWebinar::getFecha).setCaption("Fecha");

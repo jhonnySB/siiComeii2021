@@ -72,7 +72,6 @@ public class ProximoEventoModalWin extends TemplateModalWin {
             descripcion.setValue(obj.getDescripcion());
             fecha.setValue(obj.getFecha());
             imagen.setValue(obj.getImagen());
-            nombre.setValue(obj.getNombre());
             titulo.setValue(obj.getTitulo());
             usuario.setValue(Long.toString(obj.getUsuario()));
         } catch (Exception ex) {
@@ -97,7 +96,6 @@ public class ProximoEventoModalWin extends TemplateModalWin {
             obj.setDescripcion(descripcion.getValue());
             obj.setFecha(fecha.getValue());
             obj.setImagen(imagen.getValue());
-            obj.setNombre(nombre.getValue());
             obj.setTitulo(titulo.getValue());
             obj.setUsuario(Long.parseLong(usuario.getValue()));
 
