@@ -30,9 +30,9 @@ public class Agremiado implements Serializable{
     
     @Basic(optional=false)
     @Column(name="gradoEstudio",nullable=false)
-    private String gradoEstudio;
-    public String getGradoEstudios(){return gradoEstudio;}
-    public void setGradoEstudios(String valor){gradoEstudio = valor;}
+    private long gradoEstudio;
+    public long getGradoEstudios(){return gradoEstudio;}
+    public void setGradoEstudios(long valor){gradoEstudio = valor;}
     
     @Basic(optional=false)
     @Column(name="institucion",nullable=false)
@@ -48,9 +48,9 @@ public class Agremiado implements Serializable{
     
     @Basic(optional=false)
     @Column(name="pais",nullable=false)
-    private String pais;
-    public String getPais(){return pais;}
-    public void setPais(String valor){pais = valor;}
+    private long pais;
+    public long getPais(){return pais;}
+    public void setPais(long valor){pais = valor;}
     
     @Basic(optional=false)
     @Column(name="sexo",nullable=false)
@@ -82,5 +82,5 @@ public class Agremiado implements Serializable{
      * @return  **/
     @Override
     //return gradoEstudio + institucion + nombre + pais + sexo;
-    public String toString(){return gradoEstudio;}
+    public String toString(){return institucion;}
 }

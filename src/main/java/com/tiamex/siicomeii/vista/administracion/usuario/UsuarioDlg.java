@@ -3,11 +3,7 @@ package com.tiamex.siicomeii.vista.administracion.usuario;
 import com.tiamex.siicomeii.controlador.ControladorUsuario;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.utils.Utils;
-import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
-import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
-import com.vaadin.shared.Position;
-import com.vaadin.ui.Notification;
 import java.util.logging.Logger;
 
 /** @author cerimice **/

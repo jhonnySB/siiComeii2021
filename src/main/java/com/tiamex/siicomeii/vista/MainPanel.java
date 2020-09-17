@@ -59,9 +59,14 @@ public class MainPanel extends Panel{
         MenuBar.MenuItem gradoEstudio = catalogos.addItem("Grado de estudios",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getGradoEstudioDlg());});
         MenuBar.MenuItem usuarioGrupo = catalogos.addItem("Usuario Grupo",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioGrupoDlg());});
         MenuBar.MenuItem usuario = catalogos.addItem("Usuarios",VaadinIcons.USER,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioDlg());});
+        MenuBar.MenuItem pais = catalogos.addItem("Paises",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getPaisDlg());});
+        
         MenuBar.MenuItem proximosWebinar = menuPrincipal.addItem("Proximos Webinars",VaadinIcons.CALENDAR_USER,comando -> {setContenidoPrincipal(ui.getFabricaVista().getProximoWebinarDlg());});
+        
         MenuBar.MenuItem tutorial = menuPrincipal.addItem("Tutoriales",VaadinIcons.DESKTOP,comando -> {setContenidoPrincipal(ui.getFabricaVista().getTutorialDlg());});
+        
         MenuBar.MenuItem evento = menuPrincipal.addItem("Proximos eventos",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getProximoEventoDlg());});
+        
         MenuBar.MenuItem agremiado = menuPrincipal.addItem("Agremiados",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getAgremiadoDlg());});
         
         

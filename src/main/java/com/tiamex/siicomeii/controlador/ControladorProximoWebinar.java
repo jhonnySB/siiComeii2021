@@ -37,9 +37,7 @@ public class ControladorProximoWebinar extends GenericController<ServicioProximo
             return getService().save(obj);
         }
         
-        //oldObj.setActivo(obj.getActivo());
-        //oldObj.setCambiarPassword(obj.getCambiarPassword());
-        //oldObj.setNombre(obj.getNombre());
+        oldObj.setFecha(obj.getFecha());
         return getService().save(obj);
     }
     

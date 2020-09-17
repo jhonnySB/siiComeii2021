@@ -1,10 +1,10 @@
 package com.tiamex.siicomeii.controlador;
 
-import com.tiamex.siicomeii.persistencia.entidad.Usuario;
-import com.tiamex.siicomeii.persistencia.servicio.ServicioUsuario;
+import com.tiamex.siicomeii.persistencia.entidad.Pais;
+import com.tiamex.siicomeii.persistencia.servicio.ServicioPais;
 
-/** @author cerimice **/
-public class ControladorPais extends GenericController<ServicioUsuario,Usuario,Long>{
+/** @author fred **/
+public class ControladorPais extends GenericController<ServicioPais,Pais,Long>{
     
     private static ControladorPais INSTANCE;
     public static ControladorPais getInstance(){
@@ -12,19 +12,34 @@ public class ControladorPais extends GenericController<ServicioUsuario,Usuario,L
         return INSTANCE;
     }
     
+    /* DESCRIPCIÓN: Constructor de la clase para inicializar el servicio mediante la instancia de la clase ServicioUsuarioGrupo
+       ENTRADAS: No recibe ningún parámetro.
+       SALIDAS: No regresa nada.
+    */
     private ControladorPais(){
-        service = ServicioUsuario.getInstance();
+        service = ServicioPais.getInstance();
     }
 
+    /* DESCRIPCIÓN: Función abstracta que sobreescribe a la función de la clase padre GenericController para hacer la validación
+                    de los atributos o campos de la entidad "Usuario Grupo" que son: id y nombre.
+       ENTRADAS: Recibe como parámetros una instancia de la clase "Usuario Grupo" para validar sus campos.
+       SALIDAS: Regresa un booleano "true" todos los campos ingresados son correctos, de lo contrario lanza una excepción que la 
+                maneja la clase Exception.
+    */ 
     @Override
-    protected boolean validate(Usuario obj) throws Exception{
+    protected boolean validate(Pais obj) throws Exception{
         if(obj.getId() < 0){throw new Exception("El ID no es valido");}
-        
+        if(obj.getNombre().isEmpty()){throw new Exception("Es necesario proporcionar el nombre");}
         return true;
     }
 
+    /* DESCRIPCIÓN: Función abstracta que sobreescribe a la función de la clase padre GenericController para el guardado de un nuevo
+                    registro de "Usuario Grupo" y del editado de un registro existente.
+       ENTRADAS: Recibe como parámetros una instancia de la clase "Usuario Grupo".
+       SALIDAS: Regresa el registro guardado que llama de la clase GenericDao una vez que se guarda en la base de datos.
+    */
     @Override
-    public Usuario save(Usuario obj) throws Exception{
+    public Pais save(Pais obj) throws Exception{
         if(validate(obj)){
             if(obj.getId() == 0){
                 obj.setId(getService().generateId());
@@ -32,14 +47,12 @@ public class ControladorPais extends GenericController<ServicioUsuario,Usuario,L
             }
         }
         
-        Usuario oldObj = getService().getById(obj.getId());
+        Pais oldObj = getService().getById(obj.getId());
         if(oldObj == null){
             return getService().save(obj);
         }
         
-        //oldObj.setActivo(obj.getActivo());
-        //oldObj.setCambiarPassword(obj.getCambiarPassword());
-        //oldObj.setNombre(obj.getNombre());
+        oldObj.setNombre(obj.getNombre());
         return getService().save(obj);
     }
     

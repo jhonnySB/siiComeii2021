@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 /** @author fred **/
 public class ProximoEventoModalWin extends TemplateModalWin {
-    private TextField descripcion;
+    private TextArea descripcion;
     private DateTimeField fecha;
     private TextField imagen;
     private TextField nombre;
@@ -35,7 +35,7 @@ public class ProximoEventoModalWin extends TemplateModalWin {
         ResponsiveLayout contenido = new ResponsiveLayout();
         Element.cfgLayoutComponent(contenido);
 
-        descripcion = new TextField();
+        descripcion = new TextArea();
         fecha = new DateTimeField();
         imagen = new TextField();
         nombre = new TextField();

@@ -3,12 +3,17 @@ package com.tiamex.siicomeii.vista.administracion.Agremiado;
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
+import com.tiamex.siicomeii.controlador.ControladorGradoEstudio;
+import com.tiamex.siicomeii.controlador.ControladorPais;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
+import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
+import com.tiamex.siicomeii.persistencia.entidad.Pais;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
@@ -16,10 +21,10 @@ import java.util.logging.Logger;
 /** @author fred **/
 public class AgremiadoModalWin extends TemplateModalWin {
 
-    private TextField gradoEstudio;
+    private ComboBox <GradoEstudio> gradoEstudio;
     private TextField institucion;
     private TextField nombre;
-    private TextField pais;
+    private ComboBox <Pais> pais;
     private TextField sexo;
 
     public AgremiadoModalWin() {
@@ -37,24 +42,34 @@ public class AgremiadoModalWin extends TemplateModalWin {
         ResponsiveLayout contenido = new ResponsiveLayout();
         Element.cfgLayoutComponent(contenido);
 
-        gradoEstudio = new TextField();
+        gradoEstudio = new ComboBox<>();
+        Element.cfgComponent(gradoEstudio, "Grado Estudios"); 
+        
         institucion = new TextField();
-        nombre = new TextField();
-        pais = new TextField();
-        sexo = new TextField();
-
-        Element.cfgComponent(gradoEstudio, "Grado Estudios");
         Element.cfgComponent(institucion, "Institución");
+        
+        nombre = new TextField();
         Element.cfgComponent(nombre, "Nombre");
+        
+        pais = new ComboBox<>();
         Element.cfgComponent(pais, "País");
-        Element.cfgComponent(sexo, "Sexo");
-
+        
+        sexo = new TextField();
+        Element.cfgComponent(sexo, "Sexo");   
+        
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(gradoEstudio);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(pais);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(sexo);
+        
+        try{
+            gradoEstudio.setItems(ControladorGradoEstudio.getInstance().getAll());
+            pais.setItems(ControladorPais.getInstance().getAll());
+        }catch(Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+        }
 
         contentLayout.addComponent(contenido);
 
@@ -67,10 +82,10 @@ public class AgremiadoModalWin extends TemplateModalWin {
         try {
             Agremiado obj = ControladorAgremiado.getInstance().getById(id);
             this.id = obj.getId();
-            gradoEstudio.setValue(obj.getGradoEstudios());
+            gradoEstudio.setValue(obj.getObjGradoEstudio());
             institucion.setValue(obj.getInstitucion());
             nombre.setValue(obj.getNombre());
-            pais.setValue(obj.getPais());
+            pais.setValue(obj.getObjPais());
             sexo.setValue(String.valueOf(obj.getSexo()));
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
@@ -91,10 +106,10 @@ public class AgremiadoModalWin extends TemplateModalWin {
         try {
             Agremiado obj = new Agremiado();
             obj.setId(id);
-            obj.setGradoEstudios(gradoEstudio.getValue());
+            obj.setGradoEstudios(gradoEstudio.getValue()==null?0:gradoEstudio.getValue().getId());
             obj.setInstitucion(institucion.getValue());
             obj.setNombre(nombre.getValue());
-            obj.setPais(pais.getValue());
+            obj.setPais(pais.getValue()==null?0:pais.getValue().getId());
             obj.setSexo(sexo.getValue().charAt(0));
 
             obj = ControladorAgremiado.getInstance().save(obj);

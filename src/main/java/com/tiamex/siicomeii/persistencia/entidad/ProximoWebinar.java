@@ -12,7 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.Table;
 
-/** @author cerimice **/
+/** @author fred **/
 
 @Entity
 @Table(name="proximoWebinar")

@@ -17,7 +17,7 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
         grid.addColumn(Tutorial::getNombre).setCaption("Nombre");
         grid.addColumn(Tutorial::getTutor).setCaption("Tutor");
         grid.addColumn(Tutorial::getInstitucion).setCaption("Institución");
-        grid.addColumn(Tutorial::getUsuario).setCaption("Usuario");
+        grid.addColumn(Tutorial::getObjUsuario).setCaption("Usuario");
               
         buttonSearchEvent();
     }
