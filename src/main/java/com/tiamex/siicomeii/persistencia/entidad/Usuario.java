@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -19,6 +20,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="usuario")
 @NamedQueries({
+    @NamedQuery(name="Usuario.getByEmail",query="SELECT t FROM Usuario t WHERE t.correo IN (:correo)")
 })
 public class Usuario implements Serializable{
     @Id

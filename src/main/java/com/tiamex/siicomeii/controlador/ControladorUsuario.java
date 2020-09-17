@@ -2,6 +2,8 @@ package com.tiamex.siicomeii.controlador;
 
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.persistencia.servicio.ServicioUsuario;
+import com.tiamex.siicomeii.utils.Utils;
+import java.util.logging.Logger;
 
 /** @author cerimice **/
 public class ControladorUsuario extends GenericController<ServicioUsuario,Usuario,Long>{
@@ -46,4 +48,17 @@ public class ControladorUsuario extends GenericController<ServicioUsuario,Usuari
         return getService().save(obj);
     }
     
+    public Usuario login(String correo,String password) throws Exception{
+        try{
+            if(correo.isEmpty()){throw new Exception("Es necesario proporcionar el correo");}
+            if(password.isEmpty()){throw new Exception("Es necesario proporcionar la contraseña");}
+            Usuario usuario = getService().getByEmail(correo);
+            if(usuario == null){throw new Exception("El usuario no existe");}
+            if(!usuario.getPassword().equals(password)){throw new Exception("Contraseña no valida");}
+            return usuario;
+        }catch(Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+            throw ex;
+        }
+    }
 }

@@ -118,7 +118,7 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                 ui.getFabricaVista().getUsuarioDlg().updateDlg();
                 close();
             }
-        } catch (Exception ex) {
+        }catch(Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }

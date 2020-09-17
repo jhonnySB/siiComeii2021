@@ -9,6 +9,7 @@ import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.*;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 /** @author fred **/
@@ -18,7 +19,6 @@ public class ProximoEventoModalWin extends TemplateModalWin {
     private TextField imagen;
     private TextField nombre;
     private TextField titulo;
-    private TextField usuario;
 
     public ProximoEventoModalWin() {
         init();
@@ -37,17 +37,18 @@ public class ProximoEventoModalWin extends TemplateModalWin {
 
         descripcion = new TextArea();
         fecha = new DateTimeField();
+            fecha.setRequiredIndicatorVisible(true);
+            fecha.setValue(LocalDateTime.now().withHour(11).withMinute(00).plusDays(1));
+            fecha.setRangeStart(fecha.getValue().minusDays(1));
         imagen = new TextField();
         nombre = new TextField();
         titulo = new TextField();
-        usuario = new TextField();
 
         Element.cfgComponent(descripcion, "Descipción");
         Element.cfgComponent(fecha, "Fecha");
         Element.cfgComponent(imagen, "Imagen");
         Element.cfgComponent(nombre, "Nombre");
         Element.cfgComponent(titulo, "Título");
-        Element.cfgComponent(usuario, "Usuario");
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(descripcion);
@@ -55,7 +56,6 @@ public class ProximoEventoModalWin extends TemplateModalWin {
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(imagen);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(titulo);
-        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(usuario);
 
         contentLayout.addComponent(contenido);
 
@@ -73,7 +73,6 @@ public class ProximoEventoModalWin extends TemplateModalWin {
             fecha.setValue(obj.getFecha());
             imagen.setValue(obj.getImagen());
             titulo.setValue(obj.getTitulo());
-            usuario.setValue(Long.toString(obj.getUsuario()));
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -97,7 +96,7 @@ public class ProximoEventoModalWin extends TemplateModalWin {
             obj.setFecha(fecha.getValue());
             obj.setImagen(imagen.getValue());
             obj.setTitulo(titulo.getValue());
-            obj.setUsuario(Long.parseLong(usuario.getValue()));
+            obj.setUsuario(ui.getUsuario().getId());
 
             obj = ControladorProximoEvento.getInstance().save(obj);
             if (obj != null) {

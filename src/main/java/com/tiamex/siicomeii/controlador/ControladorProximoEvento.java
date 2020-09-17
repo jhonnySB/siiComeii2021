@@ -37,9 +37,10 @@ public class ControladorProximoEvento extends GenericController<ServicioProximoE
             return getService().save(obj);
         }
         
-        //oldObj.setActivo(obj.getActivo());
-        //oldObj.setCambiarPassword(obj.getCambiarPassword());
-        //oldObj.setNombre(obj.getNombre());
+        oldObj.setDescripcion(obj.getDescripcion());
+        oldObj.setFecha(obj.getFecha());
+        oldObj.setImagen(obj.getImagen());
+        oldObj.setTitulo(obj.getTitulo());
         return getService().save(obj);
     }
     
