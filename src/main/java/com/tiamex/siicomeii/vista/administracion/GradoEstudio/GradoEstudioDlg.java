@@ -1,12 +1,8 @@
 package com.tiamex.siicomeii.vista.administracion.GradoEstudio;
-
 import com.tiamex.siicomeii.controlador.ControladorGradoEstudio;
 import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
 import com.tiamex.siicomeii.utils.Utils;
-import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
-import com.vaadin.shared.Position;
-import com.vaadin.ui.Notification;
 import java.util.logging.Logger;
 
 /** @author cerimice **/

@@ -7,16 +7,18 @@ import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
+import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
 
-
-/** @author fred **/
+/**
+ * @author fred *
+ */
 public class GradoEstudioDlgModalWin extends TemplateModalWin {
-    
+
     private TextField nombre;
 
     public GradoEstudioDlgModalWin() {
@@ -35,6 +37,7 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
         Element.cfgLayoutComponent(contenido);
 
         nombre = new TextField();
+        nombre.setRequiredIndicatorVisible(true);
         Element.cfgComponent(nombre, "Nombre");
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
@@ -70,13 +73,19 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
         try {
             GradoEstudio obj = new GradoEstudio();
             obj.setId(id);
-            obj.setNombre(nombre.getValue());
-            obj = ControladorGradoEstudio.getInstance().save(obj);
-            if (obj != null) {
-                Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                ui.getFabricaVista().getGradoEstudioDlg().updateDlg();
-                close();
+
+            if ("".equals(nombre.getValue())) {
+                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+            } else {
+                obj.setNombre(nombre.getValue());
+                obj = ControladorGradoEstudio.getInstance().save(obj);
+                if (obj != null) {
+                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                    ui.getFabricaVista().getGradoEstudioDlg().updateDlg();
+                    close();
+                }
             }
+
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

@@ -7,33 +7,37 @@ import com.tiamex.siicomeii.persistencia.entidad.Pais;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
+import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
 
-/** @author fred **/
-public class PaisModalWin extends TemplateModalWin{
-    
+/**
+ * @author fred *
+ */
+public class PaisModalWin extends TemplateModalWin {
+
     private TextField nombre;
-    
+
     public PaisModalWin() {
         init();
         delete.setVisible(false);
     }
-    
+
     public PaisModalWin(long id) {
         init();
         loadData(id);
         delete.setVisible(false);
     }
-    
+
     private void init() {
         ResponsiveLayout contenido = new ResponsiveLayout();
         Element.cfgLayoutComponent(contenido);
 
         nombre = new TextField();
+            nombre.setRequiredIndicatorVisible(true);
         Element.cfgComponent(nombre, "Nombre");
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
@@ -43,18 +47,19 @@ public class PaisModalWin extends TemplateModalWin{
         setCaption("País");
         setWidth("50%");
     }
-    
+
     @Override
     protected void loadData(long id) {
         try {
             Pais obj = ControladorPais.getInstance().getById(id);
             this.id = obj.getId();
             nombre.setValue(obj.getNombre());
+
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     @Override
     protected void buttonDeleteEvent() {
         try {
@@ -63,27 +68,33 @@ public class PaisModalWin extends TemplateModalWin{
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     @Override
     protected void buttonAcceptEvent() {
         try {
             Pais obj = new Pais();
             obj.setId(id);
-            obj.setNombre(nombre.getValue());
-            obj = ControladorPais.getInstance().save(obj);
-            if (obj != null) {
-                Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                ui.getFabricaVista().getPaisDlg().updateDlg();
-                close();
+
+            if ("".equals(nombre.getValue())) {
+                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+            } else {
+                obj.setNombre(nombre.getValue());
+                obj = ControladorPais.getInstance().save(obj);
+                if (obj != null) {
+                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                    ui.getFabricaVista().getPaisDlg().updateDlg();
+                    close();
+                }
             }
+
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     @Override
     protected void buttonCancelEvent() {
         close();
     }
-    
+
 }

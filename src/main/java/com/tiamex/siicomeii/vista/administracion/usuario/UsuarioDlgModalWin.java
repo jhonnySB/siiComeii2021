@@ -9,6 +9,8 @@ import com.tiamex.siicomeii.persistencia.entidad.UsuarioGrupo;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
+import com.vaadin.data.Binder;
+import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
@@ -18,26 +20,28 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
 
-/** @author fred **/
+/**
+ * @author fred *
+ */
 public class UsuarioDlgModalWin extends TemplateModalWin {
-    
+
     private CheckBox activo;
     private TextField correo;
     private TextField nombre;
     private PasswordField password;
     private ComboBox<UsuarioGrupo> usuarioGrupo;
-    
+
     public UsuarioDlgModalWin() {
         init();
         delete.setVisible(false);
     }
-    
+
     public UsuarioDlgModalWin(long id) {
         init();
         loadData(id);
         delete.setVisible(false);
     }
-    
+
     private void init() {
         ResponsiveLayout contenido = new ResponsiveLayout();
         Element.cfgLayoutComponent(contenido);
@@ -45,29 +49,33 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
         activo = new CheckBox();
         Element.cfgComponent(activo, "Activo/Inactivo");
         activo.setValue(true);
-        
+
         correo = new TextField();
         Element.cfgComponent(correo, "Correo electrónico");
-        
+        correo.setRequiredIndicatorVisible(true);
+
         nombre = new TextField();
         Element.cfgComponent(nombre, "Nombre");
-        
+        nombre.setRequiredIndicatorVisible(true);
+
         password = new PasswordField();
         Element.cfgComponent(password, "Contraseña");
-        
+        password.setRequiredIndicatorVisible(true);
+
         usuarioGrupo = new ComboBox<>();
         Element.cfgComponent(usuarioGrupo, "Grupo de usuario");
-        
+        usuarioGrupo.setRequiredIndicatorVisible(true);
+
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(activo);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(correo);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(password);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(usuarioGrupo);
-        
-        try{
+
+        try {
             usuarioGrupo.setItems(ControladorUsuarioGrupo.getInstance().getAll());
-        }catch(Exception ex){
+        } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
 
@@ -75,8 +83,8 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
 
         setCaption("Usuario");
         setWidth("50%");
-    } 
-    
+    }
+
     @Override
     protected void loadData(long id) {
         try {
@@ -91,7 +99,7 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     @Override
     protected void buttonDeleteEvent() {
         try {
@@ -100,32 +108,46 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     @Override
     protected void buttonAcceptEvent() {
         try {
-            Usuario obj = new Usuario();
-            obj.setId(id);
-            obj.setActivo(activo.getValue());
-            obj.setCorreo(correo.getValue());
-            obj.setNombre(nombre.getValue());
-            obj.setPassword(password.getValue());
-            obj.setUsuarioGrupo(usuarioGrupo.getValue()==null?0:usuarioGrupo.getValue().getId());
+            if (validarCampos()) {
+                Usuario obj = new Usuario();
+                obj.setId(id);
+                obj.setActivo(activo.getValue());
+                obj.setCorreo(correo.getValue());
+                obj.setNombre(nombre.getValue());
+                obj.setPassword(password.getValue());
+                obj.setUsuarioGrupo(usuarioGrupo.getValue() == null ? 0 : usuarioGrupo.getValue().getId());
 
-            obj = ControladorUsuario.getInstance().save(obj);
-            if (obj != null) {
-                Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                ui.getFabricaVista().getUsuarioDlg().updateDlg();
-                close();
+                obj = ControladorUsuario.getInstance().save(obj);
+                if (obj != null) {
+                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                    ui.getFabricaVista().getUsuarioDlg().updateDlg();
+                    close();
+                }
+            } else {
+
             }
-        }catch(Exception ex){
+
+        } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     @Override
     protected void buttonCancelEvent() {
         close();
     }
-            
+
+    private boolean validarCampos() {
+        Binder<Usuario> binder = new Binder<>();
+        binder.forField(correo).asRequired("Campo requerido").withValidator(new EmailValidator("Ingrese un correo válido")).bind(Usuario::getCorreo,Usuario::setCorreo) ;
+        binder.forField(nombre).asRequired("Campo requerido").bind(Usuario::getNombre,Usuario::setNombre);
+        binder.forField(password).asRequired("Campo requerido").bind(Usuario::getPassword,Usuario::setPassword);
+        
+        return binder.validate().isOk();
+    }
+
 }
