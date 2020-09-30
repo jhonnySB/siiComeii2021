@@ -37,7 +37,7 @@ public class Usuario implements Serializable{
     public void setNombre(String valor){nombre = valor;}
     
     @Basic(optional=false)
-    @Column(name="correo",nullable=false)
+    @Column(name="correo",nullable=false,unique=true)
     private String  correo;
     public String getCorreo(){return correo;}
     public void setCorreo(String valor){correo = valor;}
