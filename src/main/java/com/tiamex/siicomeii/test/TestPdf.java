@@ -20,7 +20,8 @@ public class TestPdf{
                 cad += a;
             }
             
-            
+            cad = cad.replaceAll(":nombre","Juanito lopez");
+            cad = cad.replaceAll(":ponencia","“Uso de Acolchados Plásticos en la Agricultura”");
             
             OutputStream file = new FileOutputStream(new File("/home/cerimice/Escritorio/prueba.pdf"));
             Document document = new Document(PageSize.LETTER.rotate());
