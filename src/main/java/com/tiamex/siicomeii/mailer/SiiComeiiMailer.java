@@ -36,13 +36,13 @@ public class SiiComeiiMailer{
     
     public boolean enviarRestaurarPassword(Usuario usuario,String password) throws Exception{
         try{
-            String asunto = "SII";
-            String mensaje = cargarMensaje(Main.getBaseDir()+"/mailer/passwordRecoveryTemplate.html");
+            String asunto = "SII Comeii | Restaurar contraseña";
+            String mensaje = cargarMensaje(Main.getBaseDir()+"/mailer/passwordRecovery.txt");
                 mensaje = mensaje.replaceAll(":nombre",usuario.getNombre());
                 mensaje = mensaje.replaceAll(":usuario",usuario.getCorreo());
                 mensaje = mensaje.replaceAll(":password",password);
                 mensaje = mensaje.replaceAll(":uri",Main.getUrlServer());
-            
+                
             Mailer mailer = new Mailer();
             //return mailer.sendMail(usuario.getEmail(),"","",asunto,mensaje,null);
             return mailer.sendMail(usuario.getCorreo(),"","",asunto,mensaje,null);
@@ -54,8 +54,8 @@ public class SiiComeiiMailer{
     
     public boolean enviarBienvenida(Usuario usuario,String password) throws Exception{
         try{
-            String asunto = "Sii Comeii | Bienvenida";
-            String mensaje = cargarMensaje(Main.getBaseDir()+"/mailer/bienvenida.html");
+            String asunto = "Sii Comeii | Bienvenida ";
+            String mensaje = cargarMensaje(Main.getBaseDir()+"/mailer/bienvenidaTemplate.txt");
                 mensaje = mensaje.replaceAll(":nombre",usuario.getNombre());
                 mensaje = mensaje.replaceAll(":usuario",usuario.getCorreo());
                 mensaje = mensaje.replaceAll(":password",password);

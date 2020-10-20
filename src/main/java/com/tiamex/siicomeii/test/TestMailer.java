@@ -9,13 +9,14 @@ import javax.mail.MessagingException;
 public class TestMailer{
     public static void main(String[] args) throws MessagingException, Exception{
         
-        Usuario objUsuario = ControladorUsuario.getInstance().getById(1L);
-        SiiComeiiMailer.getInstance().enviarRestaurarPassword(objUsuario,objUsuario.getPassword());
+        Usuario objUsuario = ControladorUsuario.getInstance().getById(3L);
+        SiiComeiiMailer.getInstance().enviarBienvenida(objUsuario,objUsuario.getPassword());
         
+        /*
         objUsuario = ControladorUsuario.getInstance().getById(2L);
         SiiComeiiMailer.getInstance().enviarRestaurarPassword(objUsuario,objUsuario.getPassword());
         
         objUsuario = ControladorUsuario.getInstance().getById(3L);
-        SiiComeiiMailer.getInstance().enviarRestaurarPassword(objUsuario,objUsuario.getPassword());
+        SiiComeiiMailer.getInstance().enviarRestaurarPassword(objUsuario,objUsuario.getPassword()); */
     }
 }
