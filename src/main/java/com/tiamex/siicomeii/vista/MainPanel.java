@@ -6,6 +6,8 @@ import com.tiamex.siicomeii.SiiComeiiUI;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -38,10 +40,18 @@ public class MainPanel extends Panel{
             Element.cfgLayoutComponent(contenidoPrincipal,true,false);
         
         ResponsiveLayout footer = new ResponsiveLayout();
-            Element.cfgLayoutComponent(footer);
+            //Element.cfgLayoutComponent(footer);
+           
+        CssLayout topbar = new CssLayout();
+        topbar.setSizeFull();
+        topbar.setCaption("Caption");
+        topbar.setDescription("Description");
+        topbar.addComponent(new Label("Account info"));
+        
         
         VerticalLayout contenido = new VerticalLayout();
             Element.cfgLayoutComponent(contenido,true,true);
+            contenido.addComponent(topbar);
             contenido.addComponent(header);
             contenido.addComponent(contenidoPrincipal);
             contenido.addComponent(footer);
@@ -72,4 +82,8 @@ public class MainPanel extends Panel{
         
         return menuPrincipal;
     }
+    
+    
+     
+    
 }
