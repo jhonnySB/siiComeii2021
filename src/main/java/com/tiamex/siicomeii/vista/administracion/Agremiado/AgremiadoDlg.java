@@ -1,13 +1,23 @@
 package com.tiamex.siicomeii.vista.administracion.Agremiado;
 
+import com.jarektoro.responsivelayout.ResponsiveLayout;
+import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
+import com.tiamex.siicomeii.reportes.base.pdf.ListadoAgremiadosPDF;
 import com.tiamex.siicomeii.utils.Utils;
+import com.tiamex.siicomeii.vista.utils.Element;
+import com.tiamex.siicomeii.vista.utils.ShowPDFDlg;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import com.vaadin.server.StreamResource;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author fred **/
 public class AgremiadoDlg extends TemplateDlg<Agremiado>{
+    
+    private Button listadoAgremiados;
     
     public AgremiadoDlg(){  //Constructor de la clase AgremiadoDlg
         init();
@@ -21,7 +31,17 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado>{
         grid.addColumn(Agremiado::getObjPais).setCaption("País");
         grid.addColumn(Agremiado::getSexo).setCaption("Sexo");
         
+        listadoAgremiados = new Button("exportar a PDF");
+            Element.cfgComponent(listadoAgremiados);
+            listadoAgremiados.addClickListener(event -> {eventoBotonListadoAgremiados();});
+        ResponsiveLayout contenido = new ResponsiveLayout();
+            Element.cfgLayoutComponent(contenido);
+            ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_RIGHT);
+                Element.cfgLayoutComponent(row1,true,false);
+                row1.addColumn().withDisplayRules(12,6,3,2).withComponent(listadoAgremiados);
         
+        contentLayout.addComponent(contenido);
+        setCaption("<b>Agremiados</b>");
         buttonSearchEvent(); //Método que es llamado sin recibir ningún parametro 
     }
     
@@ -31,6 +51,13 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado>{
             grid.setItems(ControladorAgremiado.getInstance().getAll());
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+        }
+    }
+    
+    private void eventoBotonListadoAgremiados(){
+        try{
+            ui.addWindow(new ShowPDFDlg(new StreamResource(new ListadoAgremiadosPDF(), (Utils.getFormatIdLong() + ".pdf").replace(" ", ""))));
+        }catch(Exception ex){
         }
     }
 

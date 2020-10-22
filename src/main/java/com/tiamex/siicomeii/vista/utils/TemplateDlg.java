@@ -83,7 +83,7 @@ public abstract class TemplateDlg<T> extends Panel{
         main = new VerticalLayout();
             Element.cfgLayoutComponent(main,true,false);
             main.addComponent(content);
-            //main.addComponent(contentLayout);
+            main.addComponent(contentLayout);
                 
         this.setSizeFull();
         this.setContent(main);
