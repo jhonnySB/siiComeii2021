@@ -2,15 +2,24 @@ package com.tiamex.siicomeii.vista;
 
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
+import com.tiamex.siicomeii.Main;
 import com.tiamex.siicomeii.SiiComeiiUI;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.FileResource;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.CustomLayout;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /** @author fred **/
 
@@ -24,11 +33,11 @@ public class MainPanel extends Panel{
         contenidoPrincipal.addComponent(contenido);
     }
 
-    public MainPanel(){
+    public MainPanel() throws FileNotFoundException, IOException{
         init();
     }
     
-    private void init(){
+    private void init() throws FileNotFoundException, IOException{
         ui = Element.getUI();
         
         ResponsiveLayout header = new ResponsiveLayout();
@@ -39,15 +48,35 @@ public class MainPanel extends Panel{
         contenidoPrincipal = new VerticalLayout();
             Element.cfgLayoutComponent(contenidoPrincipal,true,false);
         
-        ResponsiveLayout footer = new ResponsiveLayout();
+        //ResponsiveLayout footer = new ResponsiveLayout();
             //Element.cfgLayoutComponent(footer);
-           
-        CssLayout topbar = new CssLayout();
-        topbar.setSizeFull();
-        topbar.setCaption("Caption");
-        topbar.setDescription("Description");
-        topbar.addComponent(new Label("Account info"));
+        CustomLayout footer = new CustomLayout(new FileInputStream(new File(Main.getBaseDir()+"/footer.html")));
+        footer.setSizeFull();
+        footer.setCaption("Footer");
         
+        FileResource iconLogo = new FileResource(new File(Main.getBaseDir() +"/logoTiamex2.png"));
+        GridLayout topbar = new GridLayout(2,2);
+        topbar.setSizeFull();
+        Link linkLogo = new Link();
+        linkLogo.setIcon(iconLogo);
+        linkLogo.setResource(new ExternalResource("https://www.tiamex.com.mx/"));
+        linkLogo.setTargetName("_blank");
+        topbar.addComponent(linkLogo);
+        topbar.setComponentAlignment(linkLogo, Alignment.TOP_LEFT);
+        
+        
+        Label userLbl = new Label("Bienvenido "+ui.getUsuario().getNombre());
+        topbar.addComponent(userLbl);
+        topbar.setComponentAlignment(userLbl, Alignment.MIDDLE_RIGHT);
+        
+        MenuBar menuCuenta = new MenuBar();
+        MenuBar.MenuItem perfil = menuCuenta.addItem("Cuenta",VaadinIcons.USER,null);
+        MenuBar.MenuItem confPerfil = perfil.addItem("Configurar perfil",VaadinIcons.CALC_BOOK,null);
+        MenuBar.MenuItem cerrarSesion = perfil.addItem("Cerrar sesión",VaadinIcons.POWER_OFF,
+                comando -> {ui.getSession().close();ui.getPage().reload();});
+        
+        topbar.addComponent(menuCuenta,1,1);
+        topbar.setComponentAlignment(menuCuenta, Alignment.TOP_RIGHT);
         
         VerticalLayout contenido = new VerticalLayout();
             Element.cfgLayoutComponent(contenido,true,true);

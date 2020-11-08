@@ -8,12 +8,13 @@ import com.tiamex.siicomeii.vista.administracion.usuario.UsuarioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuarioGrupo.UsuarioGrupoDlg;
 import com.tiamex.siicomeii.vista.administracion.proximowebinar.ProximoWebinarDlg;
 import com.tiamex.siicomeii.vista.administracion.tutorial.TutorialDlg;
+import java.io.IOException;
 
 /** @author fred **/
 public class FabricaVista{
     
     public MainPanel mainPanel;
-    public MainPanel getMainPanel(){
+    public MainPanel getMainPanel() throws IOException{
         if(mainPanel == null){mainPanel = new MainPanel();}
         return mainPanel;
     }

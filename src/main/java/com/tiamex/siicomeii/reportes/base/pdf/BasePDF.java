@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 
 public abstract class BasePDF  implements StreamResource.StreamSource{
     protected Format format;
+    protected Format encabezados;
+    protected Format contenido;
     protected final ElementsPDF elementsPDF;
     
     protected ByteArrayOutputStream pdfFile;

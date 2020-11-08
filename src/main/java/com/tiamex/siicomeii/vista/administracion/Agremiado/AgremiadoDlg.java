@@ -1,7 +1,5 @@
 package com.tiamex.siicomeii.vista.administracion.Agremiado;
-
 import com.jarektoro.responsivelayout.ResponsiveLayout;
-import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
 import com.tiamex.siicomeii.reportes.base.pdf.ListadoAgremiadosPDF;
@@ -9,6 +7,7 @@ import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.ShowPDFDlg;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -31,16 +30,28 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado>{
         grid.addColumn(Agremiado::getObjPais).setCaption("País");
         grid.addColumn(Agremiado::getSexo).setCaption("Sexo");
         
-        listadoAgremiados = new Button("exportar a PDF");
-            Element.cfgComponent(listadoAgremiados);
+        listadoAgremiados = new Button();
+            //Element.cfgComponent(listadoAgremiados);
+            listadoAgremiados.setResponsive(true);
+            listadoAgremiados.setCaption("Descargar PDF");
+            listadoAgremiados.setDescription("Descargar lista de agremiados");
+            listadoAgremiados.setIcon(VaadinIcons.FILE_TEXT_O);
+            //listadoAgremiados.setCaption("Generar reportes");
             listadoAgremiados.addClickListener(event -> {eventoBotonListadoAgremiados();});
-        ResponsiveLayout contenido = new ResponsiveLayout();
-            Element.cfgLayoutComponent(contenido);
-            ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_RIGHT);
-                Element.cfgLayoutComponent(row1,true,false);
-                row1.addColumn().withDisplayRules(12,6,3,2).withComponent(listadoAgremiados);
         
-        contentLayout.addComponent(contenido);
+        
+            ResponsiveLayout contenido = new ResponsiveLayout();
+            Element.cfgLayoutComponent(contenido);
+            contenido.setResponsive(true);
+            contenido.setWidth("100%");
+            contenido.addRow().withComponents(listadoAgremiados).withAlignment(Alignment.TOP_RIGHT).withSpacing(true).setSizeFull();
+            
+            //ResponsiveRow row1 = contenido.addRow().withComponents(listadoAgremiados).withAlignment(Alignment.TOP_RIGHT);
+                
+                //Element.cfgLayoutComponent(row1,true,false);
+                //row1.addColumn().withDisplayRules(12,6,3,2).withComponent(listadoAgremiados); 
+                
+                contentLayout.addComponent(contenido);        
         setCaption("<b>Agremiados</b>");
         buttonSearchEvent(); //Método que es llamado sin recibir ningún parametro 
     }
