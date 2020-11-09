@@ -78,7 +78,6 @@ public class PaisModalWin extends TemplateModalWin {
             obj.setId(id);
 
             if (("".equals(nombre.getValue())) || validarCampos()) {
-                validarCampos();
                 Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             } else {
                 obj.setNombre(nombre.getValue());
@@ -87,6 +86,8 @@ public class PaisModalWin extends TemplateModalWin {
                     Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                     ui.getFabricaVista().getPaisDlg().updateDlg();
                     close();
+                } else{
+                    Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
                 }
             }
 

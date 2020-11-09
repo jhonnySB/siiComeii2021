@@ -4,7 +4,6 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.tiamex.siicomeii.persistencia.entidad.UsuarioGrupo</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.Usuario</class>
-    <class>com.tiamex.siicomeii.persistencia.entidad.Agremiado</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.AsistenciaWebinar</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.GradoEstudio</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.Pais</class>
@@ -13,6 +12,7 @@
     <class>com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.ProximoEvento</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar</class>
+    <class>com.tiamex.siicomeii.persistencia.entidad.Agremiado</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>

@@ -75,9 +75,7 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
         try {
             GradoEstudio obj = new GradoEstudio();
             obj.setId(id);
-            if (("".equals(nombre.getValue())) || (validarCampos())) {
-                System.out.println("Hola mundo 1");
-                validarCampos();
+            if (("".equals(nombre.getValue())) && validarCampos()) {
                 Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             } else {
                 obj.setNombre(nombre.getValue());

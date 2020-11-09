@@ -47,6 +47,12 @@ public class Agremiado implements Serializable{
     public void setNombre(String valor){nombre = valor;}
     
     @Basic(optional=false)
+    @Column(name="correo",nullable=false,unique=true)
+    private String  correo;
+    public String getCorreo(){return correo;}
+    public void setCorreo(String valor){correo = valor;}
+    
+    @Basic(optional=false)
     @Column(name="pais",nullable=false)
     private long pais;
     public long getPais(){return pais;}

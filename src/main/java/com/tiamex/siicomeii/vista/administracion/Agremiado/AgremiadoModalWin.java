@@ -28,6 +28,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
     private ComboBox<GradoEstudio> gradoEstudio;
     private TextField institucion;
     private TextField nombre;
+    private TextField correo;
     private ComboBox<Pais> pais;
     private ComboBox<String> sexo;
 
@@ -59,6 +60,10 @@ public class AgremiadoModalWin extends TemplateModalWin {
         nombre = new TextField();
         Element.cfgComponent(nombre, "Nombre");
         nombre.setRequiredIndicatorVisible(true);
+        
+        correo = new TextField();
+        Element.cfgComponent(correo, "Correo");
+        correo.setRequiredIndicatorVisible(true);
 
         pais = new ComboBox<>();
         Element.cfgComponent(pais, "País");
@@ -72,6 +77,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(gradoEstudio);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
+        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(correo);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(pais);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(sexo);
 
@@ -96,6 +102,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
             gradoEstudio.setValue(obj.getObjGradoEstudio());
             institucion.setValue(obj.getInstitucion());
             nombre.setValue(obj.getNombre());
+            correo.setValue(obj.getCorreo());
             pais.setValue(obj.getObjPais());
             sexo.setValue(String.valueOf(obj.getSexo()));
         } catch (Exception ex) {
@@ -121,6 +128,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
                 obj.setGradoEstudios(gradoEstudio.getValue() == null ? 0 : gradoEstudio.getValue().getId());
                 obj.setInstitucion(institucion.getValue());
                 obj.setNombre(nombre.getValue());
+                obj.setCorreo(correo.getValue());
                 obj.setPais(pais.getValue() == null ? 0 : pais.getValue().getId());
                 if (sexo.getValue() != null) {
                     obj.setSexo(sexo.getValue().charAt(0));
@@ -155,6 +163,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
         //Marca error binder.forField(gradoEstudio).asRequired("Campo requerido").bind(Agremiado::getGradoEstudios,Agremiado::setGradoEstudios);
         binder.forField(institucion).asRequired("Campo requerido").bind(Agremiado::getInstitucion, Agremiado::setInstitucion);
         binder.forField(nombre).asRequired("Campo requerido").bind(Agremiado::getNombre, Agremiado::setNombre);
+        binder.forField(correo).asRequired("Campo requerido").bind(Agremiado::getCorreo, Agremiado::setCorreo);
         //Marca error binder.forField(pais).asRequired("Campo requerido").bind(Agremiado::getPais,Agremiado::setPais);
         //Marca error binder.forField(sexo).asRequired("Campo requerido").bind(Agremiado::getSexo,Agremiado::setSexo);
         //binder.bind(sexo, Agremiado::getSexo, Agremiado::setSexo);

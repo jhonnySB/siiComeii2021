@@ -28,6 +28,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio");
         grid.addColumn(Agremiado::getInstitucion).setCaption("Institución");
         grid.addColumn(Agremiado::getNombre).setCaption("Nombre");
+        grid.addColumn(Agremiado::getCorreo).setCaption("Correo");
         grid.addColumn(Agremiado::getObjPais).setCaption("País");
         grid.addColumn(Agremiado::getSexo).setCaption("Sexo");
 
