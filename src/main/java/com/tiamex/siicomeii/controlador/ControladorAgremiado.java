@@ -22,7 +22,8 @@ public class ControladorAgremiado extends GenericController<ServicioAgremiado,Ag
         if(obj.getGradoEstudios() <= 0){throw new Exception("El Grado de estudios no es valido");}
         if(obj.getInstitucion().isEmpty()){throw new Exception("Es necesario proporcionar el nombre de la institución");}
         if(obj.getNombre().isEmpty()){throw new Exception("Es necesario proporcionar");}
-        if(obj.getPais() <= 0){throw new Exception("Es necesario proporcionar");}
+        if(obj.getPais() <= 0){throw new Exception("Es necesario proporcionar pais");}
+        if(obj.getSexo() =='\u0000'){throw new Exception("Es necesario seleccionar sexo");}
         
         return true;
     }

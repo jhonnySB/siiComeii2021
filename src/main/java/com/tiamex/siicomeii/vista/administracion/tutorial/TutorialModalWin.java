@@ -7,6 +7,8 @@ import com.tiamex.siicomeii.persistencia.entidad.Tutorial;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
+import com.vaadin.data.Binder;
+import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.*;
 import java.util.logging.Logger;
@@ -37,18 +39,22 @@ public final class TutorialModalWin extends TemplateModalWin {
         institucion = new TextField();
         Element.cfgComponent(institucion, "Institución");
         institucion.setPlaceholder("Ingrese nstitución");
+        institucion.setRequiredIndicatorVisible(true);
         
         nombre = new TextField();
         Element.cfgComponent(nombre, "Nombre");
         nombre.setPlaceholder("Ingrese nombre");
+        nombre.setRequiredIndicatorVisible(true);
         
         tutor = new TextField();
         Element.cfgComponent(tutor, "Tutor");
         tutor.setPlaceholder("Ingrese tutor");
+        tutor.setRequiredIndicatorVisible(true);
         
         usuario = new TextField();
         Element.cfgComponent(usuario, "Usuario");
         usuario.setPlaceholder("Ingrese usuario");
+        usuario.setRequiredIndicatorVisible(true);
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
@@ -87,18 +93,22 @@ public final class TutorialModalWin extends TemplateModalWin {
     @Override
     protected void buttonAcceptEvent() {
         try {
-            Tutorial obj = new Tutorial();
-            obj.setId(id);
-            obj.setInstitucion(institucion.getValue());
-            obj.setNombre(nombre.getValue());
-            obj.setTutor(tutor.getValue());
-            obj.setUsuario(Long.parseLong(usuario.getValue()));
-            
-            obj = ControladorTutorial.getInstance().save(obj);
-            if (obj != null) {
-                Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                ui.getFabricaVista().getTutorialDlg().updateDlg();
-                close();
+            if (validarCampos()) {
+                Tutorial obj = new Tutorial();
+                obj.setId(id);
+                obj.setInstitucion(institucion.getValue());
+                obj.setNombre(nombre.getValue());
+                obj.setTutor(tutor.getValue());
+                obj.setUsuario(Long.parseLong(usuario.getValue()));
+
+                obj = ControladorTutorial.getInstance().save(obj);
+                if (obj != null) {
+                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                    ui.getFabricaVista().getTutorialDlg().updateDlg();
+                    close();
+                }
+            } else {
+                Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
@@ -109,5 +119,15 @@ public final class TutorialModalWin extends TemplateModalWin {
     protected void buttonCancelEvent() {
         close();
     }
-
+    
+    private boolean validarCampos() {
+        Binder<Tutorial> binder = new Binder<>();
+        
+        binder.forField(institucion).asRequired("Campo requerido").bind(Tutorial::getInstitucion,Tutorial::setInstitucion);
+        binder.forField(nombre).asRequired("Campo requerido").bind(Tutorial::getNombre,Tutorial::setNombre);
+        binder.forField(tutor).asRequired("Campo requerido").bind(Tutorial::getTutor,Tutorial::setTutor);
+        //Marca error binder.forField(usuario).asRequired("Campo requerido").bind(Tutorial::getUsuario,Tutorial::setUsuario);
+        
+        return binder.validate().isOk();
+    }
 }

@@ -107,6 +107,8 @@ public class MainPanel extends Panel{
         MenuBar.MenuItem evento = menuPrincipal.addItem("Proximos eventos",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getProximoEventoDlg());});
         
         MenuBar.MenuItem agremiado = menuPrincipal.addItem("Agremiados",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getAgremiadoDlg());});
+
+        MenuBar.MenuItem webinarRealizado = menuPrincipal.addItem("Webinars realizados",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getWebinarRealizadoDlg());});
         
         
         return menuPrincipal;

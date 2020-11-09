@@ -1,10 +1,10 @@
 package com.tiamex.siicomeii.controlador;
 
-import com.tiamex.siicomeii.persistencia.entidad.Usuario;
-import com.tiamex.siicomeii.persistencia.servicio.ServicioUsuario;
+import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
+import com.tiamex.siicomeii.persistencia.servicio.ServicioWebinarRealizado;
 
 /** @author cerimice **/
-public class ControladorWebinarRealizado extends GenericController<ServicioUsuario,Usuario,Long>{
+public class ControladorWebinarRealizado extends GenericController<ServicioWebinarRealizado,WebinarRealizado,Long>{
     
     private static ControladorWebinarRealizado INSTANCE;
     public static ControladorWebinarRealizado getInstance(){
@@ -13,26 +13,26 @@ public class ControladorWebinarRealizado extends GenericController<ServicioUsuar
     }
     
     private ControladorWebinarRealizado(){
-        service = ServicioUsuario.getInstance();
+        service = ServicioWebinarRealizado.getInstance();
     }
 
     @Override
-    protected boolean validate(Usuario obj) throws Exception{
+    protected boolean validate(WebinarRealizado obj) throws Exception{
         if(obj.getId() < 0){throw new Exception("El ID no es valido");}
         
         return true;
     }
 
     @Override
-    public Usuario save(Usuario obj) throws Exception{
+    public WebinarRealizado save(WebinarRealizado obj) throws Exception{
         if(validate(obj)){
             if(obj.getId() == 0){
                 obj.setId(getService().generateId());
                 return getService().save(obj);
             }
         }
-        
-        Usuario oldObj = getService().getById(obj.getId());
+
+        WebinarRealizado oldObj = getService().getById(obj.getId());
         if(oldObj == null){
             return getService().save(obj);
         }

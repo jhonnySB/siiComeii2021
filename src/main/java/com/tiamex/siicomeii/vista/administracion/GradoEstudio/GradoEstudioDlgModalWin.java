@@ -7,6 +7,7 @@ import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
+import com.vaadin.data.Binder;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
@@ -37,8 +38,9 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
         Element.cfgLayoutComponent(contenido);
 
         nombre = new TextField();
-        nombre.setRequiredIndicatorVisible(true);
         Element.cfgComponent(nombre, "Nombre");
+        nombre.setRequiredIndicatorVisible(true);
+
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
 
@@ -73,8 +75,9 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
         try {
             GradoEstudio obj = new GradoEstudio();
             obj.setId(id);
-
-            if ("".equals(nombre.getValue())) {
+            if (("".equals(nombre.getValue())) || (validarCampos())) {
+                System.out.println("Hola mundo 1");
+                validarCampos();
                 Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             } else {
                 obj.setNombre(nombre.getValue());
@@ -94,5 +97,13 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
     @Override
     protected void buttonCancelEvent() {
         close();
+    }
+    
+    private boolean validarCampos() {
+        Binder<GradoEstudio> binder = new Binder<>();
+        
+        binder.forField(nombre).asRequired("Campo requerido").bind(GradoEstudio::getNombre,GradoEstudio::setNombre);
+        
+        return binder.validate().isOk();
     }
 }

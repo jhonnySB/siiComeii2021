@@ -20,7 +20,7 @@ public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
         grid.addColumn(ProximoEvento::getImagen).setCaption("Imagen");
         grid.addColumn(ProximoEvento::getTitulo).setCaption("Título");
         grid.addColumn(ProximoEvento::getObjUsuario).setCaption("usuario");
-        
+        setCaption("<b>Próximos eventos</b>");
         buttonSearchEvent();
     }
     

@@ -2,12 +2,11 @@ package com.tiamex.siicomeii.vista.administracion.proximowebinar;
 
 import com.tiamex.siicomeii.controlador.ControladorProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
-import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
 import java.util.logging.Logger;
 
-/** @author cerimice **/
+/** @author fred **/
 public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     
     public ProximoWebinarDlg(){
@@ -20,7 +19,7 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
         grid.addColumn(ProximoWebinar::getPonente).setCaption("Ponente");
         grid.addColumn(ProximoWebinar::getInstitucion).setCaption("Institución");
         grid.addColumn(ProximoWebinar::getFecha).setCaption("Fecha");
-              
+        setCaption("<b>Próximos webinars</b>");
         buttonSearchEvent();
     }
     

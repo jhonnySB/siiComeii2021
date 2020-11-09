@@ -15,7 +15,7 @@ public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
     private void init(){
         grid.addColumn(GradoEstudio::getId).setCaption("Id");
         grid.addColumn(GradoEstudio::getNombre).setCaption("Nombre");
-        
+        setCaption("<b>Grado de estudios</b>");
         buttonSearchEvent();
     }
 

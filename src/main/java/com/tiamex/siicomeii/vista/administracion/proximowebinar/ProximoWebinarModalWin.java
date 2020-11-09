@@ -10,16 +10,16 @@ import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
+import com.vaadin.data.Binder;
+import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.DateField;
+import com.vaadin.ui.DateTimeField;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 /**
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  */
 public final class ProximoWebinarModalWin extends TemplateModalWin {
 
-    private DateField fecha;
+    private DateTimeField fecha;
     private Upload imagen;
     private TextField institucion;
     private TextField ponente;
@@ -46,12 +46,15 @@ public final class ProximoWebinarModalWin extends TemplateModalWin {
     }
 
     private void init() {
-        Date myDate = new Date();
         ResponsiveLayout contenido = new ResponsiveLayout();
         Element.cfgLayoutComponent(contenido);
-        fecha = new DateField();
+        
+        fecha = new DateTimeField();
+        fecha.setRequiredIndicatorVisible(true);
+        fecha.setValue(LocalDateTime.now().withHour(11).withMinute(00).plusDays(1));
+        fecha.setRangeStart(fecha.getValue().minusDays(1));
         Element.cfgComponent(fecha, "Fecha");
-        fecha.setPlaceholder(new SimpleDateFormat("yyyy-MM-dd").format(myDate));
+        
 
         imagen = new Upload();
         Element.cfgComponent(imagen, "Seleccione imagen");
@@ -59,17 +62,21 @@ public final class ProximoWebinarModalWin extends TemplateModalWin {
         institucion = new TextField();
         Element.cfgComponent(institucion, "Institución");
         institucion.setPlaceholder("Ingrese nstitución");
+        institucion.setRequiredIndicatorVisible(true);
         
         ponente = new TextField();
         Element.cfgComponent(ponente, "Ponente");
         ponente.setPlaceholder("Ingrese ponente");
+        ponente.setRequiredIndicatorVisible(true);
         
         titulo = new TextField();
         Element.cfgComponent(titulo, "Título");
         titulo.setPlaceholder("Ingrese título");
+        titulo.setRequiredIndicatorVisible(true);
         
         usuario = new ComboBox<>();
         Element.cfgComponent(usuario, "Usuario");
+        usuario.setRequiredIndicatorVisible(true);
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(fecha);
@@ -95,7 +102,7 @@ public final class ProximoWebinarModalWin extends TemplateModalWin {
         try {
             ProximoWebinar obj = ControladorProximoWebinar.getInstance().getById(id);
             this.id = obj.getId();
-            fecha.setValue(obj.getFecha().toLocalDate());
+            fecha.setValue(obj.getFecha());
             //imagen.setValue(obj.getImagen());
             institucion.setValue(obj.getInstitucion());
             ponente.setValue(obj.getPonente());
@@ -118,20 +125,24 @@ public final class ProximoWebinarModalWin extends TemplateModalWin {
     @Override
     protected void buttonAcceptEvent() {
         try {
-            ProximoWebinar obj = new ProximoWebinar();
-            obj.setId(id);
-            obj.setFecha(fecha.getValue().atTime(LocalTime.MIN));
-            //obj.setImagen(imagen.getValue());
-            obj.setInstitucion(institucion.getValue());
-            obj.setPonente(ponente.getValue());
-            obj.setTitulo(titulo.getValue());
-            obj.setUsuario(usuario.getValue() == null ? 0 : usuario.getValue().getId());
+            if (validarCampos()) {
+                ProximoWebinar obj = new ProximoWebinar();
+                obj.setId(id);
+                obj.setFecha(fecha.getValue());
+                //obj.setImagen(imagen.getValue());
+                obj.setInstitucion(institucion.getValue());
+                obj.setPonente(ponente.getValue());
+                obj.setTitulo(titulo.getValue());
+                obj.setUsuario(usuario.getValue() == null ? 0 : usuario.getValue().getId());
 
-            obj = ControladorProximoWebinar.getInstance().save(obj);
-            if (obj != null) {
-                Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                ui.getFabricaVista().getProximoWebinarDlg().updateDlg();
-                close();
+                obj = ControladorProximoWebinar.getInstance().save(obj);
+                if (obj != null) {
+                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                    ui.getFabricaVista().getProximoWebinarDlg().updateDlg();
+                    close();
+                }
+            } else {
+                Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
@@ -143,4 +154,16 @@ public final class ProximoWebinarModalWin extends TemplateModalWin {
         close();
     }
 
+    private boolean validarCampos() {
+        Binder<ProximoWebinar> binder = new Binder<>();
+        
+        binder.forField(fecha).asRequired("Campo requerido").bind(ProximoWebinar::getFecha,ProximoWebinar::setFecha);
+        //binder.forField(imagen).asRequired("Campo requerido").bind(ProximoWebinar::getImagen,ProximoWebinar::setImagen);
+        binder.forField(institucion).asRequired("Campo requerido").bind(ProximoWebinar::getInstitucion,ProximoWebinar::setInstitucion);
+        binder.forField(ponente).asRequired("Campo requerido").bind(ProximoWebinar::getPonente,ProximoWebinar::setPonente);
+        binder.forField(titulo).asRequired("Campo requerido").bind(ProximoWebinar::getTitulo,ProximoWebinar::setTitulo);
+        //Marca error binder.forField(usuario).asRequired("Campo requerido").bind(ProximoWebinar::getUsuario,ProximoWebinar::setUsuario);
+        
+        return binder.validate().isOk();
+    }
 }

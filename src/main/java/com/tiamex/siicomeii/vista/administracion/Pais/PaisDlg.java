@@ -16,7 +16,7 @@ public class PaisDlg extends TemplateDlg<Pais>{
     private void init(){
         grid.addColumn(Pais::getId).setCaption("Id");
         grid.addColumn(Pais::getNombre).setCaption("Pais xd");
-        
+        setCaption("<b>Países</b>");
         buttonSearchEvent();
     }
     

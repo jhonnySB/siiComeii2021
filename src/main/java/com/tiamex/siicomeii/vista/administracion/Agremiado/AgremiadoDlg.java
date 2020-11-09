@@ -1,4 +1,5 @@
 package com.tiamex.siicomeii.vista.administracion.Agremiado;
+
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
@@ -14,61 +15,60 @@ import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author fred **/
-public class AgremiadoDlg extends TemplateDlg<Agremiado>{
-    
+public class AgremiadoDlg extends TemplateDlg<Agremiado> {
+
     private Button listadoAgremiados;
-    
-    public AgremiadoDlg(){  //Constructor de la clase AgremiadoDlg
+
+    public AgremiadoDlg() {  //Constructor de la clase AgremiadoDlg
         init();
     }
-    
-    private void init(){    //Columnas que son asignadas a la tabla de agremiado en la interfaz web
+
+    private void init() {    //Columnas que son asignadas a la tabla de agremiado en la interfaz web
         grid.addColumn(Agremiado::getId).setCaption("Id");
         grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio");
         grid.addColumn(Agremiado::getInstitucion).setCaption("Institución");
         grid.addColumn(Agremiado::getNombre).setCaption("Nombre");
         grid.addColumn(Agremiado::getObjPais).setCaption("País");
         grid.addColumn(Agremiado::getSexo).setCaption("Sexo");
-        
+
         listadoAgremiados = new Button();
-            //Element.cfgComponent(listadoAgremiados);
-            listadoAgremiados.setResponsive(true);
-            listadoAgremiados.setCaption("Descargar PDF");
-            listadoAgremiados.setDescription("Descargar lista de agremiados");
-            listadoAgremiados.setIcon(VaadinIcons.FILE_TEXT_O);
-            //listadoAgremiados.setCaption("Generar reportes");
-            listadoAgremiados.addClickListener(event -> {eventoBotonListadoAgremiados();});
-        
-        
-            ResponsiveLayout contenido = new ResponsiveLayout();
-            Element.cfgLayoutComponent(contenido);
-            contenido.setResponsive(true);
-            contenido.setWidth("100%");
-            contenido.addRow().withComponents(listadoAgremiados).withAlignment(Alignment.TOP_RIGHT).withSpacing(true).setSizeFull();
-            
-            //ResponsiveRow row1 = contenido.addRow().withComponents(listadoAgremiados).withAlignment(Alignment.TOP_RIGHT);
-                
-                //Element.cfgLayoutComponent(row1,true,false);
-                //row1.addColumn().withDisplayRules(12,6,3,2).withComponent(listadoAgremiados); 
-                
-                contentLayout.addComponent(contenido);        
+        //Element.cfgComponent(listadoAgremiados);
+        listadoAgremiados.setResponsive(true);
+        listadoAgremiados.setCaption("Descargar PDF");
+        listadoAgremiados.setDescription("Descargar lista de agremiados");
+        listadoAgremiados.setIcon(VaadinIcons.FILE_TEXT_O);
+        //listadoAgremiados.setCaption("Generar reportes");
+        listadoAgremiados.addClickListener(event -> {
+            eventoBotonListadoAgremiados();
+        });
+
+        ResponsiveLayout contenido = new ResponsiveLayout();
+        Element.cfgLayoutComponent(contenido);
+        contenido.setResponsive(true);
+        contenido.setWidth("100%");
+        contenido.addRow().withComponents(listadoAgremiados).withAlignment(Alignment.TOP_RIGHT).withSpacing(true).setSizeFull();
+
+        //ResponsiveRow row1 = contenido.addRow().withComponents(listadoAgremiados).withAlignment(Alignment.TOP_RIGHT);
+        //Element.cfgLayoutComponent(row1,true,false);
+        //row1.addColumn().withDisplayRules(12,6,3,2).withComponent(listadoAgremiados); 
+        contentLayout.addComponent(contenido);
         setCaption("<b>Agremiados</b>");
         buttonSearchEvent(); //Método que es llamado sin recibir ningún parametro 
     }
-    
+
     @Override //Método que stablece los elementos de datos de este componente proporcionados como una colección.
-    protected void buttonSearchEvent(){
-        try{
+    protected void buttonSearchEvent() {
+        try {
             grid.setItems(ControladorAgremiado.getInstance().getAll());
-        }catch (Exception ex){
+        } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
-    private void eventoBotonListadoAgremiados(){
-        try{
+
+    private void eventoBotonListadoAgremiados() {
+        try {
             ui.addWindow(new ShowPDFDlg(new StreamResource(new ListadoAgremiadosPDF(), (Utils.getFormatIdLong() + ".pdf").replace(" ", ""))));
-        }catch(Exception ex){
+        } catch (Exception ex) {
         }
     }
 
@@ -80,10 +80,10 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado>{
     @Override
     protected void gridEvent() {
     }
-    
+
     @Override
     protected void eventEditButtonGrid(Agremiado obj) {
         ui.addWindow(new AgremiadoModalWin(obj.getId()));
     }
-    
+
 }

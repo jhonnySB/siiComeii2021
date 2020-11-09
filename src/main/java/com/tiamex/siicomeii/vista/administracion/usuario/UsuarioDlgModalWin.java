@@ -11,6 +11,7 @@ import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.data.Binder;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
@@ -119,18 +120,24 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                 obj.setCorreo(correo.getValue());
                 obj.setNombre(nombre.getValue());
                 obj.setPassword(password.getValue());
-                obj.setUsuarioGrupo(usuarioGrupo.getValue() == null ? 0 : usuarioGrupo.getValue().getId());
+                System.out.println("VALOR DEL COMBOBOX: " + usuarioGrupo.getValue());
+                if (usuarioGrupo.getValue() != null) {
+                    obj.setUsuarioGrupo(usuarioGrupo.getValue() == null ? 0 : usuarioGrupo.getValue().getId());
 
-                obj = ControladorUsuario.getInstance().save(obj);
-                if (obj != null) {
-                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    ui.getFabricaVista().getUsuarioDlg().updateDlg();
-                    close();
+                    obj = ControladorUsuario.getInstance().save(obj);
+                    if (obj != null) {
+                        Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        ui.getFabricaVista().getUsuarioDlg().updateDlg();
+                        close();
+                    } else {
+                        Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                    }
+                } else {
+                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
                 }
             } else {
-
+                Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
-
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -143,10 +150,11 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
 
     private boolean validarCampos() {
         Binder<Usuario> binder = new Binder<>();
+        
         binder.forField(correo).asRequired("Campo requerido").withValidator(new EmailValidator("Ingrese un correo válido")).bind(Usuario::getCorreo,Usuario::setCorreo) ;
         binder.forField(nombre).asRequired("Campo requerido").bind(Usuario::getNombre,Usuario::setNombre);
         binder.forField(password).asRequired("Campo requerido").bind(Usuario::getPassword,Usuario::setPassword);
-        
+    
         return binder.validate().isOk();
     }
 

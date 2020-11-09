@@ -4,6 +4,8 @@ import com.tiamex.siicomeii.vista.administracion.Agremiado.AgremiadoDlg;
 import com.tiamex.siicomeii.vista.administracion.GradoEstudio.GradoEstudioDlg;
 import com.tiamex.siicomeii.vista.administracion.Pais.PaisDlg;
 import com.tiamex.siicomeii.vista.administracion.ProximoEvento.ProximoEventoDlg;
+import com.tiamex.siicomeii.vista.administracion.WebinarRealizado.WebinarRealizadoDlg;
+import com.tiamex.siicomeii.vista.administracion.WebinarRealizado.WebinarRealizadoModalWin;
 import com.tiamex.siicomeii.vista.administracion.usuario.UsuarioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuarioGrupo.UsuarioGrupoDlg;
 import com.tiamex.siicomeii.vista.administracion.proximowebinar.ProximoWebinarDlg;
@@ -65,6 +67,12 @@ public class FabricaVista{
     public PaisDlg getPaisDlg(){
         if(paisDlg == null){paisDlg = new PaisDlg();}
         return paisDlg;
+    }
+
+    public WebinarRealizadoDlg WebinarRealizadoDlg;
+    public WebinarRealizadoDlg getWebinarRealizadoDlg(){
+        if(WebinarRealizadoDlg == null){WebinarRealizadoDlg = new WebinarRealizadoDlg();}
+        return WebinarRealizadoDlg;
     }
     
 }
