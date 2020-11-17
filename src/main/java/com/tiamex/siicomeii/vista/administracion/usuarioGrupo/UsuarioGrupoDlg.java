@@ -42,5 +42,10 @@ public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
     protected void eventEditButtonGrid(UsuarioGrupo obj){
         ui.addWindow(new UsuarioGrupoModalWin(obj.getId()));
     }
+
+    @Override
+    protected void eventAsistenciaButton(UsuarioGrupo obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

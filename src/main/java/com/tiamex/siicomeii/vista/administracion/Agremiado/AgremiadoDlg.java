@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 public class AgremiadoDlg extends TemplateDlg<Agremiado> {
 
     private Button listadoAgremiados;
+    
 
     public AgremiadoDlg() {  //Constructor de la clase AgremiadoDlg
         init();
@@ -31,7 +32,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         grid.addColumn(Agremiado::getCorreo).setCaption("Correo");
         grid.addColumn(Agremiado::getObjPais).setCaption("País");
         grid.addColumn(Agremiado::getSexo).setCaption("Sexo");
-
+        
         listadoAgremiados = new Button();
         //Element.cfgComponent(listadoAgremiados);
         listadoAgremiados.setResponsive(true);
@@ -85,6 +86,11 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     @Override
     protected void eventEditButtonGrid(Agremiado obj) {
         ui.addWindow(new AgremiadoModalWin(obj.getId()));
+    }
+
+    @Override
+    protected void eventAsistenciaButton(Agremiado obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

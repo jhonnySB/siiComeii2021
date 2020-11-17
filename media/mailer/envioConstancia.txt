@@ -1,0 +1,58 @@
+<html>
+<body style="margin: 0; padding: 0; ">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%"> 
+            <tr>
+                <td style="padding: 10px 0 30px 0;">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border: 1px solid #cccccc; border-collapse: collapse;">
+                        <tr>
+                            <td align="center" bgcolor="white" style="padding: 25px 0 0px 0; color: #153643; font-size: 28px; font-weight: bold; font-family: Arial, sans-serif;">
+                                <img src="https://www.mediafire.com/convkey/04e7/xiu3ijp22xk49h26g.jpg" alt="LogoTIAMEX" style="display: block;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#ffffff" style="padding: 30px 20px 30px 20px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td style="color: #153643; font-family: Arial, sans-serif; font-size: 18px;">
+                                            <b>Hola :nombre,</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
+                                            Este correo es para hacerte llegar tu constancia por asistir al webinar:
+                                            <b>:webinar</b>
+                                            <br><br>
+                                            Cualquier detalle favor de revisarlo con el administrador del sistema.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+
+                                            <span style="color:rgb(119,119,119);font-size:13px">
+                                                Este es un correo electrónico automatizado. Por favor no responder a este email.
+                                            </span>
+
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#4dc3ff" style="padding: 30px 30px 30px 30px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td style="color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;" width="75%">
+                                            &reg; Tecnologías Informáticas Aplicadas de México SA de CV, 2020<br/>
+
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

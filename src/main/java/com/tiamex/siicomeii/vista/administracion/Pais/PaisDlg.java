@@ -42,4 +42,9 @@ public class PaisDlg extends TemplateDlg<Pais>{
     protected void eventEditButtonGrid(Pais obj){
         ui.addWindow(new PaisModalWin(obj.getId()));
     }
+
+    @Override
+    protected void eventAsistenciaButton(Pais obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

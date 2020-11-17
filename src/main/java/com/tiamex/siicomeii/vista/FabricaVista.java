@@ -5,7 +5,6 @@ import com.tiamex.siicomeii.vista.administracion.GradoEstudio.GradoEstudioDlg;
 import com.tiamex.siicomeii.vista.administracion.Pais.PaisDlg;
 import com.tiamex.siicomeii.vista.administracion.ProximoEvento.ProximoEventoDlg;
 import com.tiamex.siicomeii.vista.administracion.WebinarRealizado.WebinarRealizadoDlg;
-import com.tiamex.siicomeii.vista.administracion.WebinarRealizado.WebinarRealizadoModalWin;
 import com.tiamex.siicomeii.vista.administracion.usuario.UsuarioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuarioGrupo.UsuarioGrupoDlg;
 import com.tiamex.siicomeii.vista.administracion.proximowebinar.ProximoWebinarDlg;

@@ -42,5 +42,10 @@ public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
     protected void eventEditButtonGrid(GradoEstudio obj){
         ui.addWindow(new GradoEstudioDlgModalWin(obj.getId()));
     }
+
+    @Override
+    protected void eventAsistenciaButton(GradoEstudio obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

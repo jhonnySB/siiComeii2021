@@ -46,5 +46,10 @@ public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
     protected void eventEditButtonGrid(ProximoEvento obj) {
         ui.addWindow(new ProximoEventoModalWin(obj.getId()));
     }
+
+    @Override
+    protected void eventAsistenciaButton(ProximoEvento obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

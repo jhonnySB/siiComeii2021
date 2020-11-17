@@ -44,5 +44,10 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
     protected void eventEditButtonGrid(Tutorial obj) {
         ui.addWindow(new TutorialModalWin(obj.getId()));
     }
+
+    @Override
+    protected void eventAsistenciaButton(Tutorial obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

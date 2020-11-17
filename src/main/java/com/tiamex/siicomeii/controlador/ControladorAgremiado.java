@@ -53,4 +53,8 @@ public class ControladorAgremiado extends GenericController<ServicioAgremiado,Ag
         return getService().save(obj);
     }
     
+    public Agremiado getByEmail(String correo){
+        return getService().getByEmail(correo);
+    }
+    
 }

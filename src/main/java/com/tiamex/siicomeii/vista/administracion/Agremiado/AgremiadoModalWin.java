@@ -71,6 +71,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
 
         sexo = new ComboBox<>("Sexo");
         sexo.setItems("Hombre", "Mujer");
+        sexo.setEmptySelectionAllowed(false);
         sexo.setRequiredIndicatorVisible(true);
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);

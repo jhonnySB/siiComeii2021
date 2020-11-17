@@ -45,5 +45,10 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     protected void eventEditButtonGrid(ProximoWebinar obj) {
         ui.addWindow(new ProximoWebinarModalWin(obj.getId()));
     }
+
+    @Override
+    protected void eventAsistenciaButton(ProximoWebinar obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

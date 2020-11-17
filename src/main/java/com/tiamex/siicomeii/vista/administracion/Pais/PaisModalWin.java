@@ -77,7 +77,7 @@ public class PaisModalWin extends TemplateModalWin {
             Pais obj = new Pais();
             obj.setId(id);
 
-            if (("".equals(nombre.getValue())) || validarCampos()) {
+            if (("".equals(nombre.getValue())) && validarCampos()) {
                 Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             } else {
                 obj.setNombre(nombre.getValue());

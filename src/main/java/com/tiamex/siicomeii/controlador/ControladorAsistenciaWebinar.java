@@ -1,10 +1,10 @@
 package com.tiamex.siicomeii.controlador;
 
-import com.tiamex.siicomeii.persistencia.entidad.Usuario;
-import com.tiamex.siicomeii.persistencia.servicio.ServicioUsuario;
+import com.tiamex.siicomeii.persistencia.entidad.AsistenciaWebinar;
+import com.tiamex.siicomeii.persistencia.servicio.ServicioAsistenciaWebinar;
 
 /** @author cerimice **/
-public class ControladorAsistenciaWebinar extends GenericController<ServicioUsuario,Usuario,Long>{
+public class ControladorAsistenciaWebinar extends GenericController<ServicioAsistenciaWebinar,AsistenciaWebinar,Long>{
     
     private static ControladorAsistenciaWebinar INSTANCE;
     public static ControladorAsistenciaWebinar getInstance(){
@@ -13,33 +13,33 @@ public class ControladorAsistenciaWebinar extends GenericController<ServicioUsua
     }
     
     private ControladorAsistenciaWebinar(){
-        service = ServicioUsuario.getInstance();
+        service = ServicioAsistenciaWebinar.getInstance();
     }
 
     @Override
-    protected boolean validate(Usuario obj) throws Exception{
+    protected boolean validate(AsistenciaWebinar obj) throws Exception{
         if(obj.getId() < 0){throw new Exception("El ID no es valido");}
         
         return true;
     }
 
     @Override
-    public Usuario save(Usuario obj) throws Exception{
+    public AsistenciaWebinar save(AsistenciaWebinar obj) throws Exception{
         if(validate(obj)){
             if(obj.getId() == 0){
                 obj.setId(getService().generateId());
+                obj.setWebinar(obj.getWebinar());
+                obj.setUsuario(obj.getUsuario());
+                obj.setAgremiado(obj.getAgremiado());
                 return getService().save(obj);
             }
         }
         
-        Usuario oldObj = getService().getById(obj.getId());
+        AsistenciaWebinar oldObj = getService().getById(obj.getId());
         if(oldObj == null){
             return getService().save(obj);
         }
-        
-        //oldObj.setActivo(obj.getActivo());
-        //oldObj.setCambiarPassword(obj.getCambiarPassword());
-        //oldObj.setNombre(obj.getNombre());
+
         return getService().save(obj);
     }
     
