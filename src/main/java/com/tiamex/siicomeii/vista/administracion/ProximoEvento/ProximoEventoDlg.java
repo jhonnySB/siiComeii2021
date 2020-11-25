@@ -4,6 +4,7 @@ import com.tiamex.siicomeii.controlador.ControladorProximoEvento;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoEvento;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author fred **/
@@ -48,7 +49,12 @@ public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
     }
 
     @Override
-    protected void eventAsistenciaButton(ProximoEvento obj) {
+    protected void eventAsistenciaButton(ProximoEvento obj,String idBtn) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventListaAsistentes(ProximoEvento obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

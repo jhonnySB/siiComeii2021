@@ -4,7 +4,6 @@ import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.Main;
 import com.tiamex.siicomeii.SiiComeiiUI;
-import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ExternalResource;
@@ -53,11 +52,12 @@ public class MainPanel extends Panel{
             //Element.cfgLayoutComponent(footer);
         CustomLayout footer = new CustomLayout(new FileInputStream(new File(Main.getBaseDir()+"/footer.html")));
         footer.setSizeFull();
-        footer.setCaption("Footer");
+        footer.setResponsive(true);
         
         FileResource iconLogo = new FileResource(new File(Main.getBaseDir() +"/logoTiamex2.png"));
         GridLayout topbar = new GridLayout(2,2);
         topbar.setSizeFull();
+        topbar.setResponsive(true);
         Link linkLogo = new Link();
         linkLogo.setIcon(iconLogo);
         linkLogo.setResource(new ExternalResource("https://www.tiamex.com.mx/"));
@@ -66,13 +66,14 @@ public class MainPanel extends Panel{
         topbar.setComponentAlignment(linkLogo, Alignment.TOP_LEFT);
         
         
-        Label userLbl = new Label("Bienvenido "+ui.getUsuario().getNombre());
+        Label userLbl = new Label();
+        userLbl.setCaptionAsHtml(true);
+        userLbl.setValue("Has iniciado sesión como: "+ui.getUsuario().getNombre());
         topbar.addComponent(userLbl);
         topbar.setComponentAlignment(userLbl, Alignment.MIDDLE_RIGHT);
         
         MenuBar menuCuenta = new MenuBar();
         MenuBar.MenuItem perfil = menuCuenta.addItem("Cuenta",VaadinIcons.USER,null);
-        MenuBar.MenuItem confPerfil = perfil.addItem("Configurar perfil",VaadinIcons.CALC_BOOK,null);
         MenuBar.MenuItem cerrarSesion = perfil.addItem("Cerrar sesión",VaadinIcons.POWER_OFF,
                 comando -> {ui.getSession().close();ui.getPage().reload();});
         
@@ -115,7 +116,7 @@ public class MainPanel extends Panel{
         return menuPrincipal;
     }
     
-    
+
     
     
 }

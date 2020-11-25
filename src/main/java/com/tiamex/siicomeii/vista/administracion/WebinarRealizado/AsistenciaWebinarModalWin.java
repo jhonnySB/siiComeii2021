@@ -10,15 +10,19 @@ import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,11 +30,17 @@ import java.util.logging.Logger;
 /**
  * @author fred *
  */
-public final class AsistenciaWebinarModalWin extends TemplateModalWin {
+public final class AsistenciaWebinarModalWin extends TemplateModalWin{
 
     private TextArea correos;
     private TextField webinarRealizado;
-    private TextArea correosInvalidos;
+    private Label labelAlert;
+    private ResponsiveLayout contenido;
+    private CustomLayout alertCorreos;
+    private Notification notifG;
+    private String globalHtml;
+    private final long idWebinar;
+    private String idBtnLista;
     private static final String PATTERN_EMAIL
             = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
             + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
@@ -40,30 +50,104 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
         init();
         delete.setVisible(false);
     } */
-    public AsistenciaWebinarModalWin(long id) {
+    public AsistenciaWebinarModalWin(long idWebinar,String idBtn) {
         init();
-        loadData(id);
+        //System.out.println(idBtn.substring(0, idBtn.indexOf("_")));
+        idBtnLista = idBtn.substring(0, idBtn.indexOf("_"));
+        this.idWebinar = idWebinar;
+        loadData(idWebinar);
         delete.setVisible(false);
     }
 
-    private void init() {
-        ResponsiveLayout contenido = new ResponsiveLayout();
-        Element.cfgLayoutComponent(contenido);
+    private void createNotif(String caption, String desc, VaadinIcons icon, Notification.Type type, boolean html) {
+        if (notifG != null) {
+            notifG.close();
+        }
+        notifG = new Notification(caption, type);
+        notifG.setDescription(desc);
+        notifG.setIcon(icon);
+        notifG.setHtmlContentAllowed(html);
+        notifG.setPosition(Position.TOP_CENTER);
+        notifG.setDelayMsec(2500);
+        notifG.show(ui.getPage());
+    }
 
+    private void setCustomLayout(String fileHtml) {
+        if (alertCorreos == null) {
+            try {
+                alertCorreos = new CustomLayout(new FileInputStream(new File(Main.getBaseDir() + "/mailer/" + fileHtml)));
+            } catch (IOException ex) {
+                Logger.getLogger(AsistenciaWebinarModalWin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            if (globalHtml.compareTo(fileHtml) != 0) {
+                try {
+                    contentLayout.removeComponent(alertCorreos);
+                    alertCorreos = new CustomLayout(new FileInputStream(new File(Main.getBaseDir() + "/mailer/" + fileHtml)));
+                } catch (IOException ex) {
+                    Logger.getLogger(AsistenciaWebinarModalWin.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        globalHtml = fileHtml;
+    }
+
+    private void createAlertLabel(String btnName, String labelName, String fileHtml) {
+        labelAlert.setValue("La acción se realizó con éxito");
+        labelAlert.setCaption("<strong>Constancia(s) enviada(s)</strong> \n");
+        setAlertLabel(btnName, labelName, fileHtml);
+    }
+
+    private void createAlertLabel(List<String> emailsInvalidos, String btnName, String labelName, String fileHtml) {
+        labelAlert.setCaption("<strong>Correos no válidos o no registrados:</strong> \n");
+        int cont = emailsInvalidos.size();
+        String listaMails = "";
+        for (String mail : emailsInvalidos) {
+            if (cont > 1) {
+                listaMails += mail.trim() + " , ";
+            } else {
+                listaMails += mail.trim() + " .";
+            }
+            cont--;
+        }
+        labelAlert.setValue(listaMails);
+        setAlertLabel(btnName, labelName, fileHtml);
+    }
+
+    private void setAlertLabel(String btnName, String labelName, String fileHtml) {
+        setCustomLayout(fileHtml);
+        alertCorreos.setSizeFull();
+        labelAlert.setCaptionAsHtml(true);
+        labelAlert.setResponsive(true);
+        labelAlert.setWidth("100%");
+        alertCorreos.setCaption("\n");
+        Button btnClose = new Button(VaadinIcons.CLOSE);  // button as a label
+        btnClose.setDescription("Cerrar");
+        btnClose.addStyleName(ValoTheme.BUTTON_LINK);
+        btnClose.addClickListener(event -> {
+            btnCerrarAlert();
+        });
+        alertCorreos.addComponent(labelAlert, labelName);
+        alertCorreos.addComponent(btnClose, btnName);
+        contentLayout.addComponent(alertCorreos);
+    }
+
+    private void init() {
+        labelAlert = new Label();
+        globalHtml = "";
+        contenido = new ResponsiveLayout();
+        Element.cfgLayoutComponent(contenido);
         correos = new TextArea("Correos");
         correos.setPlaceholder("Escriba los correos separados por coma.");
         Element.cfgComponent(correos);
         correos.setRequiredIndicatorVisible(true);
         correos.focus();
-
-        webinarRealizado = new TextField();
-        Element.cfgComponent(webinarRealizado, "Webinar");
+        webinarRealizado = new TextField("Webinar");
+        Element.cfgComponent(webinarRealizado);
         webinarRealizado.setReadOnly(true);
-
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(correos);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(webinarRealizado);
-
         contentLayout.addComponent(contenido);
         setCaption("Asistencia webinar");
         setWidth("50%");
@@ -89,105 +173,44 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
 
     @Override
     protected void buttonAcceptEvent() {
-
         System.out.println(correos.getValue());
         String emails = correos.getValue();
-        System.out.println(emails.matches(PATTERN_EMAIL));
+        String emailsArray[] = emails.split(",");
+        List<String> emailsList;
+        emailsList = Arrays.asList(emailsArray);
         List<String> emailsInvalidos;
         if (validarCampos()) {
             try {
                 SiiComeiiMailer mailer = new SiiComeiiMailer();
-                emailsInvalidos = mailer.enviarConstancias(emails, this.id);
-                System.out.println(emailsInvalidos);
-                if(!emailsInvalidos.isEmpty()){
-                    Notification notif = new Notification("AVISO | ",Notification.Type.HUMANIZED_MESSAGE);
-                    notif.setPosition(Position.TOP_CENTER);
-                    notif.setDelayMsec(3000);
-                    notif.setDescription("Se encontraron correos no válidos o no registrados");  //agregar un label dimiss abajo de los correos no validos o no encontraos
-                    notif.setIcon(VaadinIcons.WARNING);
-                    notif.setHtmlContentAllowed(true);
-                    notif.show(ui.getPage());
-                    //CustomLayout alertCorreos = new CustomLayout(new FileInputStream(new File(Main.getBaseDir()+"/mailer/alertCoreos.html")));
-                    ResponsiveLayout alertCorreos = new ResponsiveLayout();
-                    ResponsiveRow rowCorreos = alertCorreos.addRow();
-                    correosInvalidos = new TextArea();
-                    contentLayout.addComponent(alertCorreos);
-                }else{
-                    Notification notif = new Notification("ÉXITO | ",Notification.Type.HUMANIZED_MESSAGE);
-                    notif.setPosition(Position.TOP_CENTER);
-                    notif.setDelayMsec(3000);
-                    notif.setDescription("Se enviaron las constancias a todos los correos");
-                    notif.setIcon(VaadinIcons.CHECK);
-                    notif.setHtmlContentAllowed(true);
-                    notif.show(ui.getPage());
+                emailsInvalidos = mailer.enviarConstancias(emails, idWebinar,ui.getUsuario().getId());
+                if (!emailsInvalidos.isEmpty()) {
+                    if (alertCorreos != null) {
+                        alertCorreos.setVisible(true);
+                    }
+                    if (emailsList.equals(emailsInvalidos)) {
+                        createNotif("ERROR | ", "Los correos no son válidos o no estan registrados", VaadinIcons.WARNING,
+                                Notification.Type.ERROR_MESSAGE, true);
+                        createAlertLabel(emailsInvalidos, "btn_3", "errorMails", "alertCoreosError.html");
+                    } else {
+                        ui.getFabricaVista().getWebinarRealizadoDlg().updateButtonPdf(idWebinar,idBtnLista.concat("_lista"));
+                        createNotif("AVISO | ", "Se encontraron correos no válidos o no registrados", VaadinIcons.WARNING,
+                                Notification.Type.WARNING_MESSAGE, true);
+                        createAlertLabel(emailsInvalidos, "btn_2", "warningMails", "alertCorreosWarning.html");
+                    }
+                } else {
+                    ui.getFabricaVista().getWebinarRealizadoDlg().updateButtonPdf(idWebinar,idBtnLista.concat("_lista"));
+                    createNotif("ÉXITO | ", "Se enviaron las constancias", VaadinIcons.CHECK,
+                            Notification.Type.HUMANIZED_MESSAGE, true);
+                    createAlertLabel("btn_1", "successMails", "alertCorreosSuccess.html");
                 }
-                
-                
-                /*if (!email.matches(PATRON_EMAIL)) {
-                emailsInvalidos.add(email);
-                }
-                
-                if (emailsAgremiados.size() > 0) {
-                    Notification notif = new Notification("ERROR | ",Notification.Type.HUMANIZED_MESSAGE);
-                    notif.setPosition(Position.TOP_CENTER);
-                    notif.setDelayMsec(3000);
-                    int cont=0;
-                    notif.setDescription("Correo/s no válidos");
-                    notif.setIcon(VaadinIcons.WARNING);
-                    notif.setHtmlContentAllowed(true);
-                    notif.show(ui.getPage());
-                }*/
+
             } catch (Exception ex) {
                 Logger.getLogger(AsistenciaWebinarModalWin.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            } 
         }
-
-
-        /*
-        if (validarCampos()) {
-        try {
-        //ciclo para cada correo encontrado
-        AsistenciaWebinar obj = new AsistenciaWebinar();
-        obj.setUsuario(ui.getUsuario().getId());
-        obj.setWebinar(id);
-        obj = ControladorAsistenciaWebinar.getInstance().save(obj);
-        if (obj != null) {
-        Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-        ui.getFabricaVista().getWebinarRealizadoDlg().updateDlg();
-        close();
-        }
-        } catch (Exception ex) {
-        Logger.getLogger(AsistenciaWebinarModalWin.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        }
-        /*
-        try {
-        if (validarCampos()) {
-        WebinarRealizado obj = new WebinarRealizado();
-        obj.setId(id);
-        obj.setFecha(fecha.getValue());
-        obj.setInstitucion(institucion.getValue());
-        obj.setNombre(nombre.getValue());
-        obj.setPonente(ponente.getValue());
-        obj.setPresentacion("xd");
-        obj.setUrlYoutube("xd 2");
-        obj = ControladorWebinarRealizado.getInstance().save(obj);
-        if (obj != null) {
-        Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-        ui.getFabricaVista().getWebinarRealizadoDlg().updateDlg();
-        close();
-        }
-        } else {
-        Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
-        }
-        } catch (Exception ex) {
-        Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        }
-         */
     }
 
     @Override
@@ -197,14 +220,16 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
 
     private boolean validarCampos() {
 
-        //TextArea pnotesField = fg.buildAndBind("YOUR_CAPTION", correos, TextArea.class);
-        
         if (correos.isEmpty()) {
             correos.focus();
-            Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+            createNotif("ERROR | ", "Faltan campos por llenar", VaadinIcons.WARNING, Notification.Type.ERROR_MESSAGE, true);
             return false;
-        } 
+        }
         return true;
+    }
+
+    private void btnCerrarAlert() {
+        alertCorreos.setVisible(false);
     }
 
 }

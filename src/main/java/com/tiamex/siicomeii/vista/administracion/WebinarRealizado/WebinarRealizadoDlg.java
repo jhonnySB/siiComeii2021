@@ -1,13 +1,17 @@
 package com.tiamex.siicomeii.vista.administracion.WebinarRealizado;
 
-import com.tiamex.siicomeii.controlador.ControladorAgremiado;
+import com.jarektoro.responsivelayout.ResponsiveLayout;
+import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorWebinarRealizado;
 import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
+import com.tiamex.siicomeii.reportes.base.pdf.ListadoAsistentesPDF;
 import com.tiamex.siicomeii.utils.Utils;
+import com.tiamex.siicomeii.vista.utils.ShowPDFDlg;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
-import com.vaadin.icons.VaadinIcons;
-import com.vaadin.shared.Position;
-import com.vaadin.ui.Notification;
+import com.vaadin.server.StreamResource;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.Label;
 import java.util.logging.Logger;
 
 /**
@@ -35,7 +39,7 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
     @Override
     protected void buttonSearchEvent() {
         try {
-            grid.setItems(ControladorWebinarRealizado.getInstance().getAll());
+            grid.setItems(ControladorWebinarRealizado.getInstance().getAll()); 
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -56,18 +60,15 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
     }
 
     @Override
-    protected void eventAsistenciaButton(WebinarRealizado obj) {
+    protected void eventAsistenciaButton(WebinarRealizado obj,String idBtn) {
+        ui.addWindow(new AsistenciaWebinarModalWin(obj.getId(),idBtn));
+    }
 
-        if (!ControladorAgremiado.getInstance().getAll().isEmpty()) {
-            ui.addWindow(new AsistenciaWebinarModalWin(obj.getId()));
-        } else {
-            Notification notif = new Notification("AVISO | ", Notification.Type.HUMANIZED_MESSAGE);
-            notif.setPosition(Position.TOP_CENTER);
-            notif.setDelayMsec(3000);
-            notif.setDescription("<b>No hay agremiados registrados</b>");
-            notif.setIcon(VaadinIcons.WARNING);
-            notif.setHtmlContentAllowed(true);
-            notif.show(ui.getPage());
+    @Override
+    protected void eventListaAsistentes(WebinarRealizado obj) {
+        try {
+            ui.addWindow(new ShowPDFDlg(new StreamResource(new ListadoAsistentesPDF(obj), (Utils.getFormatIdLong() + ".pdf").replace(" ", ""))));
+        } catch (Exception ex) {
         }
     }
 }

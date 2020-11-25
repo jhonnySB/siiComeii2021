@@ -8,6 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 /** @author cerimice **/
 
 @SpringBootApplication
+//@Theme("siiComeiiTheme")
 public class Main{
     
     private static String baseDir = "";

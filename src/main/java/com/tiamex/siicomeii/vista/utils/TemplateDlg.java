@@ -4,19 +4,24 @@ import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.SiiComeiiUI;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
-import com.vaadin.client.renderers.ButtonRenderer;
+import com.tiamex.siicomeii.controlador.ControladorAsistenciaWebinar;
+import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
 import com.vaadin.data.HasValue;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.shared.ui.grid.ColumnResizeMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author cerimice *
@@ -37,13 +42,13 @@ public abstract class TemplateDlg<T> extends Panel {
     protected Button buttonDataImport;
     protected Button buttonDataExport;
     protected Button buttonWebinar;
+    protected Button buttonListado;
     protected int banBoton;
-
     protected VerticalLayout contentLayout;
 
     protected Grid<T> grid;
 
-    private VerticalLayout main;
+    public VerticalLayout main;
 
     public VerticalLayout getMain() {
         return main;
@@ -51,10 +56,11 @@ public abstract class TemplateDlg<T> extends Panel {
 
     public TemplateDlg() {
         initDlg();
+        
     }
-
+    
     private void initDlg() {
-        banBoton = 0;
+        updateDlg();
         ui = Element.getUI();
         ResponsiveLayout content = new ResponsiveLayout();
         content.setSizeFull();
@@ -92,9 +98,8 @@ public abstract class TemplateDlg<T> extends Panel {
             gridEvent();
         });
 
-        //grid.addComponentColumn(this::buildEditButton).setMaximumWidth(50).setId("botones");
-        grid.addComponentColumn(this::buildEditButton).setWidth(150);
-
+        grid.addComponentColumn(this::buildEditButton).setId("botones");
+        
         ResponsiveRow row3 = content.addRow().withAlignment(Alignment.MIDDLE_CENTER);
         Element.cfgLayoutComponent(row3, true, false);
         row3.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(grid);
@@ -106,7 +111,6 @@ public abstract class TemplateDlg<T> extends Panel {
         Element.cfgLayoutComponent(main, true, false);
         main.addComponent(content);
         main.addComponent(contentLayout);
-
         this.setSizeFull();
         this.setContent(main);
         this.setCaptionAsHtml(true);
@@ -119,26 +123,91 @@ public abstract class TemplateDlg<T> extends Panel {
         Element.cfgLayoutComponent(row, true, false);
 
         Button button = new Button(VaadinIcons.EDIT);
-        button.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+        button.addStyleName(ValoTheme.BUTTON_LINK);
         button.setDescription("Editar");
-        button.addClickListener(e -> eventEditButtonGrid(obj));
+        button.addClickListener(e -> {
+            eventEditButtonGrid(obj);
+        });
+
         if (banBoton != 0) {
-            buttonWebinar = new Button(VaadinIcons.CALENDAR);
-            buttonWebinar.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-            buttonWebinar.addClickListener(e -> eventAsistenciaButton(obj));
-            buttonWebinar.setDescription("Enviar constancia a Agremiados");
+            //grid.getColumn("botones").setWidth(220).setEditable(false);
+            grid.getColumn("botones").setMinimumWidth(220).setMaximumWidth(220).
+                    setEditable(false).clearExpandRatio().setCaption("Acción");
+            buttonListado = new Button(VaadinIcons.FILE_TEXT_O);
+            buttonListado.addStyleName(ValoTheme.BUTTON_LINK);
+            buttonListado.addClickListener(e -> eventListaAsistentes(obj));
+            buttonWebinar = new Button(VaadinIcons.ENVELOPE);
+            buttonWebinar.addStyleName(ValoTheme.BUTTON_LINK);
+            buttonWebinar.addClickListener(e -> eventAsistenciaButton(obj, e.getButton().getId()));
+            if (updateButtonCorreo()) {
+                buttonWebinar.setDescription("Enviar constancias a Agremiados por correo");
+            } else {
+                buttonWebinar.setDescription("No se encontraron agremiados registrados");
+            }
+            if (obj.getClass().getSimpleName().compareTo("WebinarRealizado") == 0) {
+                WebinarRealizado wr = (WebinarRealizado) obj;
+                String idLista = Long.toString(wr.getId()) + "_lista";
+                buttonListado.setId(idLista);
+                buttonWebinar.setId(Long.toString(wr.getId()) + "_correo");
+                if (ControladorAsistenciaWebinar.getInstance().getByWebinar(wr.getId()).isEmpty()) {
+                    buttonListado.setEnabled(false);
+                    buttonListado.setDescription("No se encontraron asistentes al webinar");
+                } else {
+                    buttonListado.setEnabled(true);
+                    buttonListado.setDescription("Descargar listado de asistentes");
+                }
+            }
+            row.addColumn().withComponent(buttonListado);
             row.addColumn().withComponent(buttonWebinar);
+        } else {
+            grid.getColumn("botones").setMinimumWidth(100).setMaximumWidth(100).
+                    setEditable(false).clearExpandRatio().setAssistiveCaption("Acción");
         }
         row.addColumn().withComponent(button);
+        //updateButtonsPdf();
         return layout;
-    }
-    
-    private boolean agremiadosRegistrados(){
-        return ControladorAgremiado.getInstance().getAll().isEmpty();
     }
 
     public void updateDlg() {
         buttonSearchEvent();
+    }
+
+    public boolean updateButtonCorreo() {
+        if (ControladorAgremiado.getInstance().getAll().isEmpty()) {
+            buttonWebinar.setEnabled(false);
+        } else {
+            buttonWebinar.setEnabled(true);
+        }
+        return buttonWebinar.isEnabled();
+    }
+
+    public void updateButtonPdf(long idWebinar, String idBtnLista) {
+        try {
+            Component btn = findComponentById(grid, idBtnLista);
+            if (!ControladorAsistenciaWebinar.getInstance().getByWebinar(idWebinar).isEmpty()) {
+                ((Button) btn).setEnabled(true);
+                ((Button) btn).setDescription("Descargar listado de asistentes ");
+            } else {
+                ((Button) btn).setEnabled(false);
+                ((Button) btn).setDescription("No se encontraron asistentes al webinar");
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(TemplateDlg.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public static Component findComponentById(HasComponents root, String id) {
+        for (Component child : root) {
+            if (id.equals(child.getId())) {
+                return child; 
+            } else if (child instanceof HasComponents) { 
+                Component result = findComponentById((HasComponents) child, id);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null; 
     }
 
     protected abstract void buttonSearchEvent();
@@ -149,5 +218,8 @@ public abstract class TemplateDlg<T> extends Panel {
 
     protected abstract void eventEditButtonGrid(T obj);
 
-    protected abstract void eventAsistenciaButton(T obj);
+    protected abstract void eventListaAsistentes(T obj);
+
+    protected abstract void eventAsistenciaButton(T obj, String idBtn);
+
 }

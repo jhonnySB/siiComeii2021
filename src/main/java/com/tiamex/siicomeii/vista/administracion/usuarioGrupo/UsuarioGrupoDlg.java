@@ -4,6 +4,7 @@ import com.tiamex.siicomeii.controlador.ControladorUsuarioGrupo;
 import com.tiamex.siicomeii.persistencia.entidad.UsuarioGrupo;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author cerimice **/
@@ -44,7 +45,12 @@ public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
     }
 
     @Override
-    protected void eventAsistenciaButton(UsuarioGrupo obj) {
+    protected void eventAsistenciaButton(UsuarioGrupo obj,String idBtn) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventListaAsistentes(UsuarioGrupo obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

@@ -2,6 +2,7 @@ package com.tiamex.siicomeii.controlador;
 
 import com.tiamex.siicomeii.persistencia.entidad.AsistenciaWebinar;
 import com.tiamex.siicomeii.persistencia.servicio.ServicioAsistenciaWebinar;
+import java.util.List;
 
 /** @author cerimice **/
 public class ControladorAsistenciaWebinar extends GenericController<ServicioAsistenciaWebinar,AsistenciaWebinar,Long>{
@@ -41,6 +42,15 @@ public class ControladorAsistenciaWebinar extends GenericController<ServicioAsis
         }
 
         return getService().save(obj);
+    }
+
+    
+    public List<AsistenciaWebinar> getByWebinar(long idWebinar){
+        return getService().getByIdWebinar(idWebinar);
+    }
+    
+    public List<AsistenciaWebinar> getByAgremiadoWebinar(long idWebinar,long idAgremiado){
+        return getService().getByAgremiadoWebinar(idWebinar,idAgremiado);
     }
     
 }

@@ -89,7 +89,12 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     }
 
     @Override
-    protected void eventAsistenciaButton(Agremiado obj) {
+    protected void eventAsistenciaButton(Agremiado obj,String idBtn) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventListaAsistentes(Agremiado obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

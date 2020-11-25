@@ -3,6 +3,7 @@ import com.tiamex.siicomeii.controlador.ControladorGradoEstudio;
 import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author cerimice **/
@@ -44,7 +45,12 @@ public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
     }
 
     @Override
-    protected void eventAsistenciaButton(GradoEstudio obj) {
+    protected void eventAsistenciaButton(GradoEstudio obj,String idBtn) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventListaAsistentes(GradoEstudio obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

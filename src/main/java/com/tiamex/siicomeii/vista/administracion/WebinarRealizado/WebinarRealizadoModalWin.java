@@ -83,9 +83,8 @@ public class WebinarRealizadoModalWin extends TemplateModalWin {
             institucion.setValue(obj.getInstitucion());
             nombre.setValue(obj.getNombre());
             ponente.setValue(obj.getPonente());
-            //presentacion.setValue("xd");
-            //urlYoutube.setValue("xd");
-
+            presentacion.setValue(obj.getPresentacion());
+            urlYoutube.setValue(obj.getUrlYoutube());
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

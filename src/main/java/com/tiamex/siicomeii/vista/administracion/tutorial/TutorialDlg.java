@@ -4,6 +4,7 @@ import com.tiamex.siicomeii.controlador.ControladorTutorial;
 import com.tiamex.siicomeii.persistencia.entidad.Tutorial;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author fred **/
@@ -46,7 +47,12 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
     }
 
     @Override
-    protected void eventAsistenciaButton(Tutorial obj) {
+    protected void eventAsistenciaButton(Tutorial obj,String idBtn) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventListaAsistentes(Tutorial obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

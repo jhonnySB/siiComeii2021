@@ -180,8 +180,9 @@ public class Mailer {
     }
 
     /// funcion de prueba para enviar correo con imagenes
-    public boolean sendMailConstancia(String to, String cc, String bcc, String subject, String mensaje, String filename,String webinar,int yearWebinar) 
-            throws MessagingException {  
+    public boolean sendMailConstancia(String to, String cc, String bcc, String subject, String mensaje, String fileName,String webinar,int yearWebinar) 
+            throws MessagingException {
+        String formFileName = fileName.substring(fileName.indexOf("constanciaWebinar"), fileName.length());
         try {
             // Create a default MimeMessage object.
             Message message = new MimeMessage(this.session);
@@ -214,9 +215,9 @@ public class Mailer {
             
             //agregar el archivo
             BodyPart messageBodyPart2 = new MimeBodyPart();
-            DataSource source = new FileDataSource(filename);
+            DataSource source = new FileDataSource(fileName);
             messageBodyPart2.setDataHandler(new DataHandler(source));
-            messageBodyPart2.setFileName(filename);
+            messageBodyPart2.setFileName(formFileName);
             
             multipart.addBodyPart(messageBodyPart);
             multipart.addBodyPart(messageBodyPart2);

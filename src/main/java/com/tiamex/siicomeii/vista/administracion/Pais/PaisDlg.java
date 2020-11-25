@@ -4,6 +4,7 @@ import com.tiamex.siicomeii.controlador.ControladorPais;
 import com.tiamex.siicomeii.persistencia.entidad.Pais;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author fred **/
@@ -44,7 +45,12 @@ public class PaisDlg extends TemplateDlg<Pais>{
     }
 
     @Override
-    protected void eventAsistenciaButton(Pais obj) {
+    protected void eventAsistenciaButton(Pais obj,String idBtn) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventListaAsistentes(Pais obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

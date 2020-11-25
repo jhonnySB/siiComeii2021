@@ -2,8 +2,10 @@ package com.tiamex.siicomeii.mailer;
 
 import com.tiamex.siicomeii.Main;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
+import com.tiamex.siicomeii.controlador.ControladorAsistenciaWebinar;
 import com.tiamex.siicomeii.controlador.ControladorWebinarRealizado;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
+import com.tiamex.siicomeii.persistencia.entidad.AsistenciaWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
 import com.tiamex.siicomeii.reportes.base.pdf.ConstanciaAgremiado;
@@ -12,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -78,26 +79,33 @@ public class SiiComeiiMailer{
         }
     }
     
-    public List<String> enviarConstancias(String correos,long idWebinar) throws Exception{
+    public List<String> enviarConstancias(String correos,long idWebinar,long idUser) throws Exception{
         try{
             List<String> emailsInvalidos = new ArrayList<>();
             Mailer mailer = new Mailer();
-            String asunto = "Sii Comeii | Envio de constancia de webinar 2_3";
-            String mensaje = cargarMensaje(Main.getBaseDir()+"/mailer/envioConstancia.txt");
+            String asunto = "Sii Comeii | Envio de constancia de webinar";
+            String mensaje;
             WebinarRealizado webinar = ControladorWebinarRealizado.getInstance().getById(idWebinar);
             String nombreWebinar = webinar.getNombre();
             ConstanciaAgremiado constancia;
+            Agremiado agremiado;
+            AsistenciaWebinar asistencia;
             for(String correo: correos.split(",")){
-                System.out.println("'"+correo+"'");
-                Agremiado agremiado = ControladorAgremiado.getInstance().getByEmail(correo.trim());
+                agremiado = ControladorAgremiado.getInstance().getByEmail(correo.trim());
                 if(agremiado!=null){
-                    System.out.print("Agremiado encontrado");
-                    String nombreAgremiado = agremiado.getNombre();
-                    mensaje = mensaje.replaceAll(":nombre",nombreAgremiado);
+                    asistencia = new AsistenciaWebinar();
+                    asistencia.setAgremiado(agremiado.getId());
+                    asistencia.setUsuario(idUser);
+                    asistencia.setWebinar(idWebinar);
+                    if(ControladorAsistenciaWebinar.getInstance().getByAgremiadoWebinar(idWebinar, agremiado.getId()).isEmpty())
+                        ControladorAsistenciaWebinar.getInstance().save(asistencia);
+                    mensaje = cargarMensaje(Main.getBaseDir()+"/mailer/envioConstancia.txt");
+                    String nuevoAgremiado = agremiado.getNombre();
+                    mensaje = mensaje.replaceAll(":nombre",nuevoAgremiado);
                     mensaje = mensaje.replaceAll(":webinar", nombreWebinar);
-                    constancia = new ConstanciaAgremiado(nombreWebinar,nombreAgremiado,webinar.getFecha());
+                    constancia = new ConstanciaAgremiado(nombreWebinar,nuevoAgremiado,webinar.getFecha());
                     String filename = constancia.generarConstancia();
-                    System.out.println(mailer.sendMailConstancia(correo, "", "", asunto, mensaje, filename,nombreWebinar,webinar.getFecha().getYear()));
+                    mailer.sendMailConstancia(correo, "", "", asunto, mensaje, filename,nombreWebinar,webinar.getFecha().getYear());
                     //constancia.borrarConstancia(filename);
                 }else{
                     emailsInvalidos.add(correo);
