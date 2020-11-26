@@ -39,6 +39,7 @@ public class PaisModalWin extends TemplateModalWin {
 
         nombre = new TextField();
         Element.cfgComponent(nombre, "Nombre");
+        nombre.setPlaceholder("Ingrese nombre de país");
         nombre.setRequiredIndicatorVisible(true);
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
@@ -76,8 +77,8 @@ public class PaisModalWin extends TemplateModalWin {
         try {
             Pais obj = new Pais();
             obj.setId(id);
-
-            if (("".equals(nombre.getValue())) && validarCampos()) {
+            
+            if ("".equals(nombre.getValue()) == true && validarCampos() == false) {
                 Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             } else {
                 obj.setNombre(nombre.getValue());

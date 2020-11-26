@@ -4,7 +4,6 @@ import com.tiamex.siicomeii.controlador.ControladorProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
-import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author fred **/

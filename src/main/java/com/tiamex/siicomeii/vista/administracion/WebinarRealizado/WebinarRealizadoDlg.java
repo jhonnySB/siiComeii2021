@@ -1,7 +1,5 @@
 package com.tiamex.siicomeii.vista.administracion.WebinarRealizado;
 
-import com.jarektoro.responsivelayout.ResponsiveLayout;
-import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorWebinarRealizado;
 import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
 import com.tiamex.siicomeii.reportes.base.pdf.ListadoAsistentesPDF;
@@ -9,9 +7,6 @@ import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.ShowPDFDlg;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
 import com.vaadin.server.StreamResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.Label;
 import java.util.logging.Logger;
 
 /**

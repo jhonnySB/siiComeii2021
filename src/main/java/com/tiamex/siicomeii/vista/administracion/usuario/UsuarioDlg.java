@@ -4,7 +4,6 @@ import com.tiamex.siicomeii.controlador.ControladorUsuario;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
-import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author cerimice **/

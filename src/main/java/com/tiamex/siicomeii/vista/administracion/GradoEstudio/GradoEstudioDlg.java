@@ -3,7 +3,6 @@ import com.tiamex.siicomeii.controlador.ControladorGradoEstudio;
 import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
-import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author cerimice **/

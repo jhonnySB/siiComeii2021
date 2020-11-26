@@ -11,15 +11,18 @@ import com.vaadin.data.Binder;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.*;
+
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 /** @author fred **/
-public class ProximoEventoModalWin extends TemplateModalWin {
+public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Receiver{
     private TextArea descripcion;
     private DateTimeField fecha;
     private TextField imagen;
     private TextField titulo;
+    private TextField usuario;
 
     public ProximoEventoModalWin() {
         init();
@@ -48,17 +51,27 @@ public class ProximoEventoModalWin extends TemplateModalWin {
 
         imagen = new TextField();
         Element.cfgComponent(imagen, "Imagen");
+        imagen.setPlaceholder("Ingrese url de imagen");
+        imagen.setRequiredIndicatorVisible(true);
 
 
         titulo = new TextField();
         Element.cfgComponent(titulo, "Título");
+        titulo.setPlaceholder("Ingrese título");
         titulo.setRequiredIndicatorVisible(true);
+        
+        usuario = new TextField();
+        Element.cfgComponent(usuario, "Usuario");
+        usuario.setValue(ui.getUsuario().getNombre());
+        //usuario.setEnabled(false);
+        usuario.setReadOnly(true);
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(descripcion);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(fecha);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(imagen);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(titulo);
+        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(usuario);
 
         contentLayout.addComponent(contenido);
 
@@ -70,7 +83,6 @@ public class ProximoEventoModalWin extends TemplateModalWin {
     protected void loadData(long id) {
         try {
             ProximoEvento obj = ControladorProximoEvento.getInstance().getById(id);            
-
             this.id = obj.getId();
             descripcion.setValue(obj.getDescripcion());
             fecha.setValue(obj.getFecha());
@@ -127,9 +139,14 @@ public class ProximoEventoModalWin extends TemplateModalWin {
         binder.forField(descripcion).asRequired("Campo requerido").bind(ProximoEvento::getDescripcion,ProximoEvento::setDescripcion);
         binder.forField(fecha).asRequired("Campo requerido").bind(ProximoEvento::getFecha,ProximoEvento::setFecha);
         binder.forField(imagen).asRequired("Campo requerido").bind(ProximoEvento::getImagen,ProximoEvento::setImagen);
-        binder.forField(imagen).asRequired("Campo requerido").bind(ProximoEvento::getImagen,ProximoEvento::setImagen);
         binder.forField(titulo).asRequired("Campo requerido").bind(ProximoEvento::getTitulo,ProximoEvento::setTitulo);
         
         return binder.validate().isOk();
     }
+
+    @Override
+    public OutputStream receiveUpload(String filename, String mimeType) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

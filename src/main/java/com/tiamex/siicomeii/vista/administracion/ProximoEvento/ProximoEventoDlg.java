@@ -4,7 +4,6 @@ import com.tiamex.siicomeii.controlador.ControladorProximoEvento;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoEvento;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
-import com.vaadin.ui.Button;
 import java.util.logging.Logger;
 
 /** @author fred **/
@@ -20,7 +19,7 @@ public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
         grid.addColumn(ProximoEvento::getFecha).setCaption("Fecha");
         grid.addColumn(ProximoEvento::getImagen).setCaption("Imagen");
         grid.addColumn(ProximoEvento::getTitulo).setCaption("Título");
-        grid.addColumn(ProximoEvento::getObjUsuario).setCaption("usuario");
+        grid.addColumn(ProximoEvento::getObjUsuario).setCaption("Usuario");
         setCaption("<b>Próximos eventos</b>");
         buttonSearchEvent();
     }

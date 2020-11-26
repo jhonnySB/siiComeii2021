@@ -38,7 +38,7 @@ public final class TutorialModalWin extends TemplateModalWin {
 
         institucion = new TextField();
         Element.cfgComponent(institucion, "Institución");
-        institucion.setPlaceholder("Ingrese nstitución");
+        institucion.setPlaceholder("Ingrese nombre de institución");
         institucion.setRequiredIndicatorVisible(true);
         
         nombre = new TextField();
@@ -48,13 +48,14 @@ public final class TutorialModalWin extends TemplateModalWin {
         
         tutor = new TextField();
         Element.cfgComponent(tutor, "Tutor");
-        tutor.setPlaceholder("Ingrese tutor");
+        tutor.setPlaceholder("Ingrese nombre del tutor");
         tutor.setRequiredIndicatorVisible(true);
         
         usuario = new TextField();
         Element.cfgComponent(usuario, "Usuario");
-        usuario.setPlaceholder("Ingrese usuario");
-        usuario.setRequiredIndicatorVisible(true);
+        usuario.setValue(ui.getUsuario().getNombre());
+        //usuario.setEnabled(false);
+        usuario.setReadOnly(true);
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
@@ -99,7 +100,7 @@ public final class TutorialModalWin extends TemplateModalWin {
                 obj.setInstitucion(institucion.getValue());
                 obj.setNombre(nombre.getValue());
                 obj.setTutor(tutor.getValue());
-                obj.setUsuario(Long.parseLong(usuario.getValue()));
+                obj.setUsuario(ui.getUsuario().getId());
 
                 obj = ControladorTutorial.getInstance().save(obj);
                 if (obj != null) {

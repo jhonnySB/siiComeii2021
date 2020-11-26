@@ -38,8 +38,10 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
         Element.cfgLayoutComponent(contenido);
 
         nombre = new TextField();
-        nombre.setRequiredIndicatorVisible(true);
         Element.cfgComponent(nombre, "Nombre");
+        nombre.setPlaceholder("Ingrese grupo de usuario");
+        nombre.setRequiredIndicatorVisible(true);
+        
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
 
@@ -74,8 +76,7 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
         try {
             UsuarioGrupo obj = new UsuarioGrupo();
             obj.setId(id);
-            if ("".equals(nombre.getValue())) {
-                validarCampos();
+            if ("".equals(nombre.getValue()) == true && validarCampos() == false) {
                 Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             } else {
                 obj.setNombre(nombre.getValue());

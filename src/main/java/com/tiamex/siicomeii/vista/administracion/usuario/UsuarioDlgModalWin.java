@@ -53,15 +53,19 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
 
         correo = new TextField();
         Element.cfgComponent(correo, "Correo electrónico");
+        correo.setPlaceholder("Ingrese correco electrónico");
         correo.setRequiredIndicatorVisible(true);
 
         nombre = new TextField();
         Element.cfgComponent(nombre, "Nombre");
+        nombre.setPlaceholder("Ingrese nombre completo");
         nombre.setRequiredIndicatorVisible(true);
 
         password = new PasswordField();
         Element.cfgComponent(password, "Contraseña");
+        password.setPlaceholder("Ingrese contraseña");
         password.setRequiredIndicatorVisible(true);
+        password.setMaxLength(8);
 
         usuarioGrupo = new ComboBox<>();
         Element.cfgComponent(usuarioGrupo, "Grupo de usuario");
@@ -120,11 +124,11 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                 obj.setCorreo(correo.getValue());
                 obj.setNombre(nombre.getValue());
                 obj.setPassword(password.getValue());
-                System.out.println("VALOR DEL COMBOBOX: " + usuarioGrupo.getValue());
+                
                 if (usuarioGrupo.getValue() != null) {
                     obj.setUsuarioGrupo(usuarioGrupo.getValue() == null ? 0 : usuarioGrupo.getValue().getId());
-
                     obj = ControladorUsuario.getInstance().save(obj);
+                    
                     if (obj != null) {
                         Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                         ui.getFabricaVista().getUsuarioDlg().updateDlg();

@@ -39,6 +39,7 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
 
         nombre = new TextField();
         Element.cfgComponent(nombre, "Nombre");
+        nombre.setPlaceholder("Ingrese grado de estudios");
         nombre.setRequiredIndicatorVisible(true);
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
@@ -75,7 +76,8 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
         try {
             GradoEstudio obj = new GradoEstudio();
             obj.setId(id);
-            if (("".equals(nombre.getValue())) && validarCampos()) {
+            
+            if ("".equals(nombre.getValue()) == true && validarCampos() == false) {
                 Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             } else {
                 obj.setNombre(nombre.getValue());
@@ -84,6 +86,8 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
                     Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                     ui.getFabricaVista().getGradoEstudioDlg().updateDlg();
                     close();
+                } else{
+                    Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
                 }
             }
 

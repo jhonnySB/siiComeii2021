@@ -14,11 +14,13 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.DateTimeField;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.Upload;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 /**@author fred **/
-public class WebinarRealizadoModalWin extends TemplateModalWin {
+public class WebinarRealizadoModalWin extends TemplateModalWin implements Upload.Receiver{
 
     private DateTimeField fecha;
     private TextField institucion;
@@ -63,11 +65,23 @@ public class WebinarRealizadoModalWin extends TemplateModalWin {
         ponente.setPlaceholder("Ingrese ponente");
         ponente.setRequiredIndicatorVisible(true);
 
+        presentacion = new TextField();
+        Element.cfgComponent(presentacion, "URL de presentación");
+        presentacion.setPlaceholder("Pega url de la presentación");
+        presentacion.setRequiredIndicatorVisible(true);
+
+        urlYoutube = new TextField();
+        Element.cfgComponent(urlYoutube, "URL de Youtube");
+        urlYoutube.setPlaceholder("Pega url de youtube");
+        urlYoutube.setRequiredIndicatorVisible(true);
+
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(fecha);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(ponente);
+        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(presentacion);
+        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(urlYoutube);
 
         contentLayout.addComponent(contenido);
         setCaption("Webinar realizado");
@@ -109,8 +123,8 @@ public class WebinarRealizadoModalWin extends TemplateModalWin {
                 obj.setInstitucion(institucion.getValue());
                 obj.setNombre(nombre.getValue());
                 obj.setPonente(ponente.getValue());
-                obj.setPresentacion("xd");
-                obj.setUrlYoutube("xd 2");
+                obj.setPresentacion(presentacion.getValue());
+                obj.setUrlYoutube(urlYoutube.getValue());
 
                 obj = ControladorWebinarRealizado.getInstance().save(obj);
                 if (obj != null) {
@@ -138,8 +152,15 @@ public class WebinarRealizadoModalWin extends TemplateModalWin {
         binder.forField(institucion).asRequired("Campo requerido").bind(WebinarRealizado::getInstitucion,WebinarRealizado::setInstitucion);
         binder.forField(nombre).asRequired("Campo requerido").bind(WebinarRealizado::getNombre,WebinarRealizado::setNombre);
         binder.forField(ponente).asRequired("Campo requerido").bind(WebinarRealizado::getPonente,WebinarRealizado::setPonente);
+        binder.forField(presentacion).asRequired("Campo requerido").bind(WebinarRealizado::getPresentacion,WebinarRealizado::setPresentacion);
+        binder.forField(urlYoutube).asRequired("Campo requerido").bind(WebinarRealizado::getUrlYoutube,WebinarRealizado::setUrlYoutube);
 
         return binder.validate().isOk();
     }
-
+    
+    @Override
+    public OutputStream receiveUpload(String filename, String mimeType) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }

@@ -12,6 +12,7 @@ import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.data.Binder;
+import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
@@ -55,14 +56,17 @@ public class AgremiadoModalWin extends TemplateModalWin {
 
         institucion = new TextField();
         Element.cfgComponent(institucion, "Institución");
+        institucion.setPlaceholder("Ingrese nombre de institucion");
         institucion.setRequiredIndicatorVisible(true);
 
         nombre = new TextField();
         Element.cfgComponent(nombre, "Nombre");
+        nombre.setPlaceholder("Ingrese nombre completo");
         nombre.setRequiredIndicatorVisible(true);
         
         correo = new TextField();
         Element.cfgComponent(correo, "Correo");
+        correo.setPlaceholder("Ingrese correo electrónico");
         correo.setRequiredIndicatorVisible(true);
 
         pais = new ComboBox<>();
@@ -164,7 +168,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
         //Marca error binder.forField(gradoEstudio).asRequired("Campo requerido").bind(Agremiado::getGradoEstudios,Agremiado::setGradoEstudios);
         binder.forField(institucion).asRequired("Campo requerido").bind(Agremiado::getInstitucion, Agremiado::setInstitucion);
         binder.forField(nombre).asRequired("Campo requerido").bind(Agremiado::getNombre, Agremiado::setNombre);
-        binder.forField(correo).asRequired("Campo requerido").bind(Agremiado::getCorreo, Agremiado::setCorreo);
+        binder.forField(correo).asRequired("Campo requerido").withValidator(new EmailValidator("Ingrese un correo válido")).bind(Agremiado::getCorreo, Agremiado::setCorreo);        
         //Marca error binder.forField(pais).asRequired("Campo requerido").bind(Agremiado::getPais,Agremiado::setPais);
         //Marca error binder.forField(sexo).asRequired("Campo requerido").bind(Agremiado::getSexo,Agremiado::setSexo);
         //binder.bind(sexo, Agremiado::getSexo, Agremiado::setSexo);
