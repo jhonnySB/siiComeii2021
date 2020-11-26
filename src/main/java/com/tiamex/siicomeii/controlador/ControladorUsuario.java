@@ -61,4 +61,8 @@ public class ControladorUsuario extends GenericController<ServicioUsuario,Usuari
             throw ex;
         }
     }
+    
+    public Usuario getByEmail(String correo){
+        return getService().getByEmail(correo);
+    }
 }

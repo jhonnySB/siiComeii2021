@@ -131,8 +131,10 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                     obj = ControladorUsuario.getInstance().save(obj);
                     
                     if (obj != null) {
-                        SiiComeiiMailer mailer=new SiiComeiiMailer();
-                        mailer.enviarBienvenida(obj);
+                        if(ControladorUsuario.getInstance().getByEmail(correo.getValue())==null){
+                            SiiComeiiMailer mailer=new SiiComeiiMailer();
+                            mailer.enviarBienvenida(obj);
+                        }
                         Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                         ui.getFabricaVista().getUsuarioDlg().updateDlg();
                         close();

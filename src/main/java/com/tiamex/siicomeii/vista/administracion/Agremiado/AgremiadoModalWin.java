@@ -64,7 +64,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
         Element.cfgComponent(nombre, "Nombre");
         nombre.setPlaceholder("Ingrese nombre completo");
         nombre.setRequiredIndicatorVisible(true);
-        
+
         correo = new TextField();
         Element.cfgComponent(correo, "Correo");
         correo.setPlaceholder("Ingrese correo electrónico");
@@ -140,8 +140,10 @@ public class AgremiadoModalWin extends TemplateModalWin {
                     obj.setSexo(sexo.getValue().charAt(0));
                     obj = ControladorAgremiado.getInstance().save(obj);
                     if (obj != null) {
-                        SiiComeiiMailer mailer=new SiiComeiiMailer(); 
-                        mailer.enviarBienvenida(obj);
+                        if (ControladorAgremiado.getInstance().getByEmail(correo.getValue()) == null) {
+                            SiiComeiiMailer mailer = new SiiComeiiMailer();
+                            mailer.enviarBienvenida(obj);
+                        }
                         Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                         ui.getFabricaVista().getAgremiadoDlg().updateDlg();
                         close();
@@ -170,11 +172,11 @@ public class AgremiadoModalWin extends TemplateModalWin {
         //Marca error binder.forField(gradoEstudio).asRequired("Campo requerido").bind(Agremiado::getGradoEstudios,Agremiado::setGradoEstudios);
         binder.forField(institucion).asRequired("Campo requerido").bind(Agremiado::getInstitucion, Agremiado::setInstitucion);
         binder.forField(nombre).asRequired("Campo requerido").bind(Agremiado::getNombre, Agremiado::setNombre);
-        binder.forField(correo).asRequired("Campo requerido").withValidator(new EmailValidator("Ingrese un correo válido")).bind(Agremiado::getCorreo, Agremiado::setCorreo);        
+        binder.forField(correo).asRequired("Campo requerido").withValidator(new EmailValidator("Ingrese un correo válido")).bind(Agremiado::getCorreo, Agremiado::setCorreo);
         //Marca error binder.forField(pais).asRequired("Campo requerido").bind(Agremiado::getPais,Agremiado::setPais);
         //Marca error binder.forField(sexo).asRequired("Campo requerido").bind(Agremiado::getSexo,Agremiado::setSexo);
         //binder.bind(sexo, Agremiado::getSexo, Agremiado::setSexo);
-        
+
         return binder.validate().isOk();
     }
 }
