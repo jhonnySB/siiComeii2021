@@ -61,23 +61,38 @@ public class SiiComeiiMailer{
         }
     }
     
-    public boolean enviarBienvenida(Usuario usuario,String password) throws Exception{
+    public boolean enviarBienvenida(Usuario usuario) throws Exception{
         try{
             String asunto = "Sii Comeii | Bienvenida ";
             String mensaje = cargarMensaje(Main.getBaseDir()+"/mailer/bienvenidaTemplate.txt");
                 mensaje = mensaje.replaceAll(":nombre",usuario.getNombre());
                 mensaje = mensaje.replaceAll(":usuario",usuario.getCorreo());
-                mensaje = mensaje.replaceAll(":password",password);
-                mensaje = mensaje.replaceAll(":uri",Main.getUrlServer());
+                mensaje = mensaje.replaceAll(":password",usuario.getPassword());
             
             Mailer mailer = new Mailer();
-            //return mailer.sendMail(usuario.getEmail(),"","",asunto,mensaje,null);
             return mailer.sendMail(usuario.getCorreo(),"","",asunto,mensaje,null);
         }catch(Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
             throw ex;
         }
     }
+    
+    
+    public boolean enviarBienvenida(Agremiado agremiado) throws Exception{
+        try{
+            String asunto = "Sii Comeii | Bienvenida ";
+            String mensaje = cargarMensaje(Main.getBaseDir()+"/mailer/bienvenidaTemplateAgremiado.txt");
+                mensaje = mensaje.replaceAll(":nombre",agremiado.getNombre());
+                mensaje = mensaje.replaceAll(":usuario",agremiado.getCorreo());
+            
+            Mailer mailer = new Mailer();
+            return mailer.sendMail(agremiado.getCorreo(),"","",asunto,mensaje,null);
+        }catch(Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
+            throw ex;
+        }
+    }
+    
     
     public List<String> enviarConstancias(String correos,long idWebinar,long idUser) throws Exception{
         try{

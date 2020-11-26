@@ -5,6 +5,7 @@ import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.controlador.ControladorGradoEstudio;
 import com.tiamex.siicomeii.controlador.ControladorPais;
+import com.tiamex.siicomeii.mailer.SiiComeiiMailer;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
 import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
 import com.tiamex.siicomeii.persistencia.entidad.Pais;
@@ -137,9 +138,10 @@ public class AgremiadoModalWin extends TemplateModalWin {
                 obj.setPais(pais.getValue() == null ? 0 : pais.getValue().getId());
                 if (sexo.getValue() != null) {
                     obj.setSexo(sexo.getValue().charAt(0));
-
                     obj = ControladorAgremiado.getInstance().save(obj);
                     if (obj != null) {
+                        SiiComeiiMailer mailer=new SiiComeiiMailer(); 
+                        mailer.enviarBienvenida(obj);
                         Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                         ui.getFabricaVista().getAgremiadoDlg().updateDlg();
                         close();

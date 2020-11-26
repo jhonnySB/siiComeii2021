@@ -51,6 +51,16 @@ public class MainPanel extends Panel{
         //ResponsiveLayout footer = new ResponsiveLayout();
             //Element.cfgLayoutComponent(footer);
         CustomLayout footer = new CustomLayout(new FileInputStream(new File(Main.getBaseDir()+"/footer.html")));
+        Link linkAbout=new Link();
+        linkAbout.setCaption("Acerca de nosotros");
+        linkAbout.setTargetName("_blank");
+        linkAbout.setResource(new ExternalResource("https://www.tiamex.com.mx/#about-us"));
+        Link linkContact=new Link();
+        linkContact.setResource(new ExternalResource("https://www.tiamex.com.mx/#contact"));
+        linkContact.setTargetName("_blank");
+        linkContact.setCaption("Contacto");
+        footer.addComponent(linkAbout, "divAbout");
+        footer.addComponent(linkContact, "divContact");
         footer.setSizeFull();
         footer.setResponsive(true);
         

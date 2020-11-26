@@ -34,7 +34,6 @@ import java.io.IOException;
  * @author cerimice *
  */
 /*@Theme("siiComeiiTheme")*/
-@Theme("siiComeiiTheme")
 @SpringUI
 @PreserveOnRefresh
 @Viewport("width=device-width, initial-scale=1")

@@ -14,18 +14,17 @@
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                     <tr>
                                         <td style="color: #153643; font-family: Arial, sans-serif; font-size: 18px;">
-                                            <b>Bienvenido :nombre </b>
+                                            Hola :nombre, 
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
                                             Tu cuenta se ha registrado exitosamente al sistema. Aquí tienes la información de tu cuenta:
                                             <br><br>
-                                            Correo electrónico: :usuario
+                                            <b>Correo electrónico:</b> :usuario
                                             <br>
-                                            Contraseña: :password
+                                            <b>Contraseña:</b> :password
                                             <br><br>
-                                            Mediante este correo estarás recibiendo tus constancias y notificaciones de evenetos.
                                             Cualquier detalle favor de revisarlo con el administrador del sistema.
                                         </td>
                                     </tr>

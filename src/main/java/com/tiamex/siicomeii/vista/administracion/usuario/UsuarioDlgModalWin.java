@@ -4,6 +4,7 @@ import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorUsuario;
 import com.tiamex.siicomeii.controlador.ControladorUsuarioGrupo;
+import com.tiamex.siicomeii.mailer.SiiComeiiMailer;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.persistencia.entidad.UsuarioGrupo;
 import com.tiamex.siicomeii.utils.Utils;
@@ -130,6 +131,8 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                     obj = ControladorUsuario.getInstance().save(obj);
                     
                     if (obj != null) {
+                        SiiComeiiMailer mailer=new SiiComeiiMailer();
+                        mailer.enviarBienvenida(obj);
                         Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                         ui.getFabricaVista().getUsuarioDlg().updateDlg();
                         close();
@@ -146,6 +149,7 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
+    
 
     @Override
     protected void buttonCancelEvent() {

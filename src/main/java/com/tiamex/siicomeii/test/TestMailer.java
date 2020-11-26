@@ -10,7 +10,7 @@ public class TestMailer{
     public static void main(String[] args) throws MessagingException, Exception{
         
         Usuario objUsuario = ControladorUsuario.getInstance().getById(3L);
-        SiiComeiiMailer.getInstance().enviarBienvenida(objUsuario,objUsuario.getPassword());
+        //SiiComeiiMailer.getInstance().enviarBienvenida(objUsuario,objUsuario.getPassword());
         
         /*
         objUsuario = ControladorUsuario.getInstance().getById(2L);
