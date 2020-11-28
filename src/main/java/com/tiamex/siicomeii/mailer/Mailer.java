@@ -123,9 +123,8 @@ public class Mailer {
             Transport.send(mensaje);
             return true;
         } catch (MessagingException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-            ex.printStackTrace();
-            throw ex;
+
+            return false;
         }
     }
 

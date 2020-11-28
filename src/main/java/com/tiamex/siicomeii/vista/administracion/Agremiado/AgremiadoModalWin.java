@@ -5,10 +5,12 @@ import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.controlador.ControladorGradoEstudio;
 import com.tiamex.siicomeii.controlador.ControladorPais;
+import com.tiamex.siicomeii.controlador.ControladorUsuario;
 import com.tiamex.siicomeii.mailer.SiiComeiiMailer;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
 import com.tiamex.siicomeii.persistencia.entidad.GradoEstudio;
 import com.tiamex.siicomeii.persistencia.entidad.Pais;
+import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
@@ -33,6 +35,8 @@ public class AgremiadoModalWin extends TemplateModalWin {
     private TextField correo;
     private ComboBox<Pais> pais;
     private ComboBox<String> sexo;
+    private String backup = " ";
+    private int flag = 0;
 
     public AgremiadoModalWin() {
         init();
@@ -109,6 +113,10 @@ public class AgremiadoModalWin extends TemplateModalWin {
             institucion.setValue(obj.getInstitucion());
             nombre.setValue(obj.getNombre());
             correo.setValue(obj.getCorreo());
+
+            backup = obj.getCorreo();
+            flag = 1;
+
             pais.setValue(obj.getObjPais());
             sexo.setValue(String.valueOf(obj.getSexo()));
         } catch (Exception ex) {
@@ -125,6 +133,13 @@ public class AgremiadoModalWin extends TemplateModalWin {
         }
     }
 
+    /*
+    1-- Comprobar que es un correo valido
+    2-- registrar y enviar nuevo correo
+    3-- Editar con el mismo correo(sin cambios)
+    4-- Editar un registro con otro correo
+    5-- Registrar un nuevo usuario con un correo ya registrado
+     */
     @Override
     protected void buttonAcceptEvent() {
         try {
@@ -138,17 +153,37 @@ public class AgremiadoModalWin extends TemplateModalWin {
                 obj.setPais(pais.getValue() == null ? 0 : pais.getValue().getId());
                 if (sexo.getValue() != null) {
                     obj.setSexo(sexo.getValue().charAt(0));
-                    obj = ControladorAgremiado.getInstance().save(obj);
-                    if (obj != null) {
-                        if (ControladorAgremiado.getInstance().getByEmail(correo.getValue()) == null) {
-                            SiiComeiiMailer mailer = new SiiComeiiMailer();
-                            mailer.enviarBienvenida(obj);
-                        }
-                        Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                        ui.getFabricaVista().getAgremiadoDlg().updateDlg();
-                        close();
+
+                    Agremiado agremiado = ControladorAgremiado.getInstance().getByEmail(correo.getValue());
+                    if(agremiado != null && flag == 0){
+                        Element.makeNotification("El Correo ingresado ya esta registrado", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                     } else {
-                        Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                        if(!backup.equals(correo.getValue())){
+                            SiiComeiiMailer mailer=new SiiComeiiMailer();
+                            if (mailer.enviarBienvenida(obj)) {
+                                obj = ControladorAgremiado.getInstance().save(obj);
+                                if (obj != null) {
+                                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                    ui.getFabricaVista().getAgremiadoDlg().updateDlg();
+                                    close();
+                                } else {
+                                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                }
+                            } else {
+                                Element.makeNotification("CORREO NO EXISTE Y NO SE ENVÍA EL CORREO DE BIENVENIDA", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                            }
+                        } else {
+                            if (flag == 1){
+                                obj = ControladorAgremiado.getInstance().save(obj);
+                                if (obj != null) {
+                                    Element.makeNotification("Datos Modificados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                    ui.getFabricaVista().getAgremiadoDlg().updateDlg();
+                                    close();
+                                } else {
+                                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                }
+                            }
+                        }
                     }
                 } else {
                     Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());

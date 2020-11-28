@@ -108,13 +108,13 @@ public class SiiComeiiUI extends UI {
             this.usuario = ControladorUsuario.getInstance().login(usuario, password);
             setContent(getFabricaVista().getMainPanel());
         } catch (Exception ex) {
-            Element.makeNotification(ex.getMessage(), Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(UI.getCurrent().getPage());
+            Element.makeNotification("Datos incorrectos", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(UI.getCurrent().getPage());
         }
     }
         
 
     @WebServlet(urlPatterns = "/*", name = "SiiComeiiUIServlet", asyncSupported = true)
-    @VaadinServletConfiguration(ui = SiiComeiiUI.class, productionMode = true)
+    @VaadinServletConfiguration(ui = SiiComeiiUI.class, productionMode = false)
     public static class SiiComeiiUIServlet extends VaadinServlet {
     }
 }

@@ -32,6 +32,8 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
     private TextField nombre;
     private PasswordField password;
     private ComboBox<UsuarioGrupo> usuarioGrupo;
+    private String backup = " ";
+    private int flag = 0;
 
     public UsuarioDlgModalWin() {
         init();
@@ -98,6 +100,10 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
             this.id = obj.getId();
             activo.setValue(obj.getActivo());
             correo.setValue(obj.getCorreo());
+
+            backup = obj.getCorreo();
+            flag = 1;
+
             nombre.setValue(obj.getNombre());
             password.setValue(obj.getPassword());
             usuarioGrupo.setValue(obj.getObjUsuarioGrupo());
@@ -115,6 +121,13 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
         }
     }
 
+    /*
+    1-- Comprobar que es un correo valido
+    2-- registrar y enviar nuevo correo
+    3-- Editar con el mismo correo(sin cambios)
+    4-- Editar un registro con otro correo
+    5-- Registrar un nuevo usuario con un correo ya registrado
+     */
     @Override
     protected void buttonAcceptEvent() {
         try {
@@ -125,21 +138,38 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                 obj.setCorreo(correo.getValue());
                 obj.setNombre(nombre.getValue());
                 obj.setPassword(password.getValue());
-                
                 if (usuarioGrupo.getValue() != null) {
                     obj.setUsuarioGrupo(usuarioGrupo.getValue() == null ? 0 : usuarioGrupo.getValue().getId());
-                    obj = ControladorUsuario.getInstance().save(obj);
-                    
-                    if (obj != null) {
-                        if(ControladorUsuario.getInstance().getByEmail(correo.getValue())==null){
-                            SiiComeiiMailer mailer=new SiiComeiiMailer();
-                            mailer.enviarBienvenida(obj);
-                        }
-                        Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                        ui.getFabricaVista().getUsuarioDlg().updateDlg();
-                        close();
+                    Usuario usuario = ControladorUsuario.getInstance().getByEmail(correo.getValue());
+                    if(usuario != null && flag == 0){
+                        Element.makeNotification("El Correo ingresado ya esta registrado", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                     } else {
-                        Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                        if(!backup.equals(correo.getValue())){
+                            SiiComeiiMailer mailer=new SiiComeiiMailer();
+                            if (mailer.enviarBienvenida(obj)) {
+                                obj = ControladorUsuario.getInstance().save(obj);
+                                if (obj != null) {
+                                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                    ui.getFabricaVista().getUsuarioDlg().updateDlg();
+                                    close();
+                                } else {
+                                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                }
+                            } else {
+                                Element.makeNotification("CORREO NO EXISTE Y NO SE ENVÍA EL CORREO DE BIENVENIDA", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                            }
+                        } else {
+                            if (flag == 1){
+                                obj = ControladorUsuario.getInstance().save(obj);
+                                if (obj != null) {
+                                    Element.makeNotification("Datos Modificados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                    ui.getFabricaVista().getUsuarioDlg().updateDlg();
+                                    close();
+                                } else {
+                                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                }
+                            }
+                        }
                     }
                 } else {
                     Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
