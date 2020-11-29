@@ -57,6 +57,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
         //select.setItems("Hombre", "Mujer", "Helicoptero", "Coche");
         gradoEstudio = new ComboBox<>();
         Element.cfgComponent(gradoEstudio, "Grado Estudios");
+        gradoEstudio.setPlaceholder("Seleccionar grado de estudios");
         gradoEstudio.setRequiredIndicatorVisible(true);
 
         institucion = new TextField();
@@ -76,10 +77,13 @@ public class AgremiadoModalWin extends TemplateModalWin {
 
         pais = new ComboBox<>();
         Element.cfgComponent(pais, "País");
+        pais.setPlaceholder("Seleccionar país");
         pais.setRequiredIndicatorVisible(true);
 
-        sexo = new ComboBox<>("Sexo");
+        sexo = new ComboBox<>();
+        Element.cfgComponent(sexo, "Sexo");
         sexo.setItems("Hombre", "Mujer");
+        sexo.setPlaceholder("Seleccione");
         sexo.setEmptySelectionAllowed(false);
         sexo.setRequiredIndicatorVisible(true);
 
@@ -151,7 +155,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
                 obj.setNombre(nombre.getValue());
                 obj.setCorreo(correo.getValue());
                 obj.setPais(pais.getValue() == null ? 0 : pais.getValue().getId());
-                if (sexo.getValue() != null) {
+                if (gradoEstudio.getValue() != null && sexo.getValue() != null && pais.getValue() != null) {
                     obj.setSexo(sexo.getValue().charAt(0));
 
                     Agremiado agremiado = ControladorAgremiado.getInstance().getByEmail(correo.getValue());

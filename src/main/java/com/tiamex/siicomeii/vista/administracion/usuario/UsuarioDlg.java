@@ -59,7 +59,8 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
     @Override
     protected void buttonSearchEvent() {
         try {
-            grid.setItems(ControladorUsuario.getInstance().getAll());
+            //grid.setItems(ControladorUsuario.getInstance().getAll());
+            grid.setItems(ControladorUsuario.getInstance().getByName(searchField.getValue()));
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -96,8 +97,9 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
         String fechaFormateada = fechaActual.format(DateTimeFormatter.ofPattern("dd_MM_yyyy", varRegional));
 
         try {
-            Process p = Runtime.getRuntime().exec("mysqldump -u bell -pElaine0708 siiComeii");
-
+            Process p = Runtime.getRuntime().exec("mysqldump -u siiComeii -psiiComeii.2020 siiComeii");
+            //Siguiente linea para compilar la base de datos en windows con xampp
+            //Process p = Runtime.getRuntime().exec("C:\\xampp\\mysql\\bin\\mysqldump -u siiComeii -psiiComeii.2020 siiComeii"); 
             InputStream is = p.getInputStream();//Pedimos la entrada
             FileOutputStream fos = new FileOutputStream(fechaFormateada + "_backup_siicomeii.sql"); //creamos el archivo para le respaldo
             byte[] buffer = new byte[1000]; //Creamos una variable de tipo byte para el buffer

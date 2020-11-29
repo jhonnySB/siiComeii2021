@@ -34,7 +34,8 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
     @Override
     protected void buttonSearchEvent() {
         try {
-            grid.setItems(ControladorWebinarRealizado.getInstance().getAll()); 
+            grid.setItems(ControladorWebinarRealizado.getInstance().getByName(searchField.getValue()));
+            
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

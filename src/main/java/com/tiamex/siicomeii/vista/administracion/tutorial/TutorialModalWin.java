@@ -76,7 +76,7 @@ public final class TutorialModalWin extends TemplateModalWin {
             institucion.setValue(obj.getInstitucion());
             nombre.setValue(obj.getNombre());
             tutor.setValue(obj.getTutor());
-            usuario.setValue(Long.toString(obj.getUsuario()));
+            //usuario.setValue(String.valueOf(ui.getUsuario().getId()));
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

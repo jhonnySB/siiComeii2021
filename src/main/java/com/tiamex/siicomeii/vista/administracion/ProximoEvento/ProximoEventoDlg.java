@@ -14,7 +14,6 @@ public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
     }
     
     private void init(){
-        grid.addColumn(ProximoEvento::getId).setCaption("Id");
         grid.addColumn(ProximoEvento::getDescripcion).setCaption("Descripción");
         grid.addColumn(ProximoEvento::getFecha).setCaption("Fecha");
         grid.addColumn(ProximoEvento::getImagen).setCaption("Imagen");
@@ -27,7 +26,7 @@ public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
     @Override
     protected void buttonSearchEvent(){
         try{
-            grid.setItems(ControladorProximoEvento.getInstance().getAll());
+            grid.setItems(ControladorProximoEvento.getInstance().getByTitulo(searchField.getValue()));
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

@@ -20,6 +20,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import java.util.logging.Logger;
 
 /**
@@ -66,12 +67,12 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
 
         password = new PasswordField();
         Element.cfgComponent(password, "Contraseña");
-        password.setPlaceholder("Ingrese contraseña");
+        password.setPlaceholder("Ingrese contraseña (min 8 y max 10 caracteres)");
         password.setRequiredIndicatorVisible(true);
-        password.setMaxLength(8);
 
         usuarioGrupo = new ComboBox<>();
         Element.cfgComponent(usuarioGrupo, "Grupo de usuario");
+        usuarioGrupo.setPlaceholder("Seleccionar grupo de usuario");
         usuarioGrupo.setRequiredIndicatorVisible(true);
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
@@ -138,41 +139,46 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                 obj.setCorreo(correo.getValue());
                 obj.setNombre(nombre.getValue());
                 obj.setPassword(password.getValue());
-                if (usuarioGrupo.getValue() != null) {
-                    obj.setUsuarioGrupo(usuarioGrupo.getValue() == null ? 0 : usuarioGrupo.getValue().getId());
-                    Usuario usuario = ControladorUsuario.getInstance().getByEmail(correo.getValue());
-                    if(usuario != null && flag == 0){
-                        Element.makeNotification("El Correo ingresado ya esta registrado", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    } else {
-                        if(!backup.equals(correo.getValue())){
-                            SiiComeiiMailer mailer=new SiiComeiiMailer();
-                            if (mailer.enviarBienvenida(obj)) {
-                                obj = ControladorUsuario.getInstance().save(obj);
-                                if (obj != null) {
-                                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                    ui.getFabricaVista().getUsuarioDlg().updateDlg();
-                                    close();
+
+                if (ContarCaracteres(password.getValue()) >= 8 && ContarCaracteres(password.getValue()) <= 10) {
+                    if (usuarioGrupo.getValue() != null) {
+                        obj.setUsuarioGrupo(usuarioGrupo.getValue() == null ? 0 : usuarioGrupo.getValue().getId());
+                        Usuario usuario = ControladorUsuario.getInstance().getByEmail(correo.getValue());
+                        if (usuario != null && flag == 0) {
+                            Element.makeNotification("El Correo ingresado ya esta registrado", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        } else {
+                            if (!backup.equals(correo.getValue())) {
+                                SiiComeiiMailer mailer = new SiiComeiiMailer();
+                                if (mailer.enviarBienvenida(obj)) {
+                                    obj = ControladorUsuario.getInstance().save(obj);
+                                    if (obj != null) {
+                                        Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        ui.getFabricaVista().getUsuarioDlg().updateDlg();
+                                        close();
+                                    } else {
+                                        Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    }
                                 } else {
-                                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    Element.makeNotification("El correo no existe", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
                                 }
                             } else {
-                                Element.makeNotification("CORREO NO EXISTE Y NO SE ENVÍA EL CORREO DE BIENVENIDA", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
-                            }
-                        } else {
-                            if (flag == 1){
-                                obj = ControladorUsuario.getInstance().save(obj);
-                                if (obj != null) {
-                                    Element.makeNotification("Datos Modificados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                    ui.getFabricaVista().getUsuarioDlg().updateDlg();
-                                    close();
-                                } else {
-                                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                if (flag == 1) {
+                                    obj = ControladorUsuario.getInstance().save(obj);
+                                    if (obj != null) {
+                                        Element.makeNotification("Datos Modificados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        ui.getFabricaVista().getUsuarioDlg().updateDlg();
+                                        close();
+                                    } else {
+                                        Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
                     }
                 } else {
-                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                    Element.makeNotification("La contraseña no cumple con un minimo de 8 caracteres y un máximo de 10", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(UI.getCurrent().getPage());
                 }
             } else {
                 Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
@@ -181,7 +187,6 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
 
     @Override
     protected void buttonCancelEvent() {
@@ -190,12 +195,22 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
 
     private boolean validarCampos() {
         Binder<Usuario> binder = new Binder<>();
-        
-        binder.forField(correo).asRequired("Campo requerido").withValidator(new EmailValidator("Ingrese un correo válido")).bind(Usuario::getCorreo,Usuario::setCorreo) ;
-        binder.forField(nombre).asRequired("Campo requerido").bind(Usuario::getNombre,Usuario::setNombre);
-        binder.forField(password).asRequired("Campo requerido").bind(Usuario::getPassword,Usuario::setPassword);
-    
+
+        binder.forField(correo).asRequired("Campo requerido").withValidator(new EmailValidator("Ingrese un correo válido")).bind(Usuario::getCorreo, Usuario::setCorreo);
+        binder.forField(nombre).asRequired("Campo requerido").bind(Usuario::getNombre, Usuario::setNombre);
+        binder.forField(password).asRequired("Campo requerido").bind(Usuario::getPassword, Usuario::setPassword);
+
         return binder.validate().isOk();
+    }
+
+    public int ContarCaracteres(String cadena) {
+
+        int cont = 0;
+
+        for (int i = 0; i < cadena.length(); i++) { // length() pide el tamaño de un String
+            cont = cont + 1;
+        }
+        return cont;
     }
 
 }

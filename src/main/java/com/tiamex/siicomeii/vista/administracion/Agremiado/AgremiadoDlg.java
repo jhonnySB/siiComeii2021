@@ -25,7 +25,6 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     }
 
     private void init() {    //Columnas que son asignadas a la tabla de agremiado en la interfaz web
-        grid.addColumn(Agremiado::getId).setCaption("Id");
         grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio");
         grid.addColumn(Agremiado::getInstitucion).setCaption("Institución");
         grid.addColumn(Agremiado::getNombre).setCaption("Nombre");
@@ -61,7 +60,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     @Override //Método que stablece los elementos de datos de este componente proporcionados como una colección.
     protected void buttonSearchEvent() {
         try {
-            grid.setItems(ControladorAgremiado.getInstance().getAll());
+            grid.setItems(ControladorAgremiado.getInstance().getByName(searchField.getValue()));
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

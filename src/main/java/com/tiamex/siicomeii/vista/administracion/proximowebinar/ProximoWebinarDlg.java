@@ -26,7 +26,7 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     @Override
     protected void buttonSearchEvent(){
         try{
-            grid.setItems(ControladorProximoWebinar.getInstance().getAll());
+            grid.setItems(ControladorProximoWebinar.getInstance().getByTitulo(searchField.getValue()));
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

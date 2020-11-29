@@ -37,6 +37,7 @@ public abstract class TemplateModalWin extends Window{
             delete.setStyleName(ValoTheme.BUTTON_FRIENDLY);
             //delete.setVisible(false);
         accept = new Button("Aceptar");
+            accept.setClickShortcut(13);
             Element.cfgComponent(accept);
             accept.addClickListener((Button.ClickEvent event) -> {buttonAcceptEvent();});
             accept.setStyleName(ValoTheme.BUTTON_PRIMARY);

@@ -25,7 +25,7 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
     @Override
     protected void buttonSearchEvent(){
         try{
-            grid.setItems(ControladorTutorial.getInstance().getAll());
+            grid.setItems(ControladorTutorial.getInstance().getByName(searchField.getValue()));
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

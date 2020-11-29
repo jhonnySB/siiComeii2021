@@ -56,6 +56,15 @@ public abstract class GenericController<SERVICE,CLASS,ID extends Serializable>{
         }
     }
     
+    public List<CLASS> getByTitulo(String titulo){
+        try{
+            return service.getByTitulo(titulo);
+        }catch(Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
+            throw ex;
+        }
+    }
+    
     public List<CLASS> getAllSorted(String fields) throws Exception{
         try{
             return service.getAllSorted(fields);

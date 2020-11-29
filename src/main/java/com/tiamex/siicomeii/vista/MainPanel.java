@@ -116,11 +116,11 @@ public class MainPanel extends Panel{
         
         MenuBar.MenuItem tutorial = menuPrincipal.addItem("Tutoriales",VaadinIcons.DESKTOP,comando -> {setContenidoPrincipal(ui.getFabricaVista().getTutorialDlg());});
         
-        MenuBar.MenuItem evento = menuPrincipal.addItem("Próximos eventos",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getProximoEventoDlg());});
+        MenuBar.MenuItem evento = menuPrincipal.addItem("Próximos eventos",VaadinIcons.CALENDAR_CLOCK, comando -> {setContenidoPrincipal(ui.getFabricaVista().getProximoEventoDlg());});
         
-        MenuBar.MenuItem agremiado = menuPrincipal.addItem("Agremiados",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getAgremiadoDlg());});
+        MenuBar.MenuItem agremiado = menuPrincipal.addItem("Agremiados",VaadinIcons.USERS, comando -> {setContenidoPrincipal(ui.getFabricaVista().getAgremiadoDlg());});
 
-        MenuBar.MenuItem webinarRealizado = menuPrincipal.addItem("Webinars realizados",VaadinIcons.USER, comando -> {setContenidoPrincipal(ui.getFabricaVista().getWebinarRealizadoDlg());});
+        MenuBar.MenuItem webinarRealizado = menuPrincipal.addItem("Webinars realizados",VaadinIcons.DIPLOMA, comando -> {setContenidoPrincipal(ui.getFabricaVista().getWebinarRealizadoDlg());});
         
         
         return menuPrincipal;

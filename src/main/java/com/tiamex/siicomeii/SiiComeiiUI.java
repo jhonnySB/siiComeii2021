@@ -94,6 +94,7 @@ public class SiiComeiiUI extends UI {
             footer.addComponent(user, "user");
             footer.addComponent(pass, "pass");
             footer.addComponent(accesar, "accesar");
+            accesar.setClickShortcut(13);
             setContent(footer);
         } catch (IOException e) {
             e.printStackTrace();
