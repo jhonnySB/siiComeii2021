@@ -118,7 +118,7 @@ public class SiiComeiiMailer{
                     String nuevoAgremiado = agremiado.getNombre();
                     mensaje = mensaje.replaceAll(":nombre",nuevoAgremiado);
                     mensaje = mensaje.replaceAll(":webinar", nombreWebinar);
-                    constancia = new ConstanciaAgremiado(nombreWebinar,nuevoAgremiado,webinar.getFecha());
+                    constancia = new ConstanciaAgremiado(nombreWebinar,nuevoAgremiado,webinar.getFecha(),webinar.getPonente());
                     String filename = constancia.generarConstancia();
                     mailer.sendMailConstancia(correo, "", "", asunto, mensaje, filename,nombreWebinar,webinar.getFecha().getYear());
                     //constancia.borrarConstancia(filename);

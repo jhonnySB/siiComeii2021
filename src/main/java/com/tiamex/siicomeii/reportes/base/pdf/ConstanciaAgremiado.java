@@ -31,12 +31,14 @@ public class ConstanciaAgremiado {
     private final String nombreWebinar;
     private final String nombreAgremiado;
     private final LocalDateTime fecha;
+    private final String nombrePonente;
     private File file;
 
-    public ConstanciaAgremiado(String nombreWebinar, String nombreAgremiado, LocalDateTime fecha) {
+    public ConstanciaAgremiado(String nombreWebinar, String nombreAgremiado, LocalDateTime fecha,String nombrePonente) {
         this.nombreWebinar = nombreWebinar;
         this.nombreAgremiado = nombreAgremiado;
         this.fecha = fecha;
+        this.nombrePonente = nombrePonente;
     }
 
     public String generarConstancia() {
@@ -50,6 +52,8 @@ public class ConstanciaAgremiado {
 
             cad = cad.replaceAll(":nombre", this.nombreAgremiado);
             cad = cad.replaceAll(":ponencia", this.nombreWebinar);
+            cad = cad.replaceAll(":ponente", nombrePonente);
+            cad = cad.replaceAll(":year", Integer.toString(fecha.getYear()));
             Locale varRegional = new Locale("es", "MX");
             String fechaFormateada = fecha.format(DateTimeFormatter.ofPattern("d 'de' MMMM 'de' y", varRegional));
             cad = cad.replaceAll(":lugarFecha", "Cuernavaca, Morelos a " + fechaFormateada);

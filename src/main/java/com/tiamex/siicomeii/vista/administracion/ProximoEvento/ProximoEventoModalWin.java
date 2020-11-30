@@ -85,9 +85,10 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
             ProximoEvento obj = ControladorProximoEvento.getInstance().getById(id);            
             this.id = obj.getId();
             descripcion.setValue(obj.getDescripcion());
-            fecha.setValue(obj.getFecha());
             imagen.setValue(obj.getImagen());
             titulo.setValue(obj.getTitulo());
+            //fecha.setReadOnly(true);
+            //fecha.setValue(obj.getFecha());
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

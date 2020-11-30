@@ -46,8 +46,8 @@ public class WebinarRealizadoModalWin extends TemplateModalWin implements Upload
 
         fecha = new DateTimeField();
         fecha.setRequiredIndicatorVisible(true);
-        fecha.setValue(LocalDateTime.now().withHour(11).withMinute(00).plusDays(1));
-        fecha.setRangeStart(fecha.getValue().minusDays(1));
+        fecha.setValue(LocalDateTime.now().withHour(11).withMinute(00));
+        fecha.setRangeEnd(fecha.getValue());
         Element.cfgComponent(fecha, "Fecha");
 
         institucion = new TextField();
@@ -93,12 +93,13 @@ public class WebinarRealizadoModalWin extends TemplateModalWin implements Upload
         try {
             WebinarRealizado obj = ControladorWebinarRealizado.getInstance().getById(id);
             this.id = obj.getId();
-            fecha.setValue(obj.getFecha());
             institucion.setValue(obj.getInstitucion());
             nombre.setValue(obj.getNombre());
             ponente.setValue(obj.getPonente());
             presentacion.setValue(obj.getPresentacion());
             urlYoutube.setValue(obj.getUrlYoutube());
+            fecha.setReadOnly(true);
+            fecha.setValue(obj.getFecha());
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

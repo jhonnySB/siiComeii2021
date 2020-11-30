@@ -4,6 +4,7 @@ import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorUsuario;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
+import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.FabricaVista;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.annotations.PreserveOnRefresh;
@@ -29,6 +30,7 @@ import javax.servlet.annotation.WebServlet;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * @author cerimice *
@@ -109,7 +111,8 @@ public class SiiComeiiUI extends UI {
             this.usuario = ControladorUsuario.getInstance().login(usuario, password);
             setContent(getFabricaVista().getMainPanel());
         } catch (Exception ex) {
-            Element.makeNotification("Datos incorrectos", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(UI.getCurrent().getPage());
+            //Element.makeNotification("Datos incorrectos", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(UI.getCurrent().getPage());
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
         

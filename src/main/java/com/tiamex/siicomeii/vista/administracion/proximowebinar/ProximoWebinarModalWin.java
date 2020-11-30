@@ -1,6 +1,5 @@
 package com.tiamex.siicomeii.vista.administracion.proximowebinar;
 
-import com.jarektoro.responsivelayout.ResponsiveColumn;
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorProximoWebinar;
@@ -55,12 +54,12 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
         
         imagen = new TextField();
         Element.cfgComponent(imagen, "Imagen");
-        imagen.setPlaceholder("Ingrese imagen");
+        imagen.setPlaceholder("Ingrese URL de la imagen");
         imagen.setRequiredIndicatorVisible(true);
 
         institucion = new TextField();
         Element.cfgComponent(institucion, "Institución");
-        institucion.setPlaceholder("Ingrese institución");
+        institucion.setPlaceholder("Ingrese  nombre de la institución");
         institucion.setRequiredIndicatorVisible(true);
         
         ponente = new TextField();
@@ -97,11 +96,12 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
         try {
             ProximoWebinar obj = ControladorProximoWebinar.getInstance().getById(id);
             this.id = obj.getId();
-            fecha.setValue(obj.getFecha());
             imagen.setValue(obj.getImagen());
             institucion.setValue(obj.getInstitucion());
             ponente.setValue(obj.getPonente());
             titulo.setValue(obj.getTitulo());
+            //fecha.setReadOnly(true);
+            //fecha.setValue(obj.getFecha());
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
