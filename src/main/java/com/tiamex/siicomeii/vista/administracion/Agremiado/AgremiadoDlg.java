@@ -25,12 +25,13 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     }
 
     private void init() {    //Columnas que son asignadas a la tabla de agremiado en la interfaz web
-        grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio");
-        grid.addColumn(Agremiado::getInstitucion).setCaption("Institución");
         grid.addColumn(Agremiado::getNombre).setCaption("Nombre");
         grid.addColumn(Agremiado::getCorreo).setCaption("Correo");
+        grid.addColumn(Agremiado::getInstitucion).setCaption("Institución");
+        grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio");
         grid.addColumn(Agremiado::getObjPais).setCaption("País");
         grid.addColumn(Agremiado::getSexo).setCaption("Sexo");
+        
         
         listadoAgremiados = new Button();
         //Element.cfgComponent(listadoAgremiados);

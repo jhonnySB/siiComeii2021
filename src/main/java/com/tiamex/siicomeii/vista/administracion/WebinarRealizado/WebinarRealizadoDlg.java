@@ -20,10 +20,11 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
 
     private void init() {
         banBoton = 1;
-        grid.addColumn(WebinarRealizado::getFecha).setCaption("Fecha");
-        grid.addColumn(WebinarRealizado::getInstitucion).setCaption("Institución");
+        
         grid.addColumn(WebinarRealizado::getNombre).setCaption("Nombre");
         grid.addColumn(WebinarRealizado::getPonente).setCaption("Ponente");
+        grid.addColumn(WebinarRealizado::getInstitucion).setCaption("Institución");
+        grid.addColumn(WebinarRealizado::getFecha).setCaption("Fecha");
         grid.addColumn(WebinarRealizado::getPresentacion).setCaption("Presentación");
         grid.addColumn(WebinarRealizado::getUrlYoutube).setCaption("URL YOUTUBE");
 

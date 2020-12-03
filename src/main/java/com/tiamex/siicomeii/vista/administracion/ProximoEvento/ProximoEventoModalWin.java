@@ -41,6 +41,7 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
 
         descripcion = new TextArea();
         Element.cfgComponent(descripcion, "Descipción");
+        descripcion.setPlaceholder("Ingrese una descripción del contenido del próximo evento");
         descripcion.setRequiredIndicatorVisible(true);
 
         fecha = new DateTimeField();
