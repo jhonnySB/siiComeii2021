@@ -53,4 +53,8 @@ public class ControladorAsistenciaWebinar extends GenericController<ServicioAsis
         return getService().getByAgremiadoWebinar(idWebinar,idAgremiado);
     }
     
+    public List<AsistenciaWebinar> getByAsistencia(long idAgremiado){
+        return getService().getByAsistencia(idAgremiado);
+    }
+    
 }

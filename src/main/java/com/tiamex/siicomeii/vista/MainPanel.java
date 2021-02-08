@@ -9,6 +9,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FileResource;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
@@ -16,6 +17,7 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -46,7 +48,21 @@ public class MainPanel extends Panel{
             headerRow1.addColumn().withDisplayRules(12,12,12,12).withComponent(crearMenuPrincipal());
         
         contenidoPrincipal = new VerticalLayout();
-            Element.cfgLayoutComponent(contenidoPrincipal,true,false);
+            //Element.cfgLayoutComponent(contenidoPrincipal,false,false);
+                    contenidoPrincipal.setWidth("100%");
+                    contenidoPrincipal.setResponsive(true);
+                    contenidoPrincipal.setSpacing(false);
+                    contenidoPrincipal.setMargin(false);
+                    contenidoPrincipal.setHeight("550px");
+                    contenidoPrincipal.setCaptionAsHtml(true);
+                    contenidoPrincipal.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
+        
+        BrowserFrame home = new BrowserFrame("",new ExternalResource("https://www.tiamex.com.mx/"));
+        home.setWidthFull();
+        home.setHeightFull();
+        home.setSizeFull();
+        
+        contenidoPrincipal.addComponent(home);
         
         //ResponsiveLayout footer = new ResponsiveLayout();
             //Element.cfgLayoutComponent(footer);

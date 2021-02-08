@@ -52,4 +52,9 @@ public class PaisDlg extends TemplateDlg<Pais>{
     protected void eventListaAsistentes(Pais obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    protected void eventWebinarsAgremiado(Pais obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

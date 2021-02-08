@@ -52,5 +52,10 @@ public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
     protected void eventListaAsistentes(UsuarioGrupo obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    protected void eventWebinarsAgremiado(UsuarioGrupo obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

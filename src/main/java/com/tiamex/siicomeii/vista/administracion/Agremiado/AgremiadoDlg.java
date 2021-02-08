@@ -4,6 +4,8 @@ import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
 import com.tiamex.siicomeii.reportes.base.pdf.ListadoAgremiadosPDF;
+import com.tiamex.siicomeii.reportes.base.pdf.ListadoAsistentesPDF;
+import com.tiamex.siicomeii.reportes.base.pdf.ListadoWebinarsPDF;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.ShowPDFDlg;
@@ -12,6 +14,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** @author fred **/
@@ -25,6 +28,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     }
 
     private void init() {    //Columnas que son asignadas a la tabla de agremiado en la interfaz web
+        banBoton = 2;
         grid.addColumn(Agremiado::getNombre).setCaption("Nombre");
         grid.addColumn(Agremiado::getCorreo).setCaption("Correo");
         grid.addColumn(Agremiado::getInstitucion).setCaption("Institución");
@@ -96,6 +100,15 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     @Override
     protected void eventListaAsistentes(Agremiado obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventWebinarsAgremiado(Agremiado obj) {
+        try {
+            ui.addWindow(new ShowPDFDlg(new StreamResource(new ListadoWebinarsPDF(obj), (Utils.getFormatIdLong() + ".pdf").replace(" ", ""))));
+        } catch (Exception ex) {
+            Logger.getLogger(AgremiadoDlg.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

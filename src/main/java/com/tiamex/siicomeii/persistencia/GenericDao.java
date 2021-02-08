@@ -164,6 +164,20 @@ public class GenericDao<CLASS,ID extends Serializable> implements GenericDaoInte
         }
     }
     
+    public List<CLASS> getByAsistencia(long idAgremiado){
+        try{
+            em = SingletonPU.createEntityManager();
+            String statement = "SELECT t FROM "+this.getPersistentClass().getSimpleName()+" t WHERE t.agremiado=:idAgremiado";
+            Query query = em.createQuery(statement);
+                query.setParameter("idAgremiado",idAgremiado);
+            List<CLASS> list = query.getResultList();
+            return list;
+        }catch(Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
+            throw ex;
+        }
+    }
+    
     
     public List<CLASS> getByAgremiadoWebinar(long idWebinar,long idAgremiado){
         try{

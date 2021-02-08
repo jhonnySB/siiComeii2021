@@ -54,5 +54,10 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
     protected void eventListaAsistentes(Tutorial obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    protected void eventWebinarsAgremiado(Tutorial obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

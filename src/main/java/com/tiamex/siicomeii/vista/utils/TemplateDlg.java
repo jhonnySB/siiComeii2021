@@ -43,6 +43,7 @@ public abstract class TemplateDlg<T> extends Panel {
     protected Button buttonDataExport;
     protected Button buttonWebinar;
     protected Button buttonListado;
+    protected Button buttonConstancias;
     protected int banBoton;
     protected VerticalLayout contentLayout;
 
@@ -98,7 +99,7 @@ public abstract class TemplateDlg<T> extends Panel {
             gridEvent();
         });
 
-        grid.addComponentColumn(this::buildEditButton).setId("botones");
+        grid.addComponentColumn(this::buildEditButton).setId("botones").setCaption("Acción");
         
         ResponsiveRow row3 = content.addRow().withAlignment(Alignment.MIDDLE_CENTER);
         Element.cfgLayoutComponent(row3, true, false);
@@ -129,39 +130,48 @@ public abstract class TemplateDlg<T> extends Panel {
             eventEditButtonGrid(obj);
         });
 
-        if (banBoton != 0) {
-            //grid.getColumn("botones").setWidth(220).setEditable(false);
-            grid.getColumn("botones").setMinimumWidth(220).setMaximumWidth(220).
-                    setEditable(false).clearExpandRatio().setCaption("Acción");
-            buttonListado = new Button(VaadinIcons.FILE_TEXT_O);
-            buttonListado.addStyleName(ValoTheme.BUTTON_LINK);
-            buttonListado.addClickListener(e -> eventListaAsistentes(obj));
-            buttonWebinar = new Button(VaadinIcons.ENVELOPE);
-            buttonWebinar.addStyleName(ValoTheme.BUTTON_LINK);
-            buttonWebinar.addClickListener(e -> eventAsistenciaButton(obj, e.getButton().getId()));
-            if (updateButtonCorreo()) {
-                buttonWebinar.setDescription("Enviar constancias a Agremiados por correo");
-            } else {
-                buttonWebinar.setDescription("No se encontraron agremiados registrados");
-            }
-            if (obj.getClass().getSimpleName().compareTo("WebinarRealizado") == 0) {
-                WebinarRealizado wr = (WebinarRealizado) obj;
-                String idLista = Long.toString(wr.getId()) + "_lista";
-                buttonListado.setId(idLista);
-                buttonWebinar.setId(Long.toString(wr.getId()) + "_correo");
-                if (ControladorAsistenciaWebinar.getInstance().getByWebinar(wr.getId()).isEmpty()) {
-                    buttonListado.setEnabled(false);
-                    buttonListado.setDescription("No se encontraron asistentes al webinar");
+        switch (banBoton) {
+            case 1: //botones webinar realizado
+                grid.getColumn("botones").setMinimumWidth(220).setMaximumWidth(220).
+                        setEditable(false).clearExpandRatio();
+                buttonListado = new Button(VaadinIcons.FILE_TEXT_O);
+                buttonListado.addStyleName(ValoTheme.BUTTON_LINK);
+                buttonListado.addClickListener(e -> eventListaAsistentes(obj));
+                buttonWebinar = new Button(VaadinIcons.ENVELOPE);
+                buttonWebinar.addStyleName(ValoTheme.BUTTON_LINK);
+                buttonWebinar.addClickListener(e -> eventAsistenciaButton(obj, e.getButton().getId()));
+                if (updateButtonCorreo()) {
+                    buttonWebinar.setDescription("Enviar constancias a Agremiados por correo");
                 } else {
-                    buttonListado.setEnabled(true);
-                    buttonListado.setDescription("Descargar listado de asistentes");
+                    buttonWebinar.setDescription("No se encontraron agremiados registrados");
                 }
-            }
-            row.addColumn().withComponent(buttonListado);
-            row.addColumn().withComponent(buttonWebinar);
-        } else {
-            grid.getColumn("botones").setMinimumWidth(100).setMaximumWidth(100).
-                    setEditable(false).clearExpandRatio().setAssistiveCaption("Acción");
+                if (obj.getClass().getSimpleName().compareTo("WebinarRealizado") == 0) {
+                    WebinarRealizado wr = (WebinarRealizado) obj;
+                    String idLista = Long.toString(wr.getId()) + "_lista";
+                    buttonListado.setId(idLista);
+                    buttonWebinar.setId(Long.toString(wr.getId()) + "_correo");
+                    if (ControladorAsistenciaWebinar.getInstance().getByWebinar(wr.getId()).isEmpty()) {
+                        buttonListado.setEnabled(false);
+                        buttonListado.setDescription("No se encontraron asistentes al webinar");
+                    } else {
+                        buttonListado.setEnabled(true);
+                        buttonListado.setDescription("Descargar listado de asistentes");
+                    }
+                }
+                row.addColumn().withComponent(buttonListado);
+                row.addColumn().withComponent(buttonWebinar);
+                break;
+            case 2: //botones agremiado para listado de webinar asistidos
+                grid.getColumn("botones").setMinimumWidth(180).setMaximumWidth(180).
+                        setEditable(false).clearExpandRatio();
+                buttonConstancias = new Button(VaadinIcons.LIST);
+                buttonConstancias.addStyleName(ValoTheme.BUTTON_LINK);
+                row.addColumn().withComponent(buttonConstancias);
+                buttonConstancias.addClickListener(e -> eventWebinarsAgremiado(obj));
+                break;
+            default:
+            grid.getColumn("botones").setMinimumWidth(80).setMaximumWidth(80).
+                        setEditable(false);
         }
         row.addColumn().withComponent(button);
         //updateButtonsPdf();
@@ -221,5 +231,7 @@ public abstract class TemplateDlg<T> extends Panel {
     protected abstract void eventListaAsistentes(T obj);
 
     protected abstract void eventAsistenciaButton(T obj, String idBtn);
+    
+    protected abstract void eventWebinarsAgremiado(T obj);
 
 }

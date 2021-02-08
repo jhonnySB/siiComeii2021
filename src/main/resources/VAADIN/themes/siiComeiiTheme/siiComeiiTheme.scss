@@ -43,5 +43,13 @@ $v-app-background-color: #e8f1fc;
 
 @mixin siiComeiiTheme{
     @include valo;
+    .v-grid-row-selected > .v-grid-cell, .v-overlay-container .v-grid-row-selected > .v-grid-cell{
+        background-color: #A4A4A4;
+        background-image: -webkit-linear-gradient(top, #A4A4A4 2%, #A4A4A4 98%);
+        background-image: linear-gradient(to bottom,#A4A4A4 2%, #A4A4A4 98%);
+        color: #fff;
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
+        border-color: #414141;
+    }
     // Insert your own theme rules here
 }

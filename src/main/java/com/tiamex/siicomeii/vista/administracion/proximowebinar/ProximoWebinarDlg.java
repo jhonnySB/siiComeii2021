@@ -56,5 +56,10 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     protected void eventListaAsistentes(ProximoWebinar obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    protected void eventWebinarsAgremiado(ProximoWebinar obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

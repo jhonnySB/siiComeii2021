@@ -116,4 +116,9 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
         }
     }
 
+    @Override
+    protected void eventWebinarsAgremiado(Usuario obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

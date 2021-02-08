@@ -55,5 +55,10 @@ public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
     protected void eventListaAsistentes(ProximoEvento obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    protected void eventWebinarsAgremiado(ProximoEvento obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

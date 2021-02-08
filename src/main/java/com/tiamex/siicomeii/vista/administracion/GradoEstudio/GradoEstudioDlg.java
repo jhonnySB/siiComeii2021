@@ -52,5 +52,10 @@ public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
     protected void eventListaAsistentes(GradoEstudio obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    protected void eventWebinarsAgremiado(GradoEstudio obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }
