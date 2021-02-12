@@ -91,7 +91,6 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
     }
 
     protected void downlaodSQL() {
-        System.out.println("Mensja de prueba para descargar SQL");
         Locale varRegional = new Locale("es", "MX");
         LocalDate fechaActual = LocalDate.now(ZoneId.of("America/Mexico_City"));
         String fechaFormateada = fechaActual.format(DateTimeFormatter.ofPattern("dd_MM_yyyy", varRegional));
@@ -101,7 +100,7 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
             //Siguiente linea para compilar la base de datos en windows con xampp
             //Process p = Runtime.getRuntime().exec("C:\\xampp\\mysql\\bin\\mysqldump -u siiComeii -psiiComeii.2020 siiComeii");
             InputStream is = p.getInputStream();//Pedimos la entrada
-            FileOutputStream fos = new FileOutputStream(fechaFormateada + "_backup_siicomeii.sql"); //creamos el archivo para le respaldo
+            FileOutputStream fos = new FileOutputStream("./respaldosBD/"+ fechaFormateada + "_backup_siicomeii.sql"); //creamos el archivo para le respaldo
             byte[] buffer = new byte[1000]; //Creamos una variable de tipo byte para el buffer
 
             int leido = is.read(buffer); //Devuelve el número de bytes leídos o -1 si se alcanzó el final del stream.
@@ -112,7 +111,7 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
             Element.makeNotification("SQL de Base de datos guardado", Notification.Type.TRAY_NOTIFICATION, Position.TOP_CENTER).show(ui.getPage());
             fos.close();//Cierra respaldo
         } catch (IOException e) {
-            System.out.println("ERROR AL DESCARGAR SQL");
+            Element.makeNotification("Error al descargar archivo SQL", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
         }
     }
     

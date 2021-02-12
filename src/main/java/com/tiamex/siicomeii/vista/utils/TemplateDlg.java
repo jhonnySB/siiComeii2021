@@ -181,7 +181,7 @@ public abstract class TemplateDlg<T> extends Panel {
                 row.addColumn().withComponent(tutorialsesion);
                 break;
             default:
-            grid.getColumn("botones").setMinimumWidth(80).setMaximumWidth(80).
+            grid.getColumn("botones").setMinimumWidth(90).setMaximumWidth(90).
                         setEditable(false);
         }
         row.addColumn().withComponent(button);

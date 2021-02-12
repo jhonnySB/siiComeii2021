@@ -9,6 +9,7 @@ import com.tiamex.siicomeii.vista.FabricaVista;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.StyleSheet;
+import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.server.VaadinRequest;
@@ -32,7 +33,7 @@ import java.util.logging.Logger;
 /**
  * @author cerimice *
  */
-/*@Theme("siiComeiiTheme")*/
+@Theme("siiComeiiTheme")
 @SpringUI
 @PreserveOnRefresh
 @Viewport("width=device-width, initial-scale=1")
