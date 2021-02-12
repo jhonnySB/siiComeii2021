@@ -29,7 +29,7 @@
                                         <td>
 
                                             <span style="color:rgb(119,119,119);font-size:13px">
-                                                Este es un correo electrÛnico automatizado. Por favor no responder a este email.
+                                                Este es un correo electr√≥nico automatizado. Por favor no responder a este email.
                                             </span>
 
                                         </td>
@@ -42,7 +42,7 @@
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                     <tr>
                                         <td style="color: #ffffff; font-family: Arial, sans-serif; font-size: 14px;" width="75%">
-                                            &reg; TecnologÌas Inform·ticas Aplicadas de MÈxico SA de CV, 2020<br/>
+                                            &reg; Tecnolog√≠as Inform√°ticas Aplicadas de M√©xico SA de CV, 2020<br/>
 
                                         </td>
 
