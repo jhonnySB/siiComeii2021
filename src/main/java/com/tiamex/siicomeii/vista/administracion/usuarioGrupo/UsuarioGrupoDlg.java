@@ -8,18 +8,18 @@ import java.util.logging.Logger;
 
 /** @author cerimice **/
 public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
-    
+
     public UsuarioGrupoDlg(){
         init();
     }
-    
+
     private void init(){
         grid.addColumn(UsuarioGrupo::getId).setCaption("Id");
         grid.addColumn(UsuarioGrupo::getNombre).setCaption("Nombre");
         setCaption("<b>Grupo de usuarios</b>");
         buttonSearchEvent();
     }
-    
+
     @Override
     protected void buttonSearchEvent(){
         try{
@@ -37,7 +37,7 @@ public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
     @Override
     protected void gridEvent() {
     }
-    
+
     @Override
     protected void eventEditButtonGrid(UsuarioGrupo obj){
         ui.addWindow(new UsuarioGrupoModalWin(obj.getId()));
@@ -57,5 +57,9 @@ public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
     protected void eventWebinarsAgremiado(UsuarioGrupo obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    @Override
+    protected void eventTutorialSesiones(UsuarioGrupo obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

@@ -7,11 +7,11 @@ import java.util.logging.Logger;
 
 /** @author cerimice **/
 public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
-    
+
     public GradoEstudioDlg(){
         init();
     }
-    
+
     private void init(){
         grid.addColumn(GradoEstudio::getId).setCaption("Id");
         grid.addColumn(GradoEstudio::getNombre).setCaption("Nombre");
@@ -27,17 +27,17 @@ public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     @Override
     protected void buttonAddEvent(){
         ui.addWindow(new GradoEstudioDlgModalWin());
     }
-    
+
     @Override
     protected void gridEvent(){
-        
+
     }
-    
+
     @Override
     protected void eventEditButtonGrid(GradoEstudio obj){
         ui.addWindow(new GradoEstudioDlgModalWin(obj.getId()));
@@ -53,9 +53,15 @@ public class GradoEstudioDlg extends TemplateDlg<GradoEstudio>{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    
     @Override
     protected void eventWebinarsAgremiado(GradoEstudio obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    @Override
+    protected void eventTutorialSesiones(GradoEstudio obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

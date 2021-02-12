@@ -8,18 +8,18 @@ import java.util.logging.Logger;
 
 /** @author fred **/
 public class PaisDlg extends TemplateDlg<Pais>{
-    
+
     public PaisDlg(){
         init();
     }
-    
+
     private void init(){
         grid.addColumn(Pais::getId).setCaption("Id");
         grid.addColumn(Pais::getNombre).setCaption("Pais");
         setCaption("<b>Países</b>");
         buttonSearchEvent();
     }
-    
+
     @Override
     protected void buttonSearchEvent(){
         try{
@@ -28,7 +28,7 @@ public class PaisDlg extends TemplateDlg<Pais>{
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     @Override
     protected void buttonAddEvent(){
         ui.addWindow(new PaisModalWin());
@@ -37,7 +37,7 @@ public class PaisDlg extends TemplateDlg<Pais>{
     @Override
     protected void gridEvent() {
     }
-    
+
     @Override
     protected void eventEditButtonGrid(Pais obj){
         ui.addWindow(new PaisModalWin(obj.getId()));
@@ -55,6 +55,11 @@ public class PaisDlg extends TemplateDlg<Pais>{
 
     @Override
     protected void eventWebinarsAgremiado(Pais obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventTutorialSesiones(Pais obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

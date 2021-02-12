@@ -20,7 +20,7 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
 
     private void init() {
         banBoton = 1;
-        
+
         grid.addColumn(WebinarRealizado::getNombre).setCaption("Nombre");
         grid.addColumn(WebinarRealizado::getPonente).setCaption("Ponente");
         grid.addColumn(WebinarRealizado::getInstitucion).setCaption("Institución");
@@ -36,7 +36,7 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
     protected void buttonSearchEvent() {
         try {
             grid.setItems(ControladorWebinarRealizado.getInstance().getByName(searchField.getValue()));
-            
+
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -68,9 +68,14 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
         } catch (Exception ex) {
         }
     }
-
+    
     @Override
     protected void eventWebinarsAgremiado(WebinarRealizado obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventTutorialSesiones(WebinarRealizado obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class AgremiadoDlg extends TemplateDlg<Agremiado> {
 
     private Button listadoAgremiados;
-    
+
 
     public AgremiadoDlg() {  //Constructor de la clase AgremiadoDlg
         init();
@@ -35,8 +35,8 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio");
         grid.addColumn(Agremiado::getObjPais).setCaption("País");
         grid.addColumn(Agremiado::getSexo).setCaption("Sexo");
-        
-        
+
+
         listadoAgremiados = new Button();
         //Element.cfgComponent(listadoAgremiados);
         listadoAgremiados.setResponsive(true);
@@ -56,10 +56,10 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
 
         //ResponsiveRow row1 = contenido.addRow().withComponents(listadoAgremiados).withAlignment(Alignment.TOP_RIGHT);
         //Element.cfgLayoutComponent(row1,true,false);
-        //row1.addColumn().withDisplayRules(12,6,3,2).withComponent(listadoAgremiados); 
+        //row1.addColumn().withDisplayRules(12,6,3,2).withComponent(listadoAgremiados);
         contentLayout.addComponent(contenido);
         setCaption("<b>Agremiados</b>");
-        buttonSearchEvent(); //Método que es llamado sin recibir ningún parametro 
+        buttonSearchEvent(); //Método que es llamado sin recibir ningún parametro
     }
 
     @Override //Método que stablece los elementos de datos de este componente proporcionados como una colección.
@@ -109,6 +109,11 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         } catch (Exception ex) {
             Logger.getLogger(AgremiadoDlg.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    protected void eventTutorialSesiones(Agremiado obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

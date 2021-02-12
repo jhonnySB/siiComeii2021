@@ -99,7 +99,7 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
         try {
             Process p = Runtime.getRuntime().exec("mysqldump -u siiComeii -psiiComeii.2020 siiComeii");
             //Siguiente linea para compilar la base de datos en windows con xampp
-            //Process p = Runtime.getRuntime().exec("C:\\xampp\\mysql\\bin\\mysqldump -u siiComeii -psiiComeii.2020 siiComeii"); 
+            //Process p = Runtime.getRuntime().exec("C:\\xampp\\mysql\\bin\\mysqldump -u siiComeii -psiiComeii.2020 siiComeii");
             InputStream is = p.getInputStream();//Pedimos la entrada
             FileOutputStream fos = new FileOutputStream(fechaFormateada + "_backup_siicomeii.sql"); //creamos el archivo para le respaldo
             byte[] buffer = new byte[1000]; //Creamos una variable de tipo byte para el buffer
@@ -115,9 +115,14 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
             System.out.println("ERROR AL DESCARGAR SQL");
         }
     }
-
+    
     @Override
     protected void eventWebinarsAgremiado(Usuario obj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void eventTutorialSesiones(Usuario obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

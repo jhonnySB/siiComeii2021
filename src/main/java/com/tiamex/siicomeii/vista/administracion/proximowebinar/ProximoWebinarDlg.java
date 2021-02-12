@@ -8,22 +8,22 @@ import java.util.logging.Logger;
 
 /** @author fred **/
 public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
-    
+
     public ProximoWebinarDlg(){
         init();
     }
-    
+
     private void init(){
         grid.addColumn(ProximoWebinar::getTitulo).setCaption("Titulo");
         grid.addColumn(ProximoWebinar::getPonente).setCaption("Ponente");
         grid.addColumn(ProximoWebinar::getInstitucion).setCaption("Institución");
         grid.addColumn(ProximoWebinar::getFecha).setCaption("Fecha");
         grid.addColumn(ProximoWebinar::getImagen).setCaption("Imagen");
-        
+
         setCaption("<b>Próximos webinars</b>");
         buttonSearchEvent();
     }
-    
+
     @Override
     protected void buttonSearchEvent(){
         try{
@@ -41,7 +41,7 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     @Override
     protected void gridEvent() {
     }
-    
+
     @Override
     protected void eventEditButtonGrid(ProximoWebinar obj) {
         ui.addWindow(new ProximoWebinarModalWin(obj.getId()));
@@ -61,5 +61,10 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     protected void eventWebinarsAgremiado(ProximoWebinar obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    @Override
+    protected void eventTutorialSesiones(ProximoWebinar t) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

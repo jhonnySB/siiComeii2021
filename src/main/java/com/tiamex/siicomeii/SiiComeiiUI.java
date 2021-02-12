@@ -9,17 +9,14 @@ import com.tiamex.siicomeii.vista.FabricaVista;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.StyleSheet;
-import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.shared.Position;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomLayout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
@@ -68,7 +65,7 @@ public class SiiComeiiUI extends UI {
     protected void init(VaadinRequest request) {
         
         ResponsiveLayout contenido = new ResponsiveLayout();
-        Panel loginPanel = new Panel("Login TIAMEX");
+        Panel loginPanel = new Panel("Iniciar sesión");
         //CustomLayout content = new CustomLayout("layoutname");
 
         loginPanel.setContent(contenido);
@@ -76,11 +73,11 @@ public class SiiComeiiUI extends UI {
         
         user = new TextField();
         pass = new PasswordField();
-        Button accesar = new Button("Login/Sign in");
+        Button accesar = new Button("Iniciar sesión");
         //accesar.setSizeFull();
         
-        Element.cfgComponent(user, "Usuario");
-        Element.cfgComponent(pass, "Password");
+        Element.cfgComponent(user, "Correo de usuario");
+        Element.cfgComponent(pass, "Contraseña");
         Element.cfgComponent(accesar);
 
         accesar.addClickListener(event -> {eventoBotonAccesar();});

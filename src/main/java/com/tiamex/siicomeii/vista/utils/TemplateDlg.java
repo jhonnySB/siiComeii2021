@@ -45,6 +45,7 @@ public abstract class TemplateDlg<T> extends Panel {
     protected Button buttonListado;
     protected Button buttonConstancias;
     protected int banBoton;
+    protected Button tutorialsesion;
     protected VerticalLayout contentLayout;
 
     protected Grid<T> grid;
@@ -169,6 +170,16 @@ public abstract class TemplateDlg<T> extends Panel {
                 row.addColumn().withComponent(buttonConstancias);
                 buttonConstancias.addClickListener(e -> eventWebinarsAgremiado(obj));
                 break;
+            case 3:
+                grid.getColumn("botones").setMinimumWidth(220).setMaximumWidth(220).
+                        setEditable(false).clearExpandRatio().setCaption("Acción");
+                tutorialsesion = new Button(VaadinIcons.ACADEMY_CAP);
+                tutorialsesion.addStyleName(ValoTheme.BUTTON_LINK);
+                tutorialsesion.addClickListener(e -> eventTutorialSesiones(obj));
+                tutorialsesion.setEnabled(true);
+                tutorialsesion.setDescription("Ingresar sesiones");
+                row.addColumn().withComponent(tutorialsesion);
+                break;
             default:
             grid.getColumn("botones").setMinimumWidth(80).setMaximumWidth(80).
                         setEditable(false);
@@ -233,5 +244,7 @@ public abstract class TemplateDlg<T> extends Panel {
     protected abstract void eventAsistenciaButton(T obj, String idBtn);
     
     protected abstract void eventWebinarsAgremiado(T obj);
+
+    protected abstract void eventTutorialSesiones(T obj);
 
 }

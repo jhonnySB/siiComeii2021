@@ -176,7 +176,7 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin{
 
     @Override
     protected void buttonAcceptEvent() {
-        System.out.println(correos.getValue());
+        //System.out.println(correos.getValue());
         String emails = correos.getValue();
         String emailsArray[] = emails.split(",");
         List<String> emailsList;

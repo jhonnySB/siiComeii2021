@@ -22,11 +22,13 @@ public final class TutorialModalWin extends TemplateModalWin {
     private TextField usuario;
 
     public TutorialModalWin() {
+
         init();
         delete.setVisible(false);
     }
 
     public TutorialModalWin(long id) {
+
         init();
         loadData(id);
         delete.setVisible(false);
@@ -40,17 +42,17 @@ public final class TutorialModalWin extends TemplateModalWin {
         Element.cfgComponent(institucion, "Institución");
         institucion.setPlaceholder("Ingrese nombre de institución");
         institucion.setRequiredIndicatorVisible(true);
-        
+
         nombre = new TextField();
         Element.cfgComponent(nombre, "Nombre");
         nombre.setPlaceholder("Ingrese nombre");
         nombre.setRequiredIndicatorVisible(true);
-        
+
         tutor = new TextField();
         Element.cfgComponent(tutor, "Tutor");
         tutor.setPlaceholder("Ingrese nombre del tutor");
         tutor.setRequiredIndicatorVisible(true);
-        
+
         usuario = new TextField();
         Element.cfgComponent(usuario, "Usuario");
         usuario.setValue(ui.getUsuario().getNombre());
@@ -120,15 +122,15 @@ public final class TutorialModalWin extends TemplateModalWin {
     protected void buttonCancelEvent() {
         close();
     }
-    
+
     private boolean validarCampos() {
         Binder<Tutorial> binder = new Binder<>();
-        
+
         binder.forField(institucion).asRequired("Campo requerido").bind(Tutorial::getInstitucion,Tutorial::setInstitucion);
         binder.forField(nombre).asRequired("Campo requerido").bind(Tutorial::getNombre,Tutorial::setNombre);
         binder.forField(tutor).asRequired("Campo requerido").bind(Tutorial::getTutor,Tutorial::setTutor);
         //Marca error binder.forField(usuario).asRequired("Campo requerido").bind(Tutorial::getUsuario,Tutorial::setUsuario);
-        
+
         return binder.validate().isOk();
     }
 }
