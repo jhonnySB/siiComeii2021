@@ -12,18 +12,17 @@ import com.vaadin.ui.themes.ValoTheme;
 /** @author cerimice **/
 /** @company tiamex **/
 
-public abstract class TemplateModalWin extends Window{
+public abstract class TemplateModalDelete extends Window{
     
     protected SiiComeiiUI ui;
     
     protected long id;
     
     protected VerticalLayout contentLayout;
-    protected Button delete;
     protected Button accept;
     protected Button cancel;
     
-    public TemplateModalWin(){
+    public TemplateModalDelete(){
         initDlg();
     }
     
@@ -31,11 +30,6 @@ public abstract class TemplateModalWin extends Window{
         ui = Element.getUI();
         ResponsiveLayout actions = new ResponsiveLayout();
         
-        /*delete = new Button("Eliminar");
-            Element.cfgComponent(delete);
-            delete.addClickListener((Button.ClickEvent event) -> {buttonDeleteEvent();});
-            delete.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-            //delete.setVisible(false);*/
         accept = new Button("Aceptar");
             accept.setClickShortcut(13);
             Element.cfgComponent(accept);
@@ -45,14 +39,11 @@ public abstract class TemplateModalWin extends Window{
             Element.cfgComponent(cancel);
             cancel.addClickListener((Button.ClickEvent event) -> {buttonCancelEvent();});
             cancel.setStyleName(ValoTheme.BUTTON_DANGER);
-        ResponsiveRow row1 = actions.addRow().withAlignment(Alignment.BOTTOM_RIGHT);
+        ResponsiveRow row1 = actions.addRow().withAlignment(Alignment.MIDDLE_CENTER);
             Element.cfgLayoutComponent(row1,true,true);
-            
-            //Label sample = new Label("\n<a style='color:#d1b33d' href='https://vaadin.com/api/com/vaadin/ui/Label.html'>Label</a>");
-        //sample.setContentMode(com.vaadin.shared.ui.ContentMode.HTML);
-            //row1.addColumn().withDisplayRules(12,4,3,3).withComponent(sample);
-            row1.addColumn().withDisplayRules(12,4,3,3).withComponent(accept);
-            row1.addColumn().withDisplayRules(12,4,3,3).withComponent(cancel);
+            row1.addColumn().withDisplayRules(12,6,4,4).withComponent(accept);
+            row1.addColumn().withDisplayRules(12,6,4,4).withComponent(cancel);
+            //row1.addColumn().withDisplayRules(12,4,3,3).withComponent(cancel);
         
         contentLayout = new VerticalLayout();
             Element.cfgLayoutComponent(contentLayout,false,false);
@@ -69,9 +60,9 @@ public abstract class TemplateModalWin extends Window{
         this.setResizable(false);
         this.setCaptionAsHtml(true);
         this.setWidth(Element.windowWidthPercent());
+        this.setDraggable(false);
     }
     
-    protected abstract void loadData(long id);
     protected abstract void buttonAcceptEvent();
     protected abstract void buttonCancelEvent();
 }

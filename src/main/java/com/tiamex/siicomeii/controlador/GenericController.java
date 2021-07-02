@@ -38,6 +38,15 @@ public abstract class GenericController<SERVICE,CLASS,ID extends Serializable>{
         }
     }
     
+    public int delete(long id) throws Exception{
+        try{
+            return service.delete(id);
+        }catch (Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+            throw ex;
+        }
+    }
+    
     public List<CLASS> getAll(){
         try{
             return service.getAll();
@@ -56,9 +65,27 @@ public abstract class GenericController<SERVICE,CLASS,ID extends Serializable>{
         }
     }
     
+    public Object getByNames(String nombre){
+        try{ 
+            return service.getByNames(nombre);
+        }catch(Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
+            throw ex;
+        }
+    }
+    
     public List<CLASS> getByTitulo(String titulo){
         try{
             return service.getByTitulo(titulo);
+        }catch(Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
+            throw ex;
+        }
+    }
+    
+    public Object getByTitulos(String titulo){
+        try{
+            return service.getByTitulos(titulo);
         }catch(Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
             throw ex;

@@ -4,26 +4,51 @@ import com.tiamex.siicomeii.controlador.ControladorPais;
 import com.tiamex.siicomeii.persistencia.entidad.Pais;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** @author fred **/
 public class PaisDlg extends TemplateDlg<Pais>{
 
-    public PaisDlg(){
+    public PaisDlg() throws Exception{
         init();
     }
 
-    private void init(){
+    private void init() {
         grid.addColumn(Pais::getId).setCaption("Id");
         grid.addColumn(Pais::getNombre).setCaption("Pais");
         setCaption("<b>Países</b>");
-        buttonSearchEvent();
+        eventMostrar();
+    }
+    
+    @Override
+    protected void eventMostrar() { 
+        grid.setItems(ControladorPais.getInstance().getAll());
     }
 
     @Override
     protected void buttonSearchEvent(){
         try{
-            grid.setItems(ControladorPais.getInstance().getByName(searchField.getValue()));
+            if(!searchField.isEmpty()){
+                resBusqueda.setHeight("35px");
+                String strBusqueda = searchField.getValue();
+                Collection<Pais> paises = ControladorPais.getInstance().getByName(strBusqueda);
+                int paiseSize = paises.size();
+                if(paiseSize>1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron "+Integer.toString(paiseSize)+" coincidencias para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else if(paiseSize==1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró "+Integer.toString(paiseSize)+" coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else{
+                     resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>");  
+                }
+                grid.setItems(paises);
+            }else{
+                resBusqueda.setValue(null);
+                resBusqueda.setHeight("10px");
+                grid.setItems(ControladorPais.getInstance().getAll());
+            }
+            
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -41,6 +66,15 @@ public class PaisDlg extends TemplateDlg<Pais>{
     @Override
     protected void eventEditButtonGrid(Pais obj){
         ui.addWindow(new PaisModalWin(obj.getId()));
+    }
+    
+    @Override
+    protected void eventDeleteButtonGrid(Pais obj) {
+        try {
+            ui.addWindow(new PaisModalDelete(obj.getId()));
+        } catch (Exception ex) {
+            Logger.getLogger(PaisDlg.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 
     @Override
@@ -61,5 +95,5 @@ public class PaisDlg extends TemplateDlg<Pais>{
     @Override
     protected void eventTutorialSesiones(Pais obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    }   
 }

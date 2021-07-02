@@ -24,7 +24,7 @@ public class ControladorAgremiado extends GenericController<ServicioAgremiado,Ag
         if(obj.getNombre().isEmpty()){throw new Exception("Es necesario proporcionar nombre");}
         if(obj.getCorreo().isEmpty()){throw new Exception("Es necesario proporcionar correo");}
         if(obj.getPais() <= 0){throw new Exception("Es necesario proporcionar pais");}
-        if(obj.getSexo() =='\u0000'){throw new Exception("Es necesario seleccionar sexo");}
+        //if(obj.getSexo() =='\u0000'){throw new Exception("Es necesario seleccionar sexo");}
         
         return true;
     }
@@ -48,7 +48,7 @@ public class ControladorAgremiado extends GenericController<ServicioAgremiado,Ag
         oldObj.setNombre(obj.getNombre());
         oldObj.setCorreo(obj.getCorreo());
         oldObj.setPais(obj.getPais());
-        oldObj.setSexo(obj.getSexo());
+        oldObj.setSexo(obj.getSexo().compareTo("Hombre")==0?'H':'M');
         
         return getService().save(obj);
     }

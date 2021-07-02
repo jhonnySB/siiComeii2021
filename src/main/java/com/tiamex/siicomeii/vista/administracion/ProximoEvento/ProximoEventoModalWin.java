@@ -26,13 +26,11 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
 
     public ProximoEventoModalWin() {
         init();
-        delete.setVisible(false);
     }
 
     public ProximoEventoModalWin(long id) {
         init();
         loadData(id);
-        delete.setVisible(false);
     }
 
     private void init() {
@@ -95,14 +93,6 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
         }
     }
 
-    @Override
-    protected void buttonDeleteEvent() {
-        try {
-            ControladorProximoEvento.getInstance().delete(id);
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        }
-    }
 
     @Override
     protected void buttonAcceptEvent() {
@@ -115,19 +105,68 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
                 obj.setImagen(imagen.getValue());
                 obj.setTitulo(titulo.getValue());
                 obj.setUsuario(ui.getUsuario().getId());
-
-                obj = ControladorProximoEvento.getInstance().save(obj);
-                if (obj != null) {
-                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    ui.getFabricaVista().getProximoEventoDlg().updateDlg();
-                    close();
-                }
+                
+                ProximoEvento evento = (ProximoEvento)ControladorProximoEvento.getInstance().getByTitulos(titulo.getValue());
+                
+                if(id==0){ // nuevo registro (botón agregar)
+                                
+                                if (evento != null) { // nuevo registro con entrada de correo duplicada
+                                    
+                                    Element.makeNotification("Ya existe un evento con el mismo título: '"+evento.getTitulo()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                }else{ // nuevo registro con nuevo correo
+                                    
+                                        obj = ControladorProximoEvento.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                }
+                            }else{ // editando un registro
+                                
+                                if(evento!=null){ // mismo reg
+                                    
+                                    if(compareEvento(evento)){ // sin cambios
+                                        close();
+                                    }else if(evento.getId()!=id){
+                                        Element.makeNotification("Ya existe un evento con el mismo título: '"+evento.getTitulo()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    }else{
+                                        obj = ControladorProximoEvento.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    }
+                                    
+                                }else{
+                                    
+                                        obj = ControladorProximoEvento.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    
+                                }
+                            }
             } else {
-                Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.makeNotification("Faltan campos por llenar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
+    }
+    
+    protected boolean compareEvento(ProximoEvento evento){
+        return (evento.getDescripcion().compareTo(descripcion.getValue())==0 && evento.getId()==id
+                && evento.getFecha().compareTo(fecha.getValue())==0 && evento.getImagen().compareTo(imagen.getValue())==0);
     }
 
     @Override

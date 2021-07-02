@@ -20,6 +20,8 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -34,26 +36,22 @@ public class TutorialSesionModalWin extends TemplateModalWin {
     private TextField urlYoutube;
     private TextField usuario;
 
-    private long idTutorial;
+    private long idTutorialLinked;
     private String sys;
 
     public long getTutorial() {
-        return idTutorial;
+        return idTutorialLinked;
     }
 
-    public void setTutorial(long idTutorial) {
-        this.idTutorial = idTutorial;
-    }
+    /*public void TutorialSesionModalWin(long idTutorialLinked) {
+        this.idTutorialLinked = idTutorialLinked;
+    }*/
 
-    public TutorialSesionModalWin() {
+    public TutorialSesionModalWin(long id,boolean nuevo) {
+        this.idTutorialLinked = id;
         init();
-        delete.setVisible(false);
-    }
-
-    public TutorialSesionModalWin(long id) {
-        init();
-        loadData(id);
-        delete.setVisible(false);
+        if(!nuevo)
+            loadData(id);
     }
 
     private void init() {
@@ -118,21 +116,13 @@ public class TutorialSesionModalWin extends TemplateModalWin {
             institucion.setValue(obj.getInstitucion());
             nombre.setValue(obj.getNombre());
             tutor.setValue(obj.getTutor());
-            idTutorial = obj.getTutorial();
+            idTutorialLinked = obj.getTutorial();
             urlYoutube.setValue(obj.getUrlYoutube());
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
 
-    @Override
-    protected void buttonDeleteEvent() {
-        try {
-            ControladorTutorialSesion.getInstance().delete(id);
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        }
-    }
 
     @Override
     protected void buttonAcceptEvent() {
@@ -143,27 +133,79 @@ public class TutorialSesionModalWin extends TemplateModalWin {
                 obj.setInstitucion(institucion.getValue());
                 obj.setNombre(nombre.getValue());
                 obj.setTutor(tutor.getValue());
-                obj.setTutorial(idTutorial);
+                obj.setTutorial(idTutorialLinked);
                 obj.setUrlYoutube(urlYoutube.getValue());
                 obj.setUsuario(ui.getUsuario().getId());
-
-                obj = ControladorTutorialSesion.getInstance().save(obj);
-                if (obj != null) {
-                    Element.makeNotification("Datos guardados 1", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    ui.getFabricaVista().getTutorialsesionDlg().updateDlg();
-                    //Lineas de prueba
-                    TutorialSesionDlg temp = new TutorialSesionDlg();
-                    temp.setTutorial(idTutorial);
-                    ui.getFabricaVista().getMainPanel().setContenidoPrincipal(temp);
-                    //Fin de lineas de prueba
-                    close();
-                }
+                
+                if(regexName()){
+                    Element.makeNotification("El nombre del tutor solo puede contener letras", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                }else{
+                    TutorialSesion tutorialSesion = (TutorialSesion)ControladorTutorialSesion.getInstance().getByNameLinked(idTutorialLinked,nombre.getValue());
+                    
+                    if(id==0){
+                        if(tutorialSesion!=null){
+                            Element.makeNotification("Ya existe una sesión con el mismo nombre: '"+tutorialSesion.getNombre()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                        }else{
+                            obj = ControladorTutorialSesion.getInstance().save(obj);
+                            if (obj != null) {
+                                Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                ui.getFabricaVista().getTutorialsesionDlg(idTutorialLinked).eventMostrar();
+                                close();
+                            }
+                        }
+                    }else{
+                        if(tutorialSesion!=null){ // mismo reg
+                                    
+                                    if(compareTutorial(tutorialSesion)){ // sin cambios
+                                        close();
+                                    }else if(tutorialSesion.getId()!=id){
+                                        Element.makeNotification("Ya existe una sesión con el mismo nombre: '"+tutorialSesion.getNombre()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    }else{
+                                        obj = ControladorTutorialSesion.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getTutorialsesionDlg(idTutorialLinked).eventMostrar();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    }
+                                    
+                                }else{
+                                    
+                                        obj = ControladorTutorialSesion.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getTutorialsesionDlg(idTutorialLinked).eventMostrar();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    
+                                }
+                    }
+                    
+                    
+                } 
             } else {
-                Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
+    }
+    
+    protected boolean compareTutorial(TutorialSesion tutorialS){
+        return (tutorialS.getInstitucion().compareTo(institucion.getValue())==0 && tutorialS.getId()==id
+                && tutorialS.getTutor().compareTo(tutor.getValue())==0 && tutorialS.getUrlYoutube().compareTo(urlYoutube.getValue())==0);
+    }
+    
+    protected boolean regexName(){
+        String regex = "[^A-z|ñ| ]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcherName = pattern.matcher(tutor.getValue()); 
+        
+        return matcherName.find();
     }
 
     @Override

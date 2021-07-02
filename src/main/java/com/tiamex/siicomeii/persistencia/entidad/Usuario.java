@@ -14,6 +14,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
 
 /** @author cerimice **/
 
@@ -30,6 +31,7 @@ public class Usuario implements Serializable{
     public long getId(){return id;}
     public void setId(long valor){id = valor;}
     
+    @Pattern(regexp="[^A-z]",message = "Solo se permiten letras en el nombre")
     @Basic(optional=false)
     @Column(name="nombre",nullable=false)
     private String  nombre;
@@ -65,7 +67,7 @@ public class Usuario implements Serializable{
     private long usuarioGrupo;
     public long getUsuarioGrupo(){return usuarioGrupo;}
     public void setUsuarioGrupo(long valor){usuarioGrupo = valor;}
-    
+     
     /** Relaciones **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuarioGrupo",referencedColumnName="id",insertable=false,updatable=false)

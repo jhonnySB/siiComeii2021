@@ -40,7 +40,7 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin{
     private Notification notifG;
     private String globalHtml;
     private final long idWebinar;
-    private String idBtnLista;
+    private final String idBtnLista;
     private static final String PATTERN_EMAIL
             = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
             + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
@@ -56,7 +56,7 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin{
         idBtnLista = idBtn.substring(0, idBtn.indexOf("_"));
         this.idWebinar = idWebinar;
         loadData(idWebinar);
-        delete.setVisible(false);
+        
     }
 
     private void createNotif(String caption, String desc, VaadinIcons icon, Notification.Type type, boolean html) {
@@ -165,14 +165,6 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin{
         }
     }
 
-    @Override
-    protected void buttonDeleteEvent() {
-        try {
-            ControladorWebinarRealizado.getInstance().delete(id);
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        }
-    }
 
     @Override
     protected void buttonAcceptEvent() {
@@ -192,7 +184,7 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin{
                     }
                     if (emailsList.equals(emailsInvalidos)) {
                         createNotif("ERROR | ", "Los correos no son válidos o no estan registrados", VaadinIcons.WARNING,
-                                Notification.Type.ERROR_MESSAGE, true);
+                                Notification.Type.WARNING_MESSAGE, true);
                         createAlertLabel(emailsInvalidos, "btn_3", "errorMails", "alertCoreosError.html");
                     } else {
                         ui.getFabricaVista().getWebinarRealizadoDlg().updateButtonPdf(idWebinar,idBtnLista.concat("_lista"));
@@ -222,7 +214,7 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin{
 
         if (correos.isEmpty()) {
             correos.focus();
-            createNotif("ERROR | ", "Faltan campos por llenar", VaadinIcons.WARNING, Notification.Type.ERROR_MESSAGE, true);
+            createNotif("ERROR | ", "Faltan campos por llenar", VaadinIcons.WARNING, Notification.Type.WARNING_MESSAGE, true);
             return false;
         }
         return true;

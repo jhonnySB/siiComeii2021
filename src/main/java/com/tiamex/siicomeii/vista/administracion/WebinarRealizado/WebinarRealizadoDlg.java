@@ -7,6 +7,8 @@ import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.ShowPDFDlg;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
 import com.vaadin.server.StreamResource;
+import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -14,7 +16,7 @@ import java.util.logging.Logger;
  */
 public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
 
-    public WebinarRealizadoDlg() {
+    public WebinarRealizadoDlg() throws Exception{
         init();
     }
 
@@ -24,22 +26,53 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
         grid.addColumn(WebinarRealizado::getNombre).setCaption("Nombre");
         grid.addColumn(WebinarRealizado::getPonente).setCaption("Ponente");
         grid.addColumn(WebinarRealizado::getInstitucion).setCaption("Institución");
-        grid.addColumn(WebinarRealizado::getFecha).setCaption("Fecha");
+        grid.addColumn(WebinarRealizado::getFechaFrm).setCaption("Fecha");
         grid.addColumn(WebinarRealizado::getPresentacion).setCaption("Presentación");
         grid.addColumn(WebinarRealizado::getUrlYoutube).setCaption("URL YOUTUBE");
 
         setCaption("<b>Webinar Realizado</b>");
-        buttonSearchEvent();
+        eventMostrar();
+    }
+    
+    @Override
+    protected void eventMostrar() { 
+        grid.setItems(ControladorWebinarRealizado.getInstance().getAll());
     }
 
     @Override
-    protected void buttonSearchEvent() {
-        try {
-            grid.setItems(ControladorWebinarRealizado.getInstance().getByName(searchField.getValue()));
-
-        } catch (Exception ex) {
+    protected void buttonSearchEvent(){
+        try{
+            if(!searchField.isEmpty()){
+                resBusqueda.setHeight("35px");
+                String strBusqueda = searchField.getValue();
+                Collection<WebinarRealizado> webinars = ControladorWebinarRealizado.getInstance().getByName(strBusqueda);
+                int webinarSize = webinars.size();
+                if(webinarSize>1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron "+Integer.toString(webinarSize)+" coincidencias para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else if(webinarSize==1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró "+Integer.toString(webinarSize)+" coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else{
+                     resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>"); 
+                }
+                grid.setItems(webinars);
+            }else{
+                resBusqueda.setValue(null);
+                resBusqueda.setHeight("10px");
+                grid.setItems(ControladorWebinarRealizado.getInstance().getAll());
+            }
+            
+        }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
+    }
+    
+        @Override
+    protected void eventDeleteButtonGrid(WebinarRealizado obj) {
+        try {
+            ui.addWindow(new WebinarRealizadoModalDelete(obj.getId()));
+        }catch (Exception ex) {
+            Logger.getLogger(WebinarRealizadoDlg.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 
     @Override

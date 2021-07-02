@@ -14,6 +14,8 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author fred *
@@ -24,13 +26,13 @@ public class PaisModalWin extends TemplateModalWin {
 
     public PaisModalWin() {
         init();
-        delete.setVisible(false);
+       
     }
 
     public PaisModalWin(long id) {
         init();
         loadData(id);
-        delete.setVisible(false);
+       
     }
 
     private void init() {
@@ -62,36 +64,64 @@ public class PaisModalWin extends TemplateModalWin {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-
+    
+    /*
     @Override
     protected void buttonDeleteEvent() {
         try {
             ControladorPais.getInstance().delete(id);
+            
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
-    }
+    } */
 
     @Override
     protected void buttonAcceptEvent() {
         try {
+            String regex = "[^A-z|ñ| ]";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(nombre.getValue());
             Pais obj = new Pais();
             obj.setId(id);
+            String cadena = nombre.getValue(); 
+            Pais pais = (Pais)ControladorPais.getInstance().getByNames(cadena);
             
-            if ("".equals(nombre.getValue()) == true && validarCampos() == false) {
-                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
-            } else {
-                obj.setNombre(nombre.getValue());
-                obj = ControladorPais.getInstance().save(obj);
-                if (obj != null) {
-                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    ui.getFabricaVista().getPaisDlg().updateDlg();
-                    close();
-                } else{
-                    Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+            if (!validarCampos()) {
+                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+            } 
+            else if (matcher.find()) {
+                Element.makeNotification("Solo se permiten letras", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                
+            }else if(id==0){
+                if(pais!=null){
+                    Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                }else{
+                    obj.setNombre(nombre.getValue());
+                    obj = ControladorPais.getInstance().save(obj);
+                    if (obj != null) {
+                        Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        ui.getFabricaVista().paisDlg.eventMostrar();
+                        close();
+                    }  
+                }
+            }else{
+                if(pais!=null){
+                    if(pais.getId()==id){
+                        close();
+                    }else{
+                        Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                    }
+                }else{
+                    obj.setNombre(nombre.getValue());
+                    obj = ControladorPais.getInstance().save(obj);
+                    if (obj != null) {
+                        Element.makeNotification("Se actualizaron los datos con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        ui.getFabricaVista().paisDlg.eventMostrar();
+                        close();
+                    } 
                 }
             }
-
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -107,6 +137,6 @@ public class PaisModalWin extends TemplateModalWin {
         
         binder.forField(nombre).asRequired("Campo requerido").bind(Pais::getNombre,Pais::setNombre);
         
-        return binder.validate().isOk();
+        return binder.validate().isOk(); 
     }
 }

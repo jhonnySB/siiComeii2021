@@ -2,6 +2,8 @@ package com.tiamex.siicomeii.persistencia.entidad;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,6 +49,9 @@ public class ProximoWebinar implements Serializable{
     @Basic(optional=false)
     @Column(name="fecha",nullable=false)
     private LocalDateTime fecha;
+    public String getFechaFrm(){
+        return fecha.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' y hh:mm", new Locale("es", "MX")));
+    }
     public LocalDateTime getFecha(){return fecha;}
     public void setFecha(LocalDateTime valor){fecha = valor;}
     

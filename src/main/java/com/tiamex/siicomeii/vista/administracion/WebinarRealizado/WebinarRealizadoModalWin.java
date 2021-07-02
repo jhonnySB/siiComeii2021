@@ -18,6 +18,8 @@ import com.vaadin.ui.Upload;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**@author fred **/
 public class WebinarRealizadoModalWin extends TemplateModalWin implements Upload.Receiver{
@@ -31,13 +33,13 @@ public class WebinarRealizadoModalWin extends TemplateModalWin implements Upload
 
     public WebinarRealizadoModalWin() {
         init();
-        delete.setVisible(false);
+        
     }
 
     public WebinarRealizadoModalWin(long id) {
         init();
         loadData(id);
-        delete.setVisible(false);
+        
     }
 
     private void init() {
@@ -105,14 +107,6 @@ public class WebinarRealizadoModalWin extends TemplateModalWin implements Upload
         }
     }
 
-    @Override
-    protected void buttonDeleteEvent() {
-        try {
-            ControladorWebinarRealizado.getInstance().delete(id);
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        }
-    }
 
     @Override
     protected void buttonAcceptEvent() {
@@ -127,19 +121,79 @@ public class WebinarRealizadoModalWin extends TemplateModalWin implements Upload
                 obj.setPresentacion(presentacion.getValue());
                 obj.setUrlYoutube(urlYoutube.getValue());
 
-                obj = ControladorWebinarRealizado.getInstance().save(obj);
-                if (obj != null) {
-                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    ui.getFabricaVista().getWebinarRealizadoDlg().updateDlg();
-                    close();
+                if(regexName()){
+                    Element.makeNotification("Solo se permiten letras para el nombre del ponente", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                }else{
+                    WebinarRealizado webinar = (WebinarRealizado)ControladorWebinarRealizado.getInstance().getByNames(nombre.getValue());
+                    if(id==0){ // nuevo registro (botón agregar)
+                                
+                                if (webinar != null) { // nuevo registro con entrada de correo duplicada
+                                    Element.makeNotification("Ya existe un registro con el mismo nombre: '"+webinar.getNombre()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                }else{ // nuevo registro con nuevo correo
+                                        obj = ControladorWebinarRealizado.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getWebinarRealizadoDlg().updateDlg();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    
+                                }
+                            }else{ // editando un registro
+                                
+                                if(webinar!=null){ // 
+                                    
+                                    if(compareWebinars(webinar)){ // el mismo registro
+                                        close();
+                                    }else if(webinar.getId()!=id){
+                                        Element.makeNotification("Ya existe un webinar con el mismo título", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    }else{
+                                        obj = ControladorWebinarRealizado.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getWebinarRealizadoDlg().updateDlg();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    }
+                                    
+                                }else{
+                                        obj = ControladorWebinarRealizado.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getWebinarRealizadoDlg().updateDlg();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    
+                                }
+                            }
                 }
             } else {
-                Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.makeNotification("Faltan campos por llenar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
+    
+    protected boolean compareWebinars(WebinarRealizado webinar){
+        return (webinar.getFecha().compareTo(fecha.getValue())==0 && webinar.getId()==id && webinar.getNombre().compareTo(nombre.getValue())==0
+                && webinar.getUrlYoutube().compareTo(urlYoutube.getValue())==0 && webinar.getInstitucion().compareTo(institucion.getValue())==0
+                && webinar.getPonente().compareTo(ponente.getValue())==0);
+    }
+    
+    protected boolean regexName(){
+        String regex = "[^A-z|ñ| ]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcherPonente = pattern.matcher(ponente.getValue()); 
+        
+        return matcherPonente.find();
+    }
+    
 
     @Override
     protected void buttonCancelEvent() {

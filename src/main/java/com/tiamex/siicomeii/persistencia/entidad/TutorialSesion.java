@@ -17,7 +17,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name="tutorialSesion")
 @NamedQueries({
-        @NamedQuery(name="TutorialSesion.getByTutorialByName",query="SELECT t FROM TutorialSesion t WHERE t.tutorial IN (:tutorial) AND t.nombre LIKE (:nombre)")
+        @NamedQuery(name="TutorialSesion.getByTutorialByName",query="SELECT t FROM TutorialSesion t WHERE t.tutorial IN (:tutorial) AND t.nombre LIKE (:nombre)"),
+        @NamedQuery(name="TutorialSesion.getAllLinked",query="SELECT t FROM TutorialSesion t WHERE t.tutorial=:tutorial"),
+        @NamedQuery(name="TutorialSesion.getByNameLinked",query="SELECT t FROM TutorialSesion t WHERE t.tutorial=?1 AND t.nombre=?2"),
 })
 public class TutorialSesion implements Serializable{
     @Id
@@ -62,7 +64,7 @@ public class TutorialSesion implements Serializable{
     private long tutorial;
     public long getTutorial(){return tutorial;}
     public void setTutorial(long valor){tutorial = valor;}
-
+    
     /** Relaciones **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutorial",referencedColumnName="id",insertable=false,updatable=false)

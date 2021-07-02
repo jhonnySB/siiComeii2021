@@ -20,7 +20,10 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author fred *
@@ -38,13 +41,11 @@ public class AgremiadoModalWin extends TemplateModalWin {
 
     public AgremiadoModalWin() {
         init();
-        delete.setVisible(false);
     }
 
     public AgremiadoModalWin(long id) {
         init();
         loadData(id);
-        delete.setVisible(false);
     }
 
     private void init() {
@@ -81,9 +82,11 @@ public class AgremiadoModalWin extends TemplateModalWin {
         sexo = new ComboBox<>();
         Element.cfgComponent(sexo, "Sexo");
         sexo.setItems("Hombre", "Mujer");
-        sexo.setPlaceholder("Seleccione");
+        sexo.setPlaceholder("Seleccione una opción");
+        sexo.setPopupWidth("50%");
         sexo.setEmptySelectionAllowed(false);
         sexo.setRequiredIndicatorVisible(true);
+        
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(gradoEstudio);
@@ -118,18 +121,10 @@ public class AgremiadoModalWin extends TemplateModalWin {
 
             backup = obj.getCorreo();
             flag = 1;
-
+            
             pais.setValue(obj.getObjPais());
-            sexo.setValue(String.valueOf(obj.getSexo()));
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        }
-    }
-
-    @Override
-    protected void buttonDeleteEvent() {
-        try {
-            ControladorAgremiado.getInstance().delete(id);
+            sexo.setSelectedItem( obj.getSexo() );
+            //sexo.setValue(String.valueOf(obj.getSexo()));
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
@@ -145,57 +140,98 @@ public class AgremiadoModalWin extends TemplateModalWin {
     @Override
     protected void buttonAcceptEvent() {
         try {
-            if (validarCampos()) {
+            if (validarCampos() && gradoEstudio.getValue()!=null && sexo.getValue()!=null && pais.getValue()!=null) {
                 Agremiado obj = new Agremiado();
                 obj.setId(id);
-                obj.setGradoEstudios(gradoEstudio.getValue() == null ? 0 : gradoEstudio.getValue().getId());
                 obj.setInstitucion(institucion.getValue());
                 obj.setNombre(nombre.getValue());
                 obj.setCorreo(correo.getValue());
-                obj.setPais(pais.getValue() == null ? 0 : pais.getValue().getId());
-                if (gradoEstudio.getValue() != null && sexo.getValue() != null && pais.getValue() != null) {
-                    obj.setSexo(sexo.getValue().charAt(0));
-
+                obj.setPais(pais.getValue().getId());
+                obj.setSexo(sexo.getValue().charAt(0)); 
+                obj.setGradoEstudios(gradoEstudio.getValue().getId());
+                
+                if(regexName()){
+                    Element.makeNotification("Solo se permiten letras en el nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(UI.getCurrent().getPage());
+                    nombre.focus();
+                }else{
                     Agremiado agremiado = ControladorAgremiado.getInstance().getByEmail(correo.getValue());
-                    if(agremiado != null && flag == 0){
-                        Element.makeNotification("El Correo ingresado ya esta registrado", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    } else {
-                        if(!backup.equals(correo.getValue())){
-                            SiiComeiiMailer mailer=new SiiComeiiMailer();
-                            if (mailer.enviarBienvenida(obj)) {
-                                obj = ControladorAgremiado.getInstance().save(obj);
-                                if (obj != null) {
-                                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                    ui.getFabricaVista().getAgremiadoDlg().updateDlg();
-                                    close();
-                                } else {
-                                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                    if(id==0){ // nuevo registro (botón agregar)
+                                
+                                if (agremiado != null) { // nuevo registro con entrada de correo duplicada
+                                    Element.makeNotification("Ya existe un agremiado con el mismo correo", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                }else{ // nuevo registro con nuevo correo
+                                    SiiComeiiMailer mailer = new SiiComeiiMailer();
+                                    if (mailer.enviarBienvenida(obj)) {
+                                        obj = ControladorAgremiado.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getAgremiadoDlg().eventMostrar();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    }else {
+                                        Element.makeNotification("El correo no existe", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    }
                                 }
-                            } else {
-                                Element.makeNotification("CORREO NO EXISTE Y NO SE ENVÍA EL CORREO DE BIENVENIDA", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
-                            }
-                        } else {
-                            if (flag == 1){
-                                obj = ControladorAgremiado.getInstance().save(obj);
-                                if (obj != null) {
-                                    Element.makeNotification("Datos Modificados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                    ui.getFabricaVista().getAgremiadoDlg().updateDlg();
-                                    close();
-                                } else {
-                                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                            }else{ // editando un registro
+                                
+                                if(agremiado!=null){ // mismo correo
+                                    
+                                    if(compareAgremiados(agremiado)){ // el mismo registro
+                                        close();
+                                    }else if(agremiado.getId()!=id){
+                                        Element.makeNotification("Ya existe un agremiado con el mismo correo", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    }else{
+                                        obj = ControladorAgremiado.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getAgremiadoDlg().eventMostrar();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    }
+                                    
+                                }else{
+                                    SiiComeiiMailer mailer = new SiiComeiiMailer();
+                                    if (mailer.enviarBienvenida(obj)) {
+                                        obj = ControladorAgremiado.getInstance().save(obj);
+                                        if (obj != null) {
+                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            ui.getFabricaVista().getAgremiadoDlg().eventMostrar();
+                                            close();
+                                        }else{
+                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                        }
+                                    }else {
+                                        Element.makeNotification("El correo no existe", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    }
                                 }
                             }
-                        }
-                    }
-                } else {
-                    Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
                 }
+
             } else {
-                Element.makeNotification("Faltan campos por llenar", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.makeNotification("Faltan campos por llenar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
+    }
+    
+    protected boolean compareAgremiados(Agremiado agremiado){
+        return (agremiado.getId()==id && agremiado.getCorreo().compareTo(correo.getValue())==0 
+                && agremiado.getGradoEstudios()==gradoEstudio.getValue().getId() && agremiado.getInstitucion().compareTo(institucion.getValue())==0
+                && agremiado.getNombre().compareTo(nombre.getValue())==0 && agremiado.getPais()==pais.getValue().getId() && 
+                agremiado.getSexo().compareTo(sexo.getValue())==0);
+    }
+    
+    protected boolean regexName(){
+        String regex = "[^A-z|ñ| ]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcherName = pattern.matcher(nombre.getValue()); 
+        
+        return matcherName.find();
     }
 
     @Override

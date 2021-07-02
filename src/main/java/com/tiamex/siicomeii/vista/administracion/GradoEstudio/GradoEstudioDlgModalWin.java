@@ -14,6 +14,8 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author fred *
@@ -24,13 +26,11 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
 
     public GradoEstudioDlgModalWin() {
         init();
-        delete.setVisible(false);
     }
 
     public GradoEstudioDlgModalWin(long id) {
         init();
         loadData(id);
-        delete.setVisible(false);
     }
 
     private void init() {
@@ -62,35 +62,52 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
         }
     }
 
-    @Override
-    protected void buttonDeleteEvent() {
-        try {
-            ControladorGradoEstudio.getInstance().delete(id);
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        }
-    }
-
-    @Override
+ @Override
     protected void buttonAcceptEvent() {
         try {
+            String regex = "[^A-z|ñ| ]";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(nombre.getValue());
             GradoEstudio obj = new GradoEstudio();
             obj.setId(id);
+            String cadena = nombre.getValue(); 
+            GradoEstudio grado = (GradoEstudio)ControladorGradoEstudio.getInstance().getByNames(cadena);
             
-            if ("".equals(nombre.getValue()) == true && validarCampos() == false) {
-                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
-            } else {
-                obj.setNombre(nombre.getValue());
-                obj = ControladorGradoEstudio.getInstance().save(obj);
-                if (obj != null) {
-                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    ui.getFabricaVista().getGradoEstudioDlg().updateDlg();
-                    close();
-                } else{
-                    Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+            if (!validarCampos()) {
+                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+            } 
+            else if (matcher.find()) {
+                Element.makeNotification("Solo se permiten letras", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                
+            }else if(id==0){
+                if(grado!=null){
+                    Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                }else{
+                    obj.setNombre(nombre.getValue());
+                    obj = ControladorGradoEstudio.getInstance().save(obj);
+                    if (obj != null) {
+                        Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        ui.getFabricaVista().gradoEstudioDlg.eventMostrar();
+                        close();
+                    }  
+                }
+            }else{
+                if(grado!=null){
+                    if(grado.getId()==id){
+                        close();
+                    }else{
+                        Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                    }
+                }else{
+                    obj.setNombre(nombre.getValue());
+                    obj = ControladorGradoEstudio.getInstance().save(obj);
+                    if (obj != null) {
+                        Element.makeNotification("Se actualizaron los datos con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        ui.getFabricaVista().gradoEstudioDlg.eventMostrar();
+                        close();
+                    } 
                 }
             }
-
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

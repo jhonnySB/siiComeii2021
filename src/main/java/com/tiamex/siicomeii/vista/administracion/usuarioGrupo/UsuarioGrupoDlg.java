@@ -1,15 +1,16 @@
 package com.tiamex.siicomeii.vista.administracion.usuarioGrupo;
-
 import com.tiamex.siicomeii.controlador.ControladorUsuarioGrupo;
 import com.tiamex.siicomeii.persistencia.entidad.UsuarioGrupo;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** @author cerimice **/
 public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
 
-    public UsuarioGrupoDlg(){
+    public UsuarioGrupoDlg() throws Exception{
         init();
     }
 
@@ -17,16 +18,49 @@ public class UsuarioGrupoDlg extends TemplateDlg<UsuarioGrupo>{
         grid.addColumn(UsuarioGrupo::getId).setCaption("Id");
         grid.addColumn(UsuarioGrupo::getNombre).setCaption("Nombre");
         setCaption("<b>Grupo de usuarios</b>");
-        buttonSearchEvent();
+        //buttonSearchEvent();
+        eventMostrar();
+    }
+    
+    @Override
+    protected void eventMostrar() { 
+        grid.setItems(ControladorUsuarioGrupo.getInstance().getAll());
     }
 
     @Override
     protected void buttonSearchEvent(){
         try{
-            grid.setItems(ControladorUsuarioGrupo.getInstance().getByName(searchField.getValue()));
+            if(!searchField.isEmpty()){
+                resBusqueda.setHeight("35px");
+                String strBusqueda = searchField.getValue();
+                Collection<UsuarioGrupo> grupos = ControladorUsuarioGrupo.getInstance().getByName(strBusqueda);
+                int grupoSize = grupos.size();
+                if(grupoSize>1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron "+Integer.toString(grupoSize)+" coincidencias para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else if(grupoSize==1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró "+Integer.toString(grupoSize)+" coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else{
+                     resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>");  
+                }
+                grid.setItems(grupos);
+            }else{
+                resBusqueda.setValue(null);
+                resBusqueda.setHeight("10px");
+                grid.setItems(ControladorUsuarioGrupo.getInstance().getAll());
+            }
+            
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
+    }
+    
+      @Override
+    protected void eventDeleteButtonGrid(UsuarioGrupo obj) {
+        try {
+            ui.addWindow(new UsuarioGrupoModalDelete(obj.getId()));
+        } catch (Exception ex) {
+            Logger.getLogger(UsuarioGrupoDlg.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 
     @Override

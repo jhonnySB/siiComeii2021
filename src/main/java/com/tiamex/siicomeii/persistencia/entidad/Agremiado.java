@@ -62,11 +62,10 @@ public class Agremiado implements Serializable{
     
     @Basic(optional=false)
     @Column(name="sexo",nullable=false)
-    private char  sexo;
-    public char getSexo(){return sexo;}
+    private char sexo;
+    public String getSexo(){return sexo=='H'?"Hombre":"Mujer";}
     public void setSexo(char valor){sexo = valor;}
-    
-    
+   
     /** Relaciones **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pais",referencedColumnName="id",insertable=false,updatable=false)
@@ -91,4 +90,5 @@ public class Agremiado implements Serializable{
     @Override
     //return gradoEstudio + institucion + nombre + pais + sexo;
     public String toString(){return institucion;}
+    
 }

@@ -44,6 +44,17 @@ public class ControladorTutorialSesion extends GenericController<ServicioTutoria
         return getService().save(obj);
     }
 
-    public List<TutorialSesion> getByTutorialByName(long tutorial, String nombre){return getService().getByTutorialByName(tutorial, nombre);}
+    public List<TutorialSesion> getByTutorialByName(long tutorialLinked, String nombre){
+        return getService().getByTutorialByName(tutorialLinked, nombre);
+    }
+    
+    public Object getByNameLinked(long tutorialLinked, String nombre){
+        return getService().getByNameLinked(tutorialLinked, nombre);
+    }
+    
+    
+    public List<TutorialSesion> getAllLinked(long tutorialLinked){
+        return getService().getAllLinked(tutorialLinked);
+    }
 
 }

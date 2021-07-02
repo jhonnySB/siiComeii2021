@@ -6,6 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 /* @author cerimice */
@@ -65,16 +66,34 @@ public class GenericDao<CLASS,ID extends Serializable> implements GenericDaoInte
         try{
             em = SingletonPU.createEntityManager();
                 em.getTransaction().begin();
-                CLASS entity = em.find(this.getPersistentClass(),id);
-                if(entity == null){return false;}
-                em.remove(entity);
-                em.getTransaction().commit();
+                CLASS entity = em.find(this.getPersistentClass(),id); 
+                if(entity == null){return false;} 
+                em.remove(entity); 
+                em.getTransaction().commit(); 
             return true;
         }catch(Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
             em.getTransaction().rollback();
+            //return false;
             throw ex;
+            
         }
+    }
+    
+    public int delete(long id){
+        try{
+            em = SingletonPU.createEntityManager();
+            em.getTransaction().begin();
+            int registroEliminado = em.createQuery("DELETE FROM "+this.getPersistentClass().getSimpleName()+" t WHERE t.id="+id).executeUpdate();
+            em.getTransaction().commit();
+            return registroEliminado;
+        }catch(Exception ex){
+            //Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
+            em.getTransaction().rollback();
+            return 0;
+            //throw ex;
+        }
+        
     }
     
     /* Basic Querys*/
@@ -135,6 +154,18 @@ public class GenericDao<CLASS,ID extends Serializable> implements GenericDaoInte
         }
     }
     
+    public Object getByNames(String nombre){
+        try{
+            em = SingletonPU.createEntityManager();
+            String statement = "SELECT t FROM "+this.getPersistentClass().getSimpleName()+" t WHERE t.nombre="+"'"+nombre+"'";
+            Query query = em.createQuery(statement);
+                //query.setParameter("nombre","%"+nombre);
+            return query.getSingleResult();
+        }catch(NoResultException  ex){
+            return null;
+        }
+    }
+    
     public List<CLASS> getByTitulo(String titulo){
         try{
             em = SingletonPU.createEntityManager();
@@ -146,6 +177,19 @@ public class GenericDao<CLASS,ID extends Serializable> implements GenericDaoInte
         }catch(Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
             throw ex;
+        }
+    }
+    
+    public Object getByTitulos(String titulo){
+        try{
+            em = SingletonPU.createEntityManager();
+            String statement = "SELECT t FROM "+this.getPersistentClass().getSimpleName()+" t WHERE t.titulo="+"'"+titulo+"'";
+            Query query = em.createQuery(statement);
+                //query.setParameter("titulo",titulo+"%");
+            return query.getSingleResult();
+        }catch(Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
+            return null;
         }
     }
     

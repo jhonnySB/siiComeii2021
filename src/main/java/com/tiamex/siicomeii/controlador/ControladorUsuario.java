@@ -73,6 +73,11 @@ public class ControladorUsuario extends GenericController<ServicioUsuario,Usuari
                 ControladorNotificaciones temp = new ControladorNotificaciones(flag);
                 throw new Exception("Contraseña no valida");
             }
+            if(!usuario.getActivo()){
+                flag=5;
+                ControladorNotificaciones temp = new ControladorNotificaciones(flag);
+                throw new Exception("Usuario inactivo");
+            }
 
             return usuario;
         }catch(Exception ex){

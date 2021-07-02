@@ -5,10 +5,13 @@
  */
 package com.tiamex.siicomeii.vista.administracion.tutorialSesion;
 
+import com.tiamex.siicomeii.controlador.ControladorTutorial;
 import com.tiamex.siicomeii.controlador.ControladorTutorialSesion;
 import com.tiamex.siicomeii.persistencia.entidad.TutorialSesion;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -17,44 +20,86 @@ import java.util.logging.Logger;
  */
 public class TutorialSesionDlg extends TemplateDlg<TutorialSesion>{
     
-    private long tutorial;
+    public long tutorialLinked;
     
     public long getTutorial(){
-        return tutorial;
+        return tutorialLinked;
     }
+    /*
     public void setTutorial(long tutorial){
-        this.tutorial = tutorial;
-        buttonSearchEvent();
-    }
+        this.tutorialLinked = tutorial;
+        eventMostrar();
+    } */
+
       
-    public TutorialSesionDlg(){
+    public TutorialSesionDlg(long tutorialLinked) throws Exception{
+        this.tutorialLinked = tutorialLinked;
+        init();
+    }
+    
+    public TutorialSesionDlg() throws Exception{
         init();
     }
 
-    private void init(){
+    private void init() throws Exception{
+        banBoton = 4;
         grid.addColumn(TutorialSesion::getNombre).setCaption("Nombre");
         grid.addColumn(TutorialSesion::getTutor).setCaption("Tutor");
         grid.addColumn(TutorialSesion::getInstitucion).setCaption("Institución");
         grid.addColumn(TutorialSesion::getUrlYoutube).setCaption("URL de youtube");
-
-        setCaption("<b>Tutoriales</b>");
-        buttonSearchEvent();
+        setCaption("<span style=\"text-decoration: underline;font-family: Source Sans Pro\">Sesiones para el tutorial: </span>"
+                + "<b><span style=\"background-color:#ffc107;padding:3px 6px;color:black;border-radius:5px;font-size:16px;\">"
+                +ControladorTutorial.getInstance().getById(tutorialLinked).getNombre()+"</span></b>");
+        eventMostrar();
+    }
+    
+        
+    @Override
+    protected void eventMostrar() { 
+        grid.setItems(ControladorTutorialSesion.getInstance().getAllLinked(tutorialLinked));
     }
     
     @Override
     protected void buttonSearchEvent(){
         try{
-            grid.setItems(ControladorTutorialSesion.getInstance().getByTutorialByName(tutorial, searchField.getValue()));
+            if(!searchField.isEmpty()){
+                resBusqueda.setHeight("35px");
+                String strBusqueda = searchField.getValue();
+                Collection<TutorialSesion> tutorials = ControladorTutorialSesion.getInstance().getByTutorialByName(tutorialLinked,strBusqueda);
+                int tutorialSize = tutorials.size();
+                if(tutorialSize>1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron "+Integer.toString(tutorialSize)+" coincidencias para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else if(tutorialSize==1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró "+Integer.toString(tutorialSize)+" coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else{
+                     resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>"); 
+                }
+                grid.setItems(tutorials);
+            }else{
+                resBusqueda.setValue(null);
+                resBusqueda.setHeight("10px");
+                grid.setItems(ControladorTutorialSesion.getInstance().getAllLinked(tutorialLinked));
+            }
+            
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
+    
+               @Override
+    protected void eventDeleteButtonGrid(TutorialSesion obj) {
+        try {
+            ui.addWindow(new TutorialSesionModalDelete(obj.getId(),tutorialLinked) );
+        } catch (Exception ex) {
+            Logger.getLogger(TutorialSesionDlg.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+    }
 
     @Override
     protected void buttonAddEvent(){
-        TutorialSesionModalWin venta = new TutorialSesionModalWin();
-        venta.setTutorial(tutorial);
-        ui.addWindow(venta);
+        TutorialSesionModalWin window = new TutorialSesionModalWin(tutorialLinked,true);
+        //venta.setTutorial(tutorialLinked); 
+        ui.addWindow(window); 
     }
 
     @Override
@@ -63,7 +108,7 @@ public class TutorialSesionDlg extends TemplateDlg<TutorialSesion>{
     
     @Override
     protected void eventEditButtonGrid(TutorialSesion obj) {
-        ui.addWindow(new TutorialSesionModalWin(obj.getId()));
+        ui.addWindow(new TutorialSesionModalWin(obj.getId(),false));
     }
 
     @Override

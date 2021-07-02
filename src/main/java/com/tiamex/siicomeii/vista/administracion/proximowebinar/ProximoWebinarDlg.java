@@ -4,12 +4,14 @@ import com.tiamex.siicomeii.controlador.ControladorProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** @author fred **/
 public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
 
-    public ProximoWebinarDlg(){
+    public ProximoWebinarDlg() throws Exception{
         init();
     }
 
@@ -17,20 +19,52 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
         grid.addColumn(ProximoWebinar::getTitulo).setCaption("Titulo");
         grid.addColumn(ProximoWebinar::getPonente).setCaption("Ponente");
         grid.addColumn(ProximoWebinar::getInstitucion).setCaption("Institución");
-        grid.addColumn(ProximoWebinar::getFecha).setCaption("Fecha");
+        grid.addColumn(ProximoWebinar::getFechaFrm).setCaption("Fecha");
         grid.addColumn(ProximoWebinar::getImagen).setCaption("Imagen");
 
         setCaption("<b>Próximos webinars</b>");
-        buttonSearchEvent();
+        eventMostrar();
+    }
+    
+    @Override
+    protected void eventMostrar() { 
+        grid.setItems(ControladorProximoWebinar.getInstance().getAll());
     }
 
     @Override
     protected void buttonSearchEvent(){
         try{
-            grid.setItems(ControladorProximoWebinar.getInstance().getByTitulo(searchField.getValue()));
+            if(!searchField.isEmpty()){
+                resBusqueda.setHeight("35px");
+                String strBusqueda = searchField.getValue();
+                Collection<ProximoWebinar> webinars = ControladorProximoWebinar.getInstance().getByTitulo(strBusqueda);
+                int proxWebinar = webinars.size();
+                if(proxWebinar>1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron "+Integer.toString(proxWebinar)+" coincidencias para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else if(proxWebinar==1){
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró "+Integer.toString(proxWebinar)+" coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>");
+                }else{
+                     resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>"); 
+                }
+                grid.setItems(webinars);
+            }else{
+                resBusqueda.setValue(null);
+                resBusqueda.setHeight("10px");
+                grid.setItems(ControladorProximoWebinar.getInstance().getAll());
+            }
+            
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
+    }
+    
+    @Override
+    protected void eventDeleteButtonGrid(ProximoWebinar obj) {
+        try {
+            ui.addWindow(new ProximoWebinarModalDelete(obj.getId()));
+        } catch (Exception ex) {
+            Logger.getLogger(ProximoWebinarDlg.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 
     @Override

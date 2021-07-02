@@ -53,7 +53,7 @@ public class Mailer {
         properties.put("mail.smtp.host", host);
         properties.put("mail.smtp.port", port);
         properties.put("mail.smtp.auth", auth);
-        properties.put("mail.smtp.starttls.enable", starttls);
+        //properties.put("mail.smtp.starttls.enable", starttls);
         properties.put("mail.smtp.ssl.trust", host);
         properties.put("mail.mime.charset", "UTF-8");
 
@@ -77,7 +77,7 @@ public class Mailer {
     }
 
     public boolean sendMail(String to, String cc, String bcc, String subject, String message, List<File> files) throws MessagingException {
-
+        System.out.println("mail send");
         try {
             Message mensaje = new MimeMessage(this.session);
             for (String direccion : to.replace(" ", "").split(";")) {
@@ -123,7 +123,7 @@ public class Mailer {
             Transport.send(mensaje);
             return true;
         } catch (MessagingException ex) {
-
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
             return false;
         }
     }

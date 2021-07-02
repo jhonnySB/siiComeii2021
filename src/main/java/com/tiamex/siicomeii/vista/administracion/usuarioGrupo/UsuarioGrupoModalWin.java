@@ -14,6 +14,8 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author cerimice *
@@ -24,13 +26,11 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
 
     public UsuarioGrupoModalWin() {
         init();
-        delete.setVisible(false);
     }
 
     public UsuarioGrupoModalWin(long id) {
         init();
         loadData(id);
-        delete.setVisible(false);
     }
 
     private void init() {
@@ -62,29 +62,50 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
         }
     }
 
-    @Override
-    protected void buttonDeleteEvent() {
-        try {
-            ControladorUsuarioGrupo.getInstance().delete(id);
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        }
-    }
-
-    @Override
+   @Override
     protected void buttonAcceptEvent() {
         try {
+            String regex = "[^A-z| ]";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(nombre.getValue());
             UsuarioGrupo obj = new UsuarioGrupo();
             obj.setId(id);
-            if ("".equals(nombre.getValue()) == true && validarCampos() == false) {
-                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
-            } else {
-                obj.setNombre(nombre.getValue());
-                obj = ControladorUsuarioGrupo.getInstance().save(obj);
-                if (obj != null) {
-                    Element.makeNotification("Datos guardados", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    ui.getFabricaVista().getUsuarioGrupoDlg().updateDlg();
-                    close();
+            String cadena = nombre.getValue(); 
+            UsuarioGrupo grupoUser = (UsuarioGrupo)ControladorUsuarioGrupo.getInstance().getByNames(cadena);
+            
+            if (!validarCampos()) {
+                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+            } 
+            else if (matcher.find()) {
+                Element.makeNotification("Solo se permiten letras", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                
+            }else if(id==0){
+                if(grupoUser!=null){
+                    Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                }else{
+                    obj.setNombre(nombre.getValue());
+                    obj = ControladorUsuarioGrupo.getInstance().save(obj);
+                    if (obj != null) {
+                        Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        ui.getFabricaVista().usuarioGrupoDlg.eventMostrar();
+                        close();
+                    }  
+                }
+            }else{
+                if(grupoUser!=null){
+                    if(grupoUser.getId()==id){
+                        close();
+                    }else{
+                        Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                    }
+                }else{
+                    obj.setNombre(nombre.getValue());
+                    obj = ControladorUsuarioGrupo.getInstance().save(obj);
+                    if (obj != null) {
+                        Element.makeNotification("Se actualizaron los datos con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        ui.getFabricaVista().usuarioGrupoDlg.eventMostrar();
+                        close();
+                    } 
                 }
             }
         } catch (Exception ex) {

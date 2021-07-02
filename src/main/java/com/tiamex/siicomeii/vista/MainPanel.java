@@ -8,6 +8,7 @@ import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FileResource;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.CustomLayout;
@@ -22,6 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** @author fred **/
 
@@ -94,7 +97,8 @@ public class MainPanel extends Panel{
         
         Label userLbl = new Label();
         userLbl.setCaptionAsHtml(true);
-        userLbl.setValue("Has iniciado sesión como: "+ui.getUsuario().getNombre());
+        userLbl.setValue("<b>Has iniciado sesión como: "+ui.getUsuario().getNombre()+"</b>");
+        userLbl.setContentMode(ContentMode.HTML);
         topbar.addComponent(userLbl);
         topbar.setComponentAlignment(userLbl, Alignment.MIDDLE_RIGHT);
         
@@ -117,26 +121,72 @@ public class MainPanel extends Panel{
         setContent(contenido);
     }
     
-    private MenuBar crearMenuPrincipal(){
+    private MenuBar crearMenuPrincipal() {
         MenuBar menuPrincipal = new MenuBar();
         menuPrincipal.setWidth("100%");
         
         MenuBar.MenuItem administracion = menuPrincipal.addItem("Administración",VaadinIcons.TOOLBOX,null);
         MenuBar.MenuItem catalogos = administracion.addItem("Catálogos",VaadinIcons.CALC_BOOK,null);
-        MenuBar.MenuItem gradoEstudio = catalogos.addItem("Grado de estudios",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getGradoEstudioDlg());});
-        MenuBar.MenuItem usuarioGrupo = catalogos.addItem("Grupo de usuario",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioGrupoDlg());});
-        MenuBar.MenuItem usuario = catalogos.addItem("Usuarios",VaadinIcons.USER,comando -> {setContenidoPrincipal(ui.getFabricaVista().getUsuarioDlg());});
-        MenuBar.MenuItem pais = catalogos.addItem("Paises",VaadinIcons.USERS,comando -> {setContenidoPrincipal(ui.getFabricaVista().getPaisDlg());});
+        MenuBar.MenuItem gradoEstudio = catalogos.addItem("Grado de estudios",VaadinIcons.ACADEMY_CAP,comando -> {try {
+            setContenidoPrincipal(ui.getFabricaVista().getGradoEstudioDlg());
+            } catch (Exception ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+});
+        MenuBar.MenuItem usuarioGrupo = catalogos.addItem("Grupo de usuario",VaadinIcons.GROUP,comando -> {try {
+            setContenidoPrincipal(ui.getFabricaVista().getUsuarioGrupoDlg());
+            } catch (Exception ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+});
+        MenuBar.MenuItem usuario = catalogos.addItem("Usuarios",VaadinIcons.USERS,comando -> {try {
+            setContenidoPrincipal(ui.getFabricaVista().getUsuarioDlg());
+            } catch (Exception ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+});
+        MenuBar.MenuItem pais = catalogos.addItem("Paises",VaadinIcons.GLOBE,comando -> {try {
+            setContenidoPrincipal(ui.getFabricaVista().getPaisDlg());
+            } catch (Exception ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+});
         
-        MenuBar.MenuItem proximosWebinar = menuPrincipal.addItem("Próximos Webinars",VaadinIcons.CALENDAR_USER,comando -> {setContenidoPrincipal(ui.getFabricaVista().getProximoWebinarDlg());});
+        MenuBar.MenuItem proximosWebinar = menuPrincipal.addItem("Próximos Webinars",VaadinIcons.CALENDAR_USER,comando -> {try {
+            setContenidoPrincipal(ui.getFabricaVista().getProximoWebinarDlg());
+            } catch (Exception ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+});
         
-        MenuBar.MenuItem tutorial = menuPrincipal.addItem("Tutoriales",VaadinIcons.DESKTOP,comando -> {setContenidoPrincipal(ui.getFabricaVista().getTutorialDlg());});
+        MenuBar.MenuItem tutorial = menuPrincipal.addItem("Tutoriales",VaadinIcons.DESKTOP,comando -> {try {
+            setContenidoPrincipal(ui.getFabricaVista().getTutorialDlg());
+            } catch (Exception ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+});
         
-        MenuBar.MenuItem evento = menuPrincipal.addItem("Próximos eventos",VaadinIcons.CALENDAR_CLOCK, comando -> {setContenidoPrincipal(ui.getFabricaVista().getProximoEventoDlg());});
+        MenuBar.MenuItem evento = menuPrincipal.addItem("Próximos eventos",VaadinIcons.CALENDAR_CLOCK, comando -> {try {
+            setContenidoPrincipal(ui.getFabricaVista().getProximoEventoDlg());
+            } catch (Exception ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+});
         
-        MenuBar.MenuItem agremiado = menuPrincipal.addItem("Agremiados",VaadinIcons.USERS, comando -> {setContenidoPrincipal(ui.getFabricaVista().getAgremiadoDlg());});
+        MenuBar.MenuItem agremiado = menuPrincipal.addItem("Agremiados",VaadinIcons.USERS, comando -> {try {
+            setContenidoPrincipal(ui.getFabricaVista().getAgremiadoDlg());
+            } catch (Exception ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+});
 
-        MenuBar.MenuItem webinarRealizado = menuPrincipal.addItem("Webinars realizados",VaadinIcons.DIPLOMA, comando -> {setContenidoPrincipal(ui.getFabricaVista().getWebinarRealizadoDlg());});
+        MenuBar.MenuItem webinarRealizado = menuPrincipal.addItem("Webinars realizados",VaadinIcons.DIPLOMA, comando -> {try {
+            setContenidoPrincipal(ui.getFabricaVista().getWebinarRealizadoDlg());
+            } catch (Exception ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+});
         
         
         return menuPrincipal;

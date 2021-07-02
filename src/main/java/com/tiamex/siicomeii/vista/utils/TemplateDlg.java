@@ -16,6 +16,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HasComponents;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -35,10 +36,11 @@ import java.util.logging.Logger;
 public abstract class TemplateDlg<T> extends Panel {
 
     protected SiiComeiiUI ui;
-
+    protected Label resBusqueda;
     protected TextField searchField;
     protected Button btnSearch;
     protected Button btnAdd;
+    protected Button btnReturn;
     protected Button buttonDataImport;
     protected Button buttonDataExport;
     protected Button buttonWebinar;
@@ -46,7 +48,9 @@ public abstract class TemplateDlg<T> extends Panel {
     protected Button buttonConstancias;
     protected int banBoton;
     protected Button tutorialsesion;
+    protected Button delete;
     protected VerticalLayout contentLayout;
+    protected ResponsiveLayout content;
 
     protected Grid<T> grid;
 
@@ -56,20 +60,23 @@ public abstract class TemplateDlg<T> extends Panel {
         return main;
     }
 
-    public TemplateDlg() {
+    public TemplateDlg() throws Exception {
         initDlg();
         
     }
     
-    private void initDlg() {
+    private void initDlg() throws Exception {
         updateDlg();
         ui = Element.getUI();
-        ResponsiveLayout content = new ResponsiveLayout();
+        content = new ResponsiveLayout();
         content.setSizeFull();
 
+        resBusqueda = new Label();
+        Element.cfgComponent(resBusqueda);
+        
         searchField = new TextField();
         Element.cfgComponent(searchField);
-        searchField.setPlaceholder("Buscar");
+        searchField.setPlaceholder("Buscar"); 
         searchField.addValueChangeListener((HasValue.ValueChangeEvent<String> event) -> {
             buttonSearchEvent();
         });
@@ -85,13 +92,18 @@ public abstract class TemplateDlg<T> extends Panel {
         btnAdd.addClickListener((Button.ClickEvent event) -> {
             buttonAddEvent();
         });
-        ResponsiveRow row1 = content.addRow().withAlignment(Alignment.BOTTOM_CENTER);
-        Element.cfgLayoutComponent(row1, true, false);
-        row1.addColumn().withDisplayRules(12, 6, 6, 8).withComponent(searchField);
-        row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnSearch);
-        row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnAdd);
-
-        grid = new Grid<>("");
+            ResponsiveRow row1 = content.addRow().withAlignment(Alignment.BOTTOM_CENTER);
+            Element.cfgLayoutComponent(row1, true, false);
+            row1.addColumn().withDisplayRules(12, 6, 6, 8).withComponent(searchField);
+            row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnSearch);
+            row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnAdd);   
+        
+        ResponsiveRow row2 = content.addRow().withAlignment(Alignment.BOTTOM_LEFT);
+            Element.cfgLayoutComponent(row2, false, false);
+            row2.addColumn().withDisplayRules(12, 6, 6, 8).withComponent(resBusqueda);
+        resBusqueda.setHeight("10px");
+        
+        grid = new Grid<>();
         Element.cfgComponent(grid);
         grid.setHeight(Element.windowHeightPx(100) + "px");
         grid.setColumnResizeMode(ColumnResizeMode.ANIMATED);
@@ -99,7 +111,7 @@ public abstract class TemplateDlg<T> extends Panel {
         grid.addSelectionListener((SelectionEvent<T> event) -> {
             gridEvent();
         });
-
+        grid.setSelectionMode(SelectionMode.NONE);
         grid.addComponentColumn(this::buildEditButton).setId("botones").setCaption("Acción");
         
         ResponsiveRow row3 = content.addRow().withAlignment(Alignment.MIDDLE_CENTER);
@@ -111,7 +123,7 @@ public abstract class TemplateDlg<T> extends Panel {
 
         main = new VerticalLayout();
         Element.cfgLayoutComponent(main, true, false);
-        main.addComponent(content);
+        main.addComponent(content); 
         main.addComponent(contentLayout);
         this.setSizeFull();
         this.setContent(main);
@@ -130,10 +142,17 @@ public abstract class TemplateDlg<T> extends Panel {
         button.addClickListener(e -> {
             eventEditButtonGrid(obj);
         });
+        
+        delete = new Button(VaadinIcons.TRASH);
+        delete.addStyleName(ValoTheme.BUTTON_LINK);
+        delete.setDescription("Eliminar");
+        delete.addClickListener(e -> {
+            eventDeleteButtonGrid(obj);
+        });
 
         switch (banBoton) {
             case 1: //botones webinar realizado
-                grid.getColumn("botones").setMinimumWidth(220).setMaximumWidth(220).
+                grid.getColumn("botones").setMinimumWidth(310).setMaximumWidth(310).
                         setEditable(false).clearExpandRatio();
                 buttonListado = new Button(VaadinIcons.FILE_TEXT_O);
                 buttonListado.addStyleName(ValoTheme.BUTTON_LINK);
@@ -163,7 +182,7 @@ public abstract class TemplateDlg<T> extends Panel {
                 row.addColumn().withComponent(buttonWebinar);
                 break;
             case 2: //botones agremiado para listado de webinar asistidos
-                grid.getColumn("botones").setMinimumWidth(180).setMaximumWidth(180).
+                grid.getColumn("botones").setMinimumWidth(240).setMaximumWidth(240).
                         setEditable(false).clearExpandRatio();
                 buttonConstancias = new Button(VaadinIcons.LIST);
                 buttonConstancias.addStyleName(ValoTheme.BUTTON_LINK);
@@ -171,7 +190,7 @@ public abstract class TemplateDlg<T> extends Panel {
                 buttonConstancias.addClickListener(e -> eventWebinarsAgremiado(obj));
                 break;
             case 3:
-                grid.getColumn("botones").setMinimumWidth(220).setMaximumWidth(220).
+                grid.getColumn("botones").setMinimumWidth(310).setMaximumWidth(310).
                         setEditable(false).clearExpandRatio().setCaption("Acción");
                 tutorialsesion = new Button(VaadinIcons.ACADEMY_CAP);
                 tutorialsesion.addStyleName(ValoTheme.BUTTON_LINK);
@@ -181,9 +200,10 @@ public abstract class TemplateDlg<T> extends Panel {
                 row.addColumn().withComponent(tutorialsesion);
                 break;
             default:
-            grid.getColumn("botones").setMinimumWidth(90).setMaximumWidth(90).
-                        setEditable(false);
+            grid.getColumn("botones").setMinimumWidth(180).setMaximumWidth(180);
         }
+        grid.getColumn("botones").setEditable(false);
+        row.addColumn().withComponent(delete);
         row.addColumn().withComponent(button);
         //updateButtonsPdf();
         return layout;
@@ -230,14 +250,19 @@ public abstract class TemplateDlg<T> extends Panel {
         }
         return null; 
     }
+   
 
     protected abstract void buttonSearchEvent();
+    
+    protected abstract void eventMostrar();
 
     protected abstract void buttonAddEvent();
 
     protected abstract void gridEvent();
 
     protected abstract void eventEditButtonGrid(T obj);
+    
+    protected abstract void eventDeleteButtonGrid(T obj);
 
     protected abstract void eventListaAsistentes(T obj);
 
