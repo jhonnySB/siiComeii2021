@@ -123,7 +123,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
             flag = 1;
             
             pais.setValue(obj.getObjPais());
-            sexo.setSelectedItem( obj.getSexo() );
+            sexo.setSelectedItem( obj.getSexo()=='H'?"Hombre":"Mujer" );
             //sexo.setValue(String.valueOf(obj.getSexo()));
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
@@ -223,7 +223,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
         return (agremiado.getId()==id && agremiado.getCorreo().compareTo(correo.getValue())==0 
                 && agremiado.getGradoEstudios()==gradoEstudio.getValue().getId() && agremiado.getInstitucion().compareTo(institucion.getValue())==0
                 && agremiado.getNombre().compareTo(nombre.getValue())==0 && agremiado.getPais()==pais.getValue().getId() && 
-                agremiado.getSexo().compareTo(sexo.getValue())==0);
+                agremiado.getSexo()==sexo.getValue().charAt(0));
     }
     
     protected boolean regexName(){

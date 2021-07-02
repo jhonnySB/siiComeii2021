@@ -35,7 +35,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         grid.addColumn(Agremiado::getInstitucion).setCaption("Institución");
         grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio");
         grid.addColumn(Agremiado::getObjPais).setCaption("País");
-        grid.addColumn(Agremiado::getSexo).setCaption("Sexo"); 
+        grid.addColumn(myBean -> (myBean.getSexo() == 'H' ? "Hombre" : "Mujer")).setCaption("Sexo"); 
 
 
         listadoAgremiados = new Button();

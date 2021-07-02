@@ -63,7 +63,7 @@ public class Agremiado implements Serializable{
     @Basic(optional=false)
     @Column(name="sexo",nullable=false)
     private char sexo;
-    public String getSexo(){return sexo=='H'?"Hombre":"Mujer";}
+    public char getSexo(){return sexo;}
     public void setSexo(char valor){sexo = valor;}
    
     /** Relaciones **/

@@ -48,7 +48,7 @@ public class ControladorAgremiado extends GenericController<ServicioAgremiado,Ag
         oldObj.setNombre(obj.getNombre());
         oldObj.setCorreo(obj.getCorreo());
         oldObj.setPais(obj.getPais());
-        oldObj.setSexo(obj.getSexo().compareTo("Hombre")==0?'H':'M');
+        oldObj.setSexo(obj.getSexo());
         
         return getService().save(obj);
     }
