@@ -12,9 +12,12 @@ import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
+import com.vaadin.data.HasValue.ValueChangeListener;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.Page;
+import com.vaadin.server.UserError;
 import com.vaadin.shared.Position;
+import com.vaadin.shared.ui.ErrorLevel;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -90,6 +93,10 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
         Element.cfgComponent(usuarioGrupo, "Grupo de usuario");
         usuarioGrupo.setPlaceholder("Seleccionar grupo de usuario");
         usuarioGrupo.setRequiredIndicatorVisible(true);
+        usuarioGrupo.setTextInputAllowed(false);
+        usuarioGrupo.addValueChangeListener((ValueChangeListener) event->{
+            usuarioGrupo.setComponentError(null);
+        });
 
         ResponsiveRow row2 = contenido.addRow().withAlignment(Alignment.BOTTOM_CENTER);
         row2.addColumn().withDisplayRules(12, 12, 12, 10).withComponent(correo);
@@ -234,6 +241,11 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                     }
                 }
                 }else{
+                   if(usuarioGrupo.isEmpty()){
+                       UserError error=new UserError("Este campo es requerido");
+                       error.setErrorLevel(ErrorLevel.ERROR);
+                       usuarioGrupo.setComponentError(error);
+                   }
                    Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(UI.getCurrent().getPage()); 
                 }
         } catch (Exception ex) {
@@ -243,7 +255,7 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
     }
     
     protected boolean regexName(){
-        String regex = "[^A-z|ñ| ]";
+        String regex = "[^A-z|ñ|\\p{L}|.| ]";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcherName = pattern.matcher(nombre.getValue()); 
         

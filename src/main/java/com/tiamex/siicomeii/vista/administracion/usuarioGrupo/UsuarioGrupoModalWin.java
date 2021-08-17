@@ -65,7 +65,7 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
    @Override
     protected void buttonAcceptEvent() {
         try {
-            String regex = "[^A-z| ]";
+            String regex = "[^A-z|ñ|\\p{L}| ]";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(nombre.getValue());
             UsuarioGrupo obj = new UsuarioGrupo();

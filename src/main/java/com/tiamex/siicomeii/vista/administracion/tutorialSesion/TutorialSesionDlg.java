@@ -43,10 +43,10 @@ public class TutorialSesionDlg extends TemplateDlg<TutorialSesion>{
 
     private void init() throws Exception{
         banBoton = 4;
-        grid.addColumn(TutorialSesion::getNombre).setCaption("Nombre");
-        grid.addColumn(TutorialSesion::getTutor).setCaption("Tutor");
-        grid.addColumn(TutorialSesion::getInstitucion).setCaption("Institución");
-        grid.addColumn(TutorialSesion::getUrlYoutube).setCaption("URL de youtube");
+        grid.addColumn(TutorialSesion::getNombre).setCaption("Nombre").setHidable(true).setHidingToggleCaption("Mostrar Nombre");
+        grid.addColumn(TutorialSesion::getTutor).setCaption("Tutor").setHidable(true).setHidingToggleCaption("Mostrar Tutor");
+        grid.addColumn(TutorialSesion::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución");
+        grid.addColumn(TutorialSesion::getUrlYoutube).setCaption("URL de youtube").setHidable(true).setHidingToggleCaption("Mostrar URL");
         setCaption("<span style=\"text-decoration: underline;font-family: Source Sans Pro\">Sesiones para el tutorial: </span>"
                 + "<b><span style=\"background-color:#ffc107;padding:3px 6px;color:black;border-radius:5px;font-size:16px;\">"
                 +ControladorTutorial.getInstance().getById(tutorialLinked).getNombre()+"</span></b>");

@@ -10,6 +10,7 @@ import com.tiamex.siicomeii.vista.administracion.usuario.UsuarioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuarioGrupo.UsuarioGrupoDlg;
 import com.tiamex.siicomeii.vista.administracion.proximowebinar.ProximoWebinarDlg;
 import com.tiamex.siicomeii.vista.administracion.tutorial.TutorialDlg;
+import com.tiamex.siicomeii.vista.reportes.agremiadosChart;
 import java.io.IOException;
 
 /** @author fred **/
@@ -82,6 +83,12 @@ public class FabricaVista{
     public PaisDlg getPaisDlg() throws Exception{
         if(paisDlg == null){paisDlg = new PaisDlg();}
         return paisDlg;
+    }
+    
+    public agremiadosChart agremiadosChart;
+    public agremiadosChart getAgremiadosChart() throws Exception{
+        if(agremiadosChart == null){agremiadosChart = new agremiadosChart();}
+        return agremiadosChart;
     }
 
     public WebinarRealizadoDlg WebinarRealizadoDlg;

@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 @Company Tiamex
 */
 
-public class FileUploadReceiver implements Receiver{
+public class FileUploadReceiver  implements Receiver{
     
     private OutputStream outputFile;
     

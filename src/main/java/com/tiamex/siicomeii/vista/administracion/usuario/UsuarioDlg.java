@@ -69,14 +69,14 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
         Label lblActivo = new Label();
         
         if(obj.getActivo()){
-            lblActivo.setValue("<span style=\"background-color:#28a745;padding:3px 6px;color:white;border-radius:20px;font-size:16px\">Activo</span>");
+            lblActivo.setValue("<span style=\"background-color:#28a745;padding:3px 6px;color:white;border-radius:0px;font-size:13px\">Activo</span>");
         }else{
-            lblActivo.setValue("<span style=\"background-color:#dc3545;padding:3px 6px;color:white;border-radius:20px;font-size:16px\">Inactivo</span>");
+            lblActivo.setValue("<span style=\"background-color:#dc3545;padding:3px 6px;color:white;border-radius:0px;font-size:13px\">Inactivo</span>");
         }
         if(ui.getUsuario().getCorreo().compareTo(obj.getCorreo())==0){
             delete.setEnabled(false); delete.setDescription("Cambia de sesión para poder eliminar este usuario");
             Label lblSesion = new Label();
-            lblSesion.setValue("<span style=\"background-color:#007bff;padding:3px 6px;color:white;border-radius:20px;font-size:16px\">En sesión</span>");
+            lblSesion.setValue("<span style=\"background-color:#007bff;padding:3px 6px;color:white;border-radius:0px;font-size:13px\">En sesión</span>");
             lblSesion.setContentMode(ContentMode.HTML);
             row.addColumn().withComponent(lblSesion);
         }
@@ -158,9 +158,9 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
         String fechaFormateada = fechaActual.format(DateTimeFormatter.ofPattern("dd_MM_yyyy", varRegional));
 
         try {
-            Process p = Runtime.getRuntime().exec("mysqldump -u siiComeii -psiiComeii.2020 siiComeii");
+            //Process p = Runtime.getRuntime().exec("mysqldump -u siiComeii -psiiComeii.2020 siiComeii");
             //Siguiente linea para compilar la base de datos en windows con xampp
-            //Process p = Runtime.getRuntime().exec("C:\\xampp\\mysql\\bin\\mysqldump -u siiComeii -psiiComeii.2020 siiComeii");
+            Process p = Runtime.getRuntime().exec("C:\\xampp\\mysql\\bin\\mysqldump -u siiComeii -psiiComeii.2020 siiComeii");
             InputStream is = p.getInputStream();//Pedimos la entrada
             FileOutputStream fos = new FileOutputStream("./respaldosBD/"+ fechaFormateada + "_backup_siicomeii.sql"); //creamos el archivo para le respaldo
             byte[] buffer = new byte[1000]; //Creamos una variable de tipo byte para el buffer

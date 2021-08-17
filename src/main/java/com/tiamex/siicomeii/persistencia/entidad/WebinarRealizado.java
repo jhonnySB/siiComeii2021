@@ -51,7 +51,7 @@ public class WebinarRealizado implements Serializable{
     @Column(name="fecha",nullable=false)
     private LocalDateTime fecha;
     public String getFechaFrm(){
-        return fecha.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' y hh:mm", new Locale("es", "MX")));
+        return fecha.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' y '('hh:mm a')'", new Locale("es", "MX")));
     }
     public LocalDateTime getFecha(){return fecha;}
     public void setFecha(LocalDateTime valor){fecha = valor;}

@@ -28,6 +28,11 @@ public abstract class GenericController<SERVICE,CLASS,ID extends Serializable>{
             throw ex;
         }
     }
+        
+    public long generarId(){
+        return service.generateId();
+    }
+
     
     public boolean delete(ID id) throws Exception{
         try{
@@ -42,6 +47,15 @@ public abstract class GenericController<SERVICE,CLASS,ID extends Serializable>{
         try{
             return service.delete(id);
         }catch (Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+            throw ex;
+        }
+    }
+    
+    public int updateField(String field,boolean value,long id) throws Exception {
+        try {
+            return service.updateField(field,value,id);
+        } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
             throw ex;
         }

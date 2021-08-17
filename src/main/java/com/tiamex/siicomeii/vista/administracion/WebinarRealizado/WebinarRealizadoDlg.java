@@ -7,6 +7,7 @@ import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.ShowPDFDlg;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
 import com.vaadin.server.StreamResource;
+import com.vaadin.ui.Grid.Column;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,14 +23,18 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
 
     private void init() {
         banBoton = 1;
-
-        grid.addColumn(WebinarRealizado::getNombre).setCaption("Nombre");
-        grid.addColumn(WebinarRealizado::getPonente).setCaption("Ponente");
-        grid.addColumn(WebinarRealizado::getInstitucion).setCaption("Institución");
-        grid.addColumn(WebinarRealizado::getFechaFrm).setCaption("Fecha");
-        grid.addColumn(WebinarRealizado::getPresentacion).setCaption("Presentación");
-        grid.addColumn(WebinarRealizado::getUrlYoutube).setCaption("URL YOUTUBE");
-
+        int A = 0;
+            row1.removeAllComponents();
+            row1.addColumn().withDisplayRules(12, 6, 6, 10).withComponent(searchField);
+            row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnSearch);
+        
+        grid.addColumn(WebinarRealizado::getNombre).setCaption("Nombre").setHidable(false);
+        grid.addColumn(WebinarRealizado::getPonente).setCaption("Ponente").setHidable(true).setHidingToggleCaption("Mostrar Ponente");
+        grid.addColumn(WebinarRealizado::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución");
+        grid.addColumn(WebinarRealizado::getFechaFrm).setCaption("Fecha").setHidable(true).setHidingToggleCaption("Mostrar Fecha");
+        grid.addColumn(WebinarRealizado::getPresentacion).setCaption("Presentación").setHidable(true).setHidingToggleCaption("Mostrar Presentación").setHidden(true);
+        grid.addColumn(WebinarRealizado::getUrlYoutube).setCaption("URL YOUTUBE").setHidable(true).setHidingToggleCaption("Mostrar URL Youtube").setHidden(true);
+        
         setCaption("<b>Webinar Realizado</b>");
         eventMostrar();
     }

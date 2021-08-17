@@ -5,10 +5,14 @@ import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.SiiComeiiUI;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.controlador.ControladorAsistenciaWebinar;
+import com.tiamex.siicomeii.controlador.ControladorWebinarRealizado;
+import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
+import com.tiamex.siicomeii.vista.administracion.WebinarRealizado.WebinarRealizadoModalWin;
 import com.vaadin.data.HasValue;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.grid.ColumnResizeMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -21,6 +25,8 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,9 +54,11 @@ public abstract class TemplateDlg<T> extends Panel {
     protected Button buttonConstancias;
     protected int banBoton;
     protected Button tutorialsesion;
+    protected Button upWebinar;
     protected Button delete;
     protected VerticalLayout contentLayout;
     protected ResponsiveLayout content;
+    protected ResponsiveRow row1;
 
     protected Grid<T> grid;
 
@@ -66,7 +74,6 @@ public abstract class TemplateDlg<T> extends Panel {
     }
     
     private void initDlg() throws Exception {
-        updateDlg();
         ui = Element.getUI();
         content = new ResponsiveLayout();
         content.setSizeFull();
@@ -75,28 +82,30 @@ public abstract class TemplateDlg<T> extends Panel {
         Element.cfgComponent(resBusqueda);
         
         searchField = new TextField();
-        Element.cfgComponent(searchField);
+        Element.cfgComponent(searchField); searchField.setId("searchFld");
         searchField.setPlaceholder("Buscar"); 
         searchField.addValueChangeListener((HasValue.ValueChangeEvent<String> event) -> {
             buttonSearchEvent();
         });
         btnSearch = new Button("Buscar");
-        Element.cfgComponent(btnSearch);
+        Element.cfgComponent(btnSearch); btnSearch.setId("btnSearch");
         btnSearch.addStyleName(ValoTheme.BUTTON_PRIMARY);
         btnSearch.addClickListener((Button.ClickEvent event) -> {
             buttonSearchEvent();
         });
-        btnAdd = new Button("Agregar");
+        btnAdd = new Button("Nuevo");
         Element.cfgComponent(btnAdd);
         btnAdd.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         btnAdd.addClickListener((Button.ClickEvent event) -> {
             buttonAddEvent();
         });
-            ResponsiveRow row1 = content.addRow().withAlignment(Alignment.BOTTOM_CENTER);
+            row1 = content.addRow().withAlignment(Alignment.BOTTOM_CENTER);
             Element.cfgLayoutComponent(row1, true, false);
-            row1.addColumn().withDisplayRules(12, 6, 6, 8).withComponent(searchField);
-            row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnSearch);
-            row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnAdd);   
+                row1.addColumn().withDisplayRules(12, 6, 6, 8).withComponent(searchField);
+                row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnSearch);
+                row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnAdd); 
+            
+              
         
         ResponsiveRow row2 = content.addRow().withAlignment(Alignment.BOTTOM_LEFT);
             Element.cfgLayoutComponent(row2, false, false);
@@ -105,13 +114,14 @@ public abstract class TemplateDlg<T> extends Panel {
         
         grid = new Grid<>();
         Element.cfgComponent(grid);
-        grid.setHeight(Element.windowHeightPx(100) + "px");
+        //grid.setHeight(Element.windowHeightPx(100) + "px");
         grid.setColumnResizeMode(ColumnResizeMode.ANIMATED);
         grid.setSelectionMode(SelectionMode.SINGLE);
         grid.addSelectionListener((SelectionEvent<T> event) -> {
             gridEvent();
         });
-        grid.setSelectionMode(SelectionMode.NONE);
+        grid.setSelectionMode(SelectionMode.SINGLE);
+        grid.setColumnReorderingAllowed(true);
         grid.addComponentColumn(this::buildEditButton).setId("botones").setCaption("Acción");
         
         ResponsiveRow row3 = content.addRow().withAlignment(Alignment.MIDDLE_CENTER);
@@ -124,11 +134,11 @@ public abstract class TemplateDlg<T> extends Panel {
         main = new VerticalLayout();
         Element.cfgLayoutComponent(main, true, false);
         main.addComponent(content); 
-        main.addComponent(contentLayout);
+        main.addComponent(contentLayout); 
         this.setSizeFull();
         this.setContent(main);
         this.setCaptionAsHtml(true);
-        this.setHeight(Element.windowHeightPx());
+        this.setHeight(Element.windowHeightPx());  
     }
 
     private ResponsiveLayout buildEditButton(T obj) {
@@ -149,10 +159,13 @@ public abstract class TemplateDlg<T> extends Panel {
         delete.addClickListener(e -> {
             eventDeleteButtonGrid(obj);
         });
-
+        
+        row.addColumn().withComponent(delete).setId("btnDel");
+        row.addColumn().withComponent(button).setId("btnEdit");
+        
         switch (banBoton) {
             case 1: //botones webinar realizado
-                grid.getColumn("botones").setMinimumWidth(310).setMaximumWidth(310).
+                grid.getColumn("botones").setMinimumWidth(180).setMaximumWidth(180).
                         setEditable(false).clearExpandRatio();
                 buttonListado = new Button(VaadinIcons.FILE_TEXT_O);
                 buttonListado.addStyleName(ValoTheme.BUTTON_LINK);
@@ -178,6 +191,7 @@ public abstract class TemplateDlg<T> extends Panel {
                         buttonListado.setDescription("Descargar listado de asistentes");
                     }
                 }
+                row.removeAllComponents();
                 row.addColumn().withComponent(buttonListado);
                 row.addColumn().withComponent(buttonWebinar);
                 break;
@@ -199,18 +213,29 @@ public abstract class TemplateDlg<T> extends Panel {
                 tutorialsesion.setDescription("Ingresar sesiones");
                 row.addColumn().withComponent(tutorialsesion);
                 break;
+            case 4: //proximos webinars
+                
+                grid.getColumn("botones").setMinimumWidth(240).setMaximumWidth(240).
+                        setEditable(false).clearExpandRatio().setCaption("Acción");
+                upWebinar = new Button(VaadinIcons.ARCHIVE);
+                upWebinar.addStyleName(ValoTheme.BUTTON_LINK);
+                upWebinar.addClickListener(e -> this.eventWebinarRealizado(obj));
+                upWebinar.setEnabled(true);
+                upWebinar.setDescription("Agregar a webinars realizados");
+                row.addColumn().withComponent(upWebinar);
+                
+                break;
             default:
-            grid.getColumn("botones").setMinimumWidth(180).setMaximumWidth(180);
+                grid.getColumn("botones").setMinimumWidth(180).setMaximumWidth(180);
+                break;
         }
         grid.getColumn("botones").setEditable(false);
-        row.addColumn().withComponent(delete);
-        row.addColumn().withComponent(button);
         //updateButtonsPdf();
         return layout;
     }
-
-    public void updateDlg() {
-        buttonSearchEvent();
+    
+    public void updateDlg(){
+        eventMostrar();
     }
 
     public boolean updateButtonCorreo() {
@@ -251,6 +276,15 @@ public abstract class TemplateDlg<T> extends Panel {
         return null; 
     }
    
+    protected void eventWebinarRealizado(T obj){
+        ProximoWebinar proxWebinar = (ProximoWebinar)obj;
+        WebinarRealizado webinarR = (WebinarRealizado) ControladorWebinarRealizado.getInstance().getByNames(proxWebinar.getTitulo());
+        if (webinarR != null) {
+            ui.addWindow(new WebinarRealizadoModalWin(webinarR));
+        } else {
+            ui.addWindow(new WebinarRealizadoModalWin(proxWebinar));
+        }
+    }
 
     protected abstract void buttonSearchEvent();
     

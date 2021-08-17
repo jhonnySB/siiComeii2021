@@ -1,7 +1,17 @@
 package com.tiamex.siicomeii.persistencia.entidad;
 
 import java.io.Serializable;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,7 +23,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 /** @author cerimice **/
 
@@ -66,6 +80,39 @@ public class Agremiado implements Serializable{
     public char getSexo(){return sexo;}
     public void setSexo(char valor){sexo = valor;}
    
+    @Column(name = "created_at", updatable = false)
+    @Temporal(TemporalType.DATE)
+    private Calendar createdAt;
+    public java.util.Date getCreatedAt(){
+        return createdAt.getTime();
+    }
+    
+    @PrePersist
+    private void creationTimestamp() {
+        Calendar cal = Calendar.getInstance();
+        cal.clear();
+        cal.setTime(Timestamp.valueOf(LocalDateTime.now(ZoneId.systemDefault())));
+        this.createdAt = cal;
+    }
+    public LocalDate getFechaReg(){
+        LocalDate localDate = LocalDateTime.ofInstant(createdAt.toInstant(), createdAt.getTimeZone().toZoneId()).toLocalDate();
+        return localDate;
+    }
+    
+    @Column(name = "updated_at", columnDefinition = "TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Calendar updated_at;
+    public java.util.Date getTimestamp() {
+        return updated_at.getTime();
+    }
+    
+    @Basic(optional=false)
+    @Column(name="urlIcon")
+    private boolean urlIcon=false;
+    public boolean getUrlIcon(){
+        return urlIcon;
+    }
+
     /** Relaciones **/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pais",referencedColumnName="id",insertable=false,updatable=false)

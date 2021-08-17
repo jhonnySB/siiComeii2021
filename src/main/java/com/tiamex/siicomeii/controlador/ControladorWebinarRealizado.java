@@ -37,9 +37,8 @@ public class ControladorWebinarRealizado extends GenericController<ServicioWebin
             return getService().save(obj);
         }
         
-        //oldObj.setActivo(obj.getActivo());
-        //oldObj.setCambiarPassword(obj.getCambiarPassword());
-        //oldObj.setNombre(obj.getNombre());
+        oldObj.setPresentacion(obj.getPresentacion());
+        oldObj.setUrlYoutube(obj.getUrlYoutube());
         return getService().save(obj);
     }
     

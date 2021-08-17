@@ -13,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /** @author cerimice **/
 
@@ -35,7 +37,7 @@ public class ProximoEvento implements Serializable{
     public void setTitulo(String valor){titulo = valor;}
     
     @Basic(optional=false)
-    @Column(name="descripcion",nullable=false)
+    @Column(name="descripcion",nullable=false,length=300)
     private String  descripcion;
     public String getDescripcion(){return descripcion;}
     public void setDescripcion(String valor){descripcion = valor;}
@@ -44,7 +46,7 @@ public class ProximoEvento implements Serializable{
     @Column(name="fecha",nullable=false)
     private LocalDateTime fecha;
     public String getFechaFrm(){
-        return fecha.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' y hh:mm", new Locale("es", "MX")));
+        return fecha.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' y '('hh:mm a')'", new Locale("es", "MX")));
     }
     public LocalDateTime getFecha(){return fecha;}
     public void setFecha(LocalDateTime valor){fecha = valor;}

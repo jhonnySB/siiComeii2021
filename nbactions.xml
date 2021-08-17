@@ -10,8 +10,40 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath com.tiamex.siicomeii.Main</exec.args>
+                <exec.args>-classpath %classpath com.tiamex.siicomeii.Main clean vaadin:update-widgetset vaadin:compile -classpath %classpath com.tiamex.siicomeii.Main</exec.args>
                 <exec.executable>java</exec.executable>
+                <exec.workingdir>C:\Users\jhon\Documents\NetBeansProjects\up_v2\siicomeii</exec.workingdir>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath ${packageClassName} clean vaadin:update-widgetset vaadin:compile -classpath %classpath com.tiamex.siicomeii.Main</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+                <exec.workingdir>C:\Users\jhon\Documents\NetBeansProjects\up_v2\siicomeii</exec.workingdir>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath ${packageClassName} clean vaadin:update-widgetset vaadin:compile -classpath %classpath com.tiamex.siicomeii.Main</exec.args>
+                <exec.executable>java</exec.executable>
+                <exec.workingdir>C:\Users\jhon\Documents\NetBeansProjects\up_v2\siicomeii</exec.workingdir>
             </properties>
         </action>
     </actions>

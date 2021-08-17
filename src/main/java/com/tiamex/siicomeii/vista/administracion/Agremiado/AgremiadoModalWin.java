@@ -13,11 +13,16 @@ import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.data.Binder;
+import com.vaadin.data.HasValue.ValueChangeListener;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.server.ErrorMessage;
 import com.vaadin.server.Page;
+import com.vaadin.server.UserError;
 import com.vaadin.shared.Position;
+import com.vaadin.shared.ui.ErrorLevel;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -57,7 +62,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
         gradoEstudio = new ComboBox<>();
         Element.cfgComponent(gradoEstudio, "Grado Estudios");
         gradoEstudio.setPlaceholder("Seleccionar grado de estudios");
-        gradoEstudio.setRequiredIndicatorVisible(true);
+        gradoEstudio.setRequiredIndicatorVisible(true); gradoEstudio.setWidth("95%");
 
         institucion = new TextField();
         Element.cfgComponent(institucion, "Institución");
@@ -77,24 +82,37 @@ public class AgremiadoModalWin extends TemplateModalWin {
         pais = new ComboBox<>();
         Element.cfgComponent(pais, "País");
         pais.setPlaceholder("Seleccionar país");
-        pais.setRequiredIndicatorVisible(true);
+        pais.setRequiredIndicatorVisible(true); pais.setWidth("95%");
 
         sexo = new ComboBox<>();
         Element.cfgComponent(sexo, "Sexo");
         sexo.setItems("Hombre", "Mujer");
         sexo.setPlaceholder("Seleccione una opción");
-        sexo.setPopupWidth("50%");
+        //sexo.setPopupWidth("50%");
         sexo.setEmptySelectionAllowed(false);
         sexo.setRequiredIndicatorVisible(true);
         
+        gradoEstudio.setTextInputAllowed(false);
+        sexo.setTextInputAllowed(false);
+        pais.setTextInputAllowed(false);
+        
+        gradoEstudio.addValueChangeListener((ValueChangeListener) event->{
+            gradoEstudio.setComponentError(null);
+        });
+        sexo.addValueChangeListener((ValueChangeListener) event->{
+            sexo.setComponentError(null);
+        });
+        pais.addValueChangeListener((ValueChangeListener) event->{
+            pais.setComponentError(null);
+        });
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
-        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(gradoEstudio);
-        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(correo);
-        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(pais);
-        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(sexo);
+        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
+        row1.addColumn().withDisplayRules(5, 5, 5, 5).withComponent(gradoEstudio);
+        row1.addColumn().withDisplayRules(5, 5, 5, 5).withComponent(pais);
+        row1.addColumn().withDisplayRules(2, 2, 2, 2).withComponent(sexo);
 
         try {
             gradoEstudio.setItems(ControladorGradoEstudio.getInstance().getAll());
@@ -129,14 +147,14 @@ public class AgremiadoModalWin extends TemplateModalWin {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-
+    
     /*
     1-- Comprobar que es un correo valido
     2-- registrar y enviar nuevo correo
     3-- Editar con el mismo correo(sin cambios)
     4-- Editar un registro con otro correo
     5-- Registrar un nuevo usuario con un correo ya registrado
-     */
+    */
     @Override
     protected void buttonAcceptEvent() {
         try {
@@ -212,10 +230,25 @@ public class AgremiadoModalWin extends TemplateModalWin {
                 }
 
             } else {
+                validateComboBox();
                 Element.makeNotification("Faltan campos por llenar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+        }
+    }
+    
+    protected void validateComboBox(){
+        UserError userError = new UserError("Este campo es requerido");
+        userError.setErrorLevel(ErrorLevel.ERROR);
+        if (sexo.isEmpty()) {
+            sexo.setComponentError(userError);
+        }
+        if (gradoEstudio.isEmpty()) {
+            gradoEstudio.setComponentError(userError); 
+        }
+        if(pais.isEmpty()){
+            pais.setComponentError(userError);
         }
     }
     
@@ -227,7 +260,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
     }
     
     protected boolean regexName(){
-        String regex = "[^A-z|ñ| ]";
+        String regex = "[^A-z|ñ|\\p{L}|.| ]";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcherName = pattern.matcher(nombre.getValue()); 
         

@@ -21,10 +21,10 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
 
     private void init() {
         banBoton = 3;
-        grid.addColumn(Tutorial::getNombre).setCaption("Nombre");
-        grid.addColumn(Tutorial::getTutor).setCaption("Tutor");
-        grid.addColumn(Tutorial::getInstitucion).setCaption("Institución");
-        grid.addColumn(Tutorial::getObjUsuario).setCaption("Usuario");
+        grid.addColumn(Tutorial::getNombre).setCaption("Nombre").setHidable(false);
+        grid.addColumn(Tutorial::getTutor).setCaption("Tutor").setHidable(true).setHidingToggleCaption("Mostrar Tutor");
+        grid.addColumn(Tutorial::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución");
+        grid.addColumn(Tutorial::getObjUsuario).setCaption("Usuario").setHidable(true).setHidingToggleCaption("Mostrar Usuario").setHidden(true);
 
         setCaption("<b>Tutoriales</b>");
         eventMostrar();

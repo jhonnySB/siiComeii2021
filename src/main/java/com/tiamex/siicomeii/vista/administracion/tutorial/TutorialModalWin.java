@@ -167,7 +167,7 @@ public final class TutorialModalWin extends TemplateModalWin {
     }
     
     protected boolean regexTutor(){
-        String regex = "[^A-z|ñ| ]";
+        String regex = "[^A-z|ñ|\\p{L}| ]";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcherName = pattern.matcher(tutor.getValue()); 
         

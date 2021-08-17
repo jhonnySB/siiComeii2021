@@ -95,8 +95,8 @@ public class SiiComeiiMailer{
     
     
     public List<String> enviarConstancias(String correos,long idWebinar,long idUser) throws Exception{
+        List<String> emailsInvalidos = new ArrayList<>();
         try{
-            List<String> emailsInvalidos = new ArrayList<>();
             Mailer mailer = new Mailer();
             String asunto = "Sii Comeii | Envio de constancia de webinar";
             String mensaje;
@@ -108,28 +108,29 @@ public class SiiComeiiMailer{
             for(String correo: correos.split(",")){
                 agremiado = ControladorAgremiado.getInstance().getByEmail(correo.trim());
                 if(agremiado!=null){
-                    asistencia = new AsistenciaWebinar();
-                    asistencia.setAgremiado(agremiado.getId());
-                    asistencia.setUsuario(idUser);
-                    asistencia.setWebinar(idWebinar);
-                    if(ControladorAsistenciaWebinar.getInstance().getByAgremiadoWebinar(idWebinar, agremiado.getId()).isEmpty())
-                        ControladorAsistenciaWebinar.getInstance().save(asistencia);
                     mensaje = cargarMensaje(Main.getBaseDir()+"/mailer/envioConstancia.txt");
                     String nuevoAgremiado = agremiado.getNombre();
                     mensaje = mensaje.replaceAll(":nombre",nuevoAgremiado);
                     mensaje = mensaje.replaceAll(":webinar", nombreWebinar);
                     constancia = new ConstanciaAgremiado(nombreWebinar,nuevoAgremiado,webinar.getFecha(),webinar.getPonente());
                     String filename = constancia.generarConstancia();
-                    mailer.sendMailConstancia(correo, "", "", asunto, mensaje, filename,nombreWebinar,webinar.getFecha().getYear());
-                    //constancia.borrarConstancia(filename);
-                }else{
-                    emailsInvalidos.add(correo);
+                    if(mailer.sendMailConstancia(correo, "", "", asunto, mensaje, filename,nombreWebinar,webinar.getFecha().getYear())){
+                        asistencia = new AsistenciaWebinar();
+                        asistencia.setAgremiado(agremiado.getId());
+                        asistencia.setUsuario(idUser);
+                        asistencia.setWebinar(idWebinar);
+                        if (ControladorAsistenciaWebinar.getInstance().getByAgremiadoWebinar(idWebinar, agremiado.getId()).isEmpty())
+                            ControladorAsistenciaWebinar.getInstance().save(asistencia);
+                    }else{
+                        emailsInvalidos.add(correo);
+                    }
                 }
             }
             return emailsInvalidos;
         }catch(Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
-            throw ex;
+            return emailsInvalidos;
+            //throw ex;
         }
     }
 }

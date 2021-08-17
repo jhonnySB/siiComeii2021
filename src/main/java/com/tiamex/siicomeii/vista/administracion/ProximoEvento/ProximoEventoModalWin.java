@@ -8,16 +8,29 @@ import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.data.Binder;
+import com.vaadin.data.HasValue.ValueChangeListener;
+import com.vaadin.data.Result;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
+import com.vaadin.shared.ui.ValueChangeMode;
+import com.vaadin.shared.ui.datefield.DateTimeResolution;
 import com.vaadin.ui.*;
 
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/** @author fred **/
-public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Receiver{
+/**
+ * @author fred *
+ */
+public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Receiver {
+
     private TextArea descripcion;
     private DateTimeField fecha;
     private TextField imagen;
@@ -38,27 +51,47 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
         Element.cfgLayoutComponent(contenido);
 
         descripcion = new TextArea();
-        Element.cfgComponent(descripcion, "Descipción");
+        Element.cfgComponent(descripcion, "Descipción (300 caracteres)");
         descripcion.setPlaceholder("Ingrese una descripción del contenido del próximo evento");
         descripcion.setRequiredIndicatorVisible(true);
+        descripcion.setMaxLength(300);
+        descripcion.addValueChangeListener((ValueChangeListener) event->{
+            int leftChar = descripcion.getMaxLength()-descripcion.getValue().length();
+            descripcion.setCaption("<b>Descipción ("+leftChar+" caracteres restantes)</b>");
+        });
 
-        fecha = new DateTimeField();
-        Element.cfgComponent(fecha, "Fecha");
-        fecha.setValue(LocalDateTime.now().withHour(11).withMinute(00).plusDays(1));
-        fecha.setRangeStart(fecha.getValue().minusDays(1));
+        fecha = new DateTimeField("") {
+            @Override
+            protected Result<LocalDateTime> handleUnparsableDateString(
+                    String dateString) {
+                try {
+                    LocalDateTime parsedAtServer = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+                    return Result.ok(parsedAtServer);
+                } catch (DateTimeParseException e) {
+                    return Result.error("Fecha y/u hora no válida");
+                }
+            }
+        };
+        fecha.setDefaultValue(LocalDateTime.now(ZoneId.systemDefault()));
         fecha.setRequiredIndicatorVisible(true);
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        fecha.setPlaceholder("Seleccione o ingrese la fecha (ej. "+now.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))+")");
+        fecha.setShowISOWeekNumbers(true);
+        fecha.setZoneId(ZoneId.of("America/Mexico_City"));
+        fecha.setResolution(DateTimeResolution.MINUTE);
+        fecha.setLocale(new Locale("es","MX"));
+        Element.cfgComponent(fecha, "Fecha y Hora");
 
         imagen = new TextField();
         Element.cfgComponent(imagen, "Imagen");
         imagen.setPlaceholder("Ingrese url de imagen");
         imagen.setRequiredIndicatorVisible(true);
 
-
         titulo = new TextField();
         Element.cfgComponent(titulo, "Título");
         titulo.setPlaceholder("Ingrese título");
         titulo.setRequiredIndicatorVisible(true);
-        
+
         usuario = new TextField();
         Element.cfgComponent(usuario, "Usuario");
         usuario.setValue(ui.getUsuario().getNombre());
@@ -81,18 +114,17 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
     @Override
     protected void loadData(long id) {
         try {
-            ProximoEvento obj = ControladorProximoEvento.getInstance().getById(id);            
+            ProximoEvento obj = ControladorProximoEvento.getInstance().getById(id);
             this.id = obj.getId();
             descripcion.setValue(obj.getDescripcion());
             imagen.setValue(obj.getImagen());
             titulo.setValue(obj.getTitulo());
             //fecha.setReadOnly(true);
-            //fecha.setValue(obj.getFecha());
+            fecha.setValue(obj.getFecha());
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-
 
     @Override
     protected void buttonAcceptEvent() {
@@ -105,57 +137,64 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
                 obj.setImagen(imagen.getValue());
                 obj.setTitulo(titulo.getValue());
                 obj.setUsuario(ui.getUsuario().getId());
-                
-                ProximoEvento evento = (ProximoEvento)ControladorProximoEvento.getInstance().getByTitulos(titulo.getValue());
-                
-                if(id==0){ // nuevo registro (botón agregar)
-                                
-                                if (evento != null) { // nuevo registro con entrada de correo duplicada
-                                    
-                                    Element.makeNotification("Ya existe un evento con el mismo título: '"+evento.getTitulo()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
-                                }else{ // nuevo registro con nuevo correo
-                                    
-                                        obj = ControladorProximoEvento.getInstance().save(obj);
-                                        if (obj != null) {
-                                            Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                            ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
-                                            close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                        }
-                                }
-                            }else{ // editando un registro
-                                
-                                if(evento!=null){ // mismo reg
-                                    
-                                    if(compareEvento(evento)){ // sin cambios
-                                        close();
-                                    }else if(evento.getId()!=id){
-                                        Element.makeNotification("Ya existe un evento con el mismo título: '"+evento.getTitulo()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
-                                    }else{
-                                        obj = ControladorProximoEvento.getInstance().save(obj);
-                                        if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                            ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
-                                            close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                        }
-                                    }
-                                    
-                                }else{
-                                    
-                                        obj = ControladorProximoEvento.getInstance().save(obj);
-                                        if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                            ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
-                                            close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                                        }
-                                    
+
+                if (regexName()) {
+                    Element.makeNotification("Solo se permiten letras en el título", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                } else {
+
+                    ProximoEvento evento = (ProximoEvento) ControladorProximoEvento.getInstance().getByTitulos(titulo.getValue());
+
+                    if (id == 0) { // nuevo registro (botón agregar)
+
+                        if (evento != null) { // nuevo registro con entrada de correo duplicada
+
+                            Element.makeNotification("Ya existe un evento con el mismo título: '" + evento.getTitulo() + "'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                        } else { // nuevo registro con nuevo correo
+
+                            obj = ControladorProximoEvento.getInstance().save(obj);
+                            if (obj != null) {
+                                Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
+                                close();
+                            } else {
+                                Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                            }
+                        }
+                    } else { // editando un registro
+
+                        if (evento != null) { // mismo reg
+
+                            if (compareEvento(evento)) { // sin cambios
+                                close();
+                            } else if (evento.getId() != id) {
+                                Element.makeNotification("Ya existe un evento con el mismo título: '" + evento.getTitulo() + "'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                            } else {
+                                obj = ControladorProximoEvento.getInstance().save(obj);
+                                if (obj != null) {
+                                    Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                    ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
+                                    close();
+                                } else {
+                                    Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                 }
                             }
+
+                        } else {
+
+                            obj = ControladorProximoEvento.getInstance().save(obj);
+                            if (obj != null) {
+                                Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
+                                close();
+                            } else {
+                                Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                            }
+
+                        }
+                    }
+                    ui.getFabricaVista().getProximoEventoDlg().fechaFinF.setEnabled(true);
+                    ui.getFabricaVista().getProximoEventoDlg().fechaInicioF.setEnabled(true);
+                }
             } else {
                 Element.makeNotification("Faltan campos por llenar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
@@ -163,25 +202,33 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
+
+    protected boolean compareEvento(ProximoEvento evento) {
+        return (evento.getDescripcion().compareTo(descripcion.getValue()) == 0 && evento.getId() == id
+                && evento.getFecha().compareTo(fecha.getValue()) == 0 && evento.getImagen().compareTo(imagen.getValue()) == 0);
+    }
     
-    protected boolean compareEvento(ProximoEvento evento){
-        return (evento.getDescripcion().compareTo(descripcion.getValue())==0 && evento.getId()==id
-                && evento.getFecha().compareTo(fecha.getValue())==0 && evento.getImagen().compareTo(imagen.getValue())==0);
+    protected boolean regexName() {
+        String regex = "[^A-z|ñ|\\p{L}| ]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcherPonente = pattern.matcher(titulo.getValue());
+
+        return matcherPonente.find();
     }
 
     @Override
     protected void buttonCancelEvent() {
         close();
     }
-    
+
     private boolean validarCampos() {
         Binder<ProximoEvento> binder = new Binder<>();
-        
-        binder.forField(descripcion).asRequired("Campo requerido").bind(ProximoEvento::getDescripcion,ProximoEvento::setDescripcion);
-        binder.forField(fecha).asRequired("Campo requerido").bind(ProximoEvento::getFecha,ProximoEvento::setFecha);
-        binder.forField(imagen).asRequired("Campo requerido").bind(ProximoEvento::getImagen,ProximoEvento::setImagen);
-        binder.forField(titulo).asRequired("Campo requerido").bind(ProximoEvento::getTitulo,ProximoEvento::setTitulo);
-        
+
+        binder.forField(descripcion).asRequired("Campo requerido").bind(ProximoEvento::getDescripcion, ProximoEvento::setDescripcion);
+        binder.forField(fecha).asRequired("Campo requerido").bind(ProximoEvento::getFecha, ProximoEvento::setFecha);
+        binder.forField(imagen).asRequired("Campo requerido").bind(ProximoEvento::getImagen, ProximoEvento::setImagen);
+        binder.forField(titulo).asRequired("Campo requerido").bind(ProximoEvento::getTitulo, ProximoEvento::setTitulo);
+
         return binder.validate().isOk();
     }
 

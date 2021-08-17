@@ -5,6 +5,7 @@ import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.SiiComeiiUI;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
@@ -22,6 +23,8 @@ public abstract class TemplateModalWin extends Window{
     protected Button delete;
     protected Button accept;
     protected Button cancel;
+    protected Button lblIcon;
+    protected CheckBox editBox;
     
     public TemplateModalWin(){
         initDlg();
@@ -31,16 +34,16 @@ public abstract class TemplateModalWin extends Window{
         ui = Element.getUI();
         ResponsiveLayout actions = new ResponsiveLayout();
         
-        /*delete = new Button("Eliminar");
-            Element.cfgComponent(delete);
-            delete.addClickListener((Button.ClickEvent event) -> {buttonDeleteEvent();});
-            delete.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-            //delete.setVisible(false);*/
+        editBox = new CheckBox();
+        
         accept = new Button("Aceptar");
             accept.setClickShortcut(13);
             Element.cfgComponent(accept);
             accept.addClickListener((Button.ClickEvent event) -> {buttonAcceptEvent();});
             accept.setStyleName(ValoTheme.BUTTON_PRIMARY);
+            
+        lblIcon = new Button(); lblIcon.setVisible(false);
+
         cancel = new Button("Cancelar");
             Element.cfgComponent(cancel);
             cancel.addClickListener((Button.ClickEvent event) -> {buttonCancelEvent();});
@@ -51,6 +54,7 @@ public abstract class TemplateModalWin extends Window{
             //Label sample = new Label("\n<a style='color:#d1b33d' href='https://vaadin.com/api/com/vaadin/ui/Label.html'>Label</a>");
         //sample.setContentMode(com.vaadin.shared.ui.ContentMode.HTML);
             //row1.addColumn().withDisplayRules(12,4,3,3).withComponent(sample);
+            row1.addColumn().withDisplayRules(1, 1, 1, 1).withComponent(lblIcon); 
             row1.addColumn().withDisplayRules(12,4,3,3).withComponent(accept);
             row1.addColumn().withDisplayRules(12,4,3,3).withComponent(cancel);
         
@@ -69,6 +73,7 @@ public abstract class TemplateModalWin extends Window{
         this.setResizable(false);
         this.setCaptionAsHtml(true);
         this.setWidth(Element.windowWidthPercent());
+        this.addStyleName(ValoTheme.WINDOW_TOP_TOOLBAR);
     }
     
     protected abstract void loadData(long id);

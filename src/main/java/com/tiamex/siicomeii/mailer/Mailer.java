@@ -180,7 +180,7 @@ public class Mailer {
 
     /// funcion de prueba para enviar correo con imagenes
     public boolean sendMailConstancia(String to, String cc, String bcc, String subject, String mensaje, String fileName,String webinar,int yearWebinar) 
-            throws MessagingException {
+            /*throws MessagingException*/ {
         String formFileName = fileName.substring(fileName.indexOf("constanciaWebinar"), fileName.length());
         try {
             // Create a default MimeMessage object.
@@ -225,12 +225,13 @@ public class Mailer {
             message.setContent(multipart, "text/html; charset=UTF-8");
 
             Transport.send(message);
-
+            
             return true;
         } catch (MessagingException ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
             ex.printStackTrace();
-            throw ex;
+            return false;
+            //throw ex;
         }
     }
 

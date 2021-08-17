@@ -51,7 +51,7 @@ public class GenericDao<CLASS,ID extends Serializable> implements GenericDaoInte
             CLASS savedEntity;
             em = SingletonPU.createEntityManager();
                 em.getTransaction().begin();
-                savedEntity = em.merge(entity);
+                savedEntity = em.merge(entity); 
                 em.getTransaction().commit();
             return savedEntity;
         }catch(Exception ex){
@@ -92,8 +92,21 @@ public class GenericDao<CLASS,ID extends Serializable> implements GenericDaoInte
             em.getTransaction().rollback();
             return 0;
             //throw ex;
-        }
-        
+        }     
+    }
+    
+    public int updateField(String field,boolean value,long id){
+        try{
+            em = SingletonPU.createEntityManager();
+            em.getTransaction().begin();
+            int registroEliminado = em.createQuery("UPDATE "+this.getPersistentClass().getSimpleName()+" t SET t."+field+" = '"+value+"' WHERE t.id = "+id).executeUpdate();
+            em.getTransaction().commit();
+            return registroEliminado;
+        }catch(Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
+            em.getTransaction().rollback();
+            return 0;
+        }     
     }
     
     /* Basic Querys*/

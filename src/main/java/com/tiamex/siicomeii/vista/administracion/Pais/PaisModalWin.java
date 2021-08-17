@@ -79,7 +79,7 @@ public class PaisModalWin extends TemplateModalWin {
     @Override
     protected void buttonAcceptEvent() {
         try {
-            String regex = "[^A-z|ñ| ]";
+            String regex = "[^A-z|ñ|\\p{L}| ]";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(nombre.getValue());
             Pais obj = new Pais();
