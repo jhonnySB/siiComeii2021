@@ -5,9 +5,11 @@ import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.Main;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
+import com.tiamex.siicomeii.controlador.ControladorAsistenciaWebinar;
 import com.tiamex.siicomeii.controlador.ControladorWebinarRealizado;
 import com.tiamex.siicomeii.mailer.SiiComeiiMailer;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
+import com.tiamex.siicomeii.persistencia.entidad.AsistenciaWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
@@ -185,8 +187,9 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
         cmboxAgremiados.setItemIconGenerator(agremiado -> {
             Resource r = null;
             BufferedImage bImage;
+            
             try {
-                if(agremiado.getUrlIcon()){
+                if(!ControladorAsistenciaWebinar.getInstance().getByAgremiadoWebinar(agremiado.getId(),this.idWebinar).isEmpty()){
                     r = new ThemeResource(PATH_ICON_1);
                     bImage = ImageIO.read(new File(PATH_ICON_1));
                 }else{
