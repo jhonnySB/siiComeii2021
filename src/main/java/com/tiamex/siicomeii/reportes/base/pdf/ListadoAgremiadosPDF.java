@@ -79,43 +79,43 @@ public final class ListadoAgremiadosPDF extends BasePDF {
             int totalAgremiados = ControladorAgremiado.getInstance().getAll().size();
 
             if (totalAgremiados > 0) {
-                PdfPTable tableAgremiados = null;
+                PdfPTable table = null;
                 PdfPCell cell;
                 String pais = "";
                 int cont = 0;
                 encabezados = new Format(15);
                 contenido = new Format(15);
-                boolean fieldColor =true;
+                boolean fieldColor =false;
                 BaseColor bcHeader = new BaseColor(130, 219, 255);
                 BaseColor bcGray = new BaseColor(218, 224, 235);
                 for (Agremiado agremiado : ControladorAgremiado.getInstance().getAllSorted("pais")) {
                     totalAgremiados--;
-                    tableAgremiados = new PdfPTable(2);
+                    table = new PdfPTable(2);
                     if (pais.compareTo(agremiado.getObjPais().getNombre()) != 0) {
                         if (cont != 0) {
                             document.add(elementsPDF.getParagraph("Registros: " + cont, format.getFontSmallSimple(), Element.ALIGN_RIGHT));
                             cont = 0;
                         }
-                        tableAgremiados.setSpacingBefore(5);
+                        table.setSpacingBefore(5);
                         pais = agremiado.getObjPais().getNombre();
                         document.add(elementsPDF.getParagraph("País: "+pais, format.getFontTextBold(), Element.ALIGN_LEFT));
                         cell = new PdfPCell(elementsPDF.getParagraph("Nombre", encabezados.getFontTitleBold(), Element.ALIGN_JUSTIFIED));                 
                         cell.setBackgroundColor(bcHeader);
-                        tableAgremiados.addCell(cell);
+                        table.addCell(cell);
                         cell = new PdfPCell(elementsPDF.getParagraph("Institución", encabezados.getFontSubtitleBold(), Element.ALIGN_JUSTIFIED));
                         cell.setBackgroundColor(bcHeader);
-                        tableAgremiados.addCell(cell);
+                        table.addCell(cell);
                         cell.setBorder(5);
                     }
                     cont++;
                     cell = new PdfPCell(elementsPDF.getParagraph(agremiado.getNombre(), contenido.getFontTextSimple(), Element.ALIGN_JUSTIFIED));
                     cell.setBackgroundColor(fieldColor==true ? bcGray : BaseColor.WHITE);
-                    tableAgremiados.addCell(cell);
+                    table.addCell(cell);
                     cell = new PdfPCell(elementsPDF.getParagraph(agremiado.getInstitucion(), contenido.getFontTextSimple(), Element.ALIGN_JUSTIFIED));
                     cell.setBackgroundColor(fieldColor==true ? bcGray : BaseColor.WHITE);
-                    tableAgremiados.addCell(cell);
-                    tableAgremiados.setWidthPercentage(100);
-                    document.add(tableAgremiados);
+                    table.addCell(cell);
+                    table.setWidthPercentage(100);
+                    document.add(table);
                     if (totalAgremiados == 0) {
                         document.add(elementsPDF.getParagraph("Registros: " + cont, format.getFontSmallSimple(), Element.ALIGN_RIGHT));
                     }

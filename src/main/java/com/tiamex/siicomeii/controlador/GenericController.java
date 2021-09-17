@@ -52,6 +52,15 @@ public abstract class GenericController<SERVICE,CLASS,ID extends Serializable>{
         }
     }
     
+    public int totalByField(String field,String value) throws Exception{
+        try{
+            return service.totalByField(field,value);
+        }catch (Exception ex){
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+            throw ex;
+        }
+    }
+    
     public int updateField(String field,boolean value,long id) throws Exception {
         try {
             return service.updateField(field,value,id);

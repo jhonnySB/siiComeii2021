@@ -85,11 +85,12 @@ public class FabricaVista{
         return paisDlg;
     }
     
+    /*
     public agremiadosChart agremiadosChart;
     public agremiadosChart getAgremiadosChart() throws Exception{
         if(agremiadosChart == null){agremiadosChart = new agremiadosChart();}
         return agremiadosChart;
-    }
+    } */
 
     public WebinarRealizadoDlg WebinarRealizadoDlg;
     public WebinarRealizadoDlg getWebinarRealizadoDlg() throws Exception{

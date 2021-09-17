@@ -95,6 +95,21 @@ public class GenericDao<CLASS,ID extends Serializable> implements GenericDaoInte
         }     
     }
     
+    public int totalByField(String field,String value){
+        try{
+            em = SingletonPU.createEntityManager();
+            em.getTransaction().begin();
+            int registroEliminado = em.createQuery("SELECT t FROM "+this.getPersistentClass().getSimpleName()+" t WHERE t."+field+"="+"'"+value+"'").executeUpdate();
+            em.getTransaction().commit();
+            return registroEliminado;
+        }catch(Exception ex){
+            //Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(),ex.getMessage());
+            em.getTransaction().rollback();
+            return 0;
+            //throw ex;
+        }     
+    }
+    
     public int updateField(String field,boolean value,long id){
         try{
             em = SingletonPU.createEntityManager();

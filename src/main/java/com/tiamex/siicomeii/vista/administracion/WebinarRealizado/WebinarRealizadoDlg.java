@@ -24,9 +24,9 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
     private void init() {
         banBoton = 1;
         int A = 0;
-            row1.removeAllComponents();
-            row1.addColumn().withDisplayRules(12, 6, 6, 10).withComponent(searchField);
-            row1.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnSearch);
+            rowBar.removeAllComponents();
+            rowBar.addColumn().withDisplayRules(12, 6, 6, 10).withComponent(searchField);
+            rowBar.addColumn().withDisplayRules(12, 3, 3, 2).withComponent(btnSearch);
         
         grid.addColumn(WebinarRealizado::getNombre).setCaption("Nombre").setHidable(false);
         grid.addColumn(WebinarRealizado::getPonente).setCaption("Ponente").setHidable(true).setHidingToggleCaption("Mostrar Ponente");

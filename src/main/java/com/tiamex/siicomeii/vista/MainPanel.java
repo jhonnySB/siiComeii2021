@@ -8,6 +8,7 @@ import com.tiamex.siicomeii.vista.reportes.ChartExportDemo;
 import com.tiamex.siicomeii.vista.reportes.agremiadosChart;
 //import com.tiamex.siicomeii.vista.utils.ChartExportDemo;
 import com.tiamex.siicomeii.vista.utils.Element;
+import com.vaadin.annotations.Theme;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FileResource;
@@ -33,6 +34,7 @@ import java.util.logging.Logger;
 /**
  * @author fred *
  */
+@Theme("siiComeiiTheme")
 public class MainPanel extends Panel {
 
     private SiiComeiiUI ui;

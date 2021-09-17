@@ -20,6 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,16 +31,53 @@ import java.util.regex.Pattern;
  * @author jhon
  */
 public class regex {
-    public static void main(String[] args){
 
-        List<List<String>> list = new ArrayList<>();
-        list.add(Arrays.asList("nombre","1"));
-        System.out.println("Lista: "+list);
-        System.out.println("Contiene nombre? "+list.contains(Arrays.asList("nombre","1")));
-        System.out.println("Contiene 1 ? "+list.contains("1"));
+    public static void main(String[] args) {
+
+        String some = "some string";
+        String other = "some string";
+        boolean identical = some == other;
+        System.out.println("Identical? "+identical);
+        some.equals(other);
         
-        
+        Collection<String> bags = new ArrayList<String>();
+  
+        // Add values in the bags list.
+        bags.add("pen");
+        bags.add("pencil");
+        bags.add("paper");
+  
+        // Creating another array list
+        Collection<String> boxes = new ArrayList<String>();
+        //Collection<String> boxes = Arrays.asList("pen","paper","books","rubber");
+        // Add values in the boxes list.
+        boxes.add("pen");
+        boxes.add("paper");
+        boxes.add("books");
+        boxes.add("rubber");
+  
+        // Before Applying method print both lists
+        System.out.println("Bags Contains :" + bags);
+        System.out.println("Boxes Contains :" + boxes);
+  
+        // Apply retainAll() method to boxes passing bags as parameter
+        boxes.retainAll(bags); 
+  
+        // Displaying both the lists after operation
+        System.out.println("\nAfter Applying retainAll()"+
+        " method to Boxes\n");
+        System.out.println("Bags Contains :" + bags);
+        System.out.println("Boxes Contains :" + boxes);
         /*
+        HashMap<String, String> map = new HashMap<>();
+        map.put("comeii", "");
+        map.put("immta", "");
+        map.put("cemac", "");
+        System.out.println("Map: "+map);
+        map.replace("comeii", "4");
+        System.out.println("Upd map: "+map);
+        System.out.println("Get key value: "+map.get("comeii")); */
+ /*
         long l = new Long(-10);
         System.out.println(Integer.toUnsignedLong((int)l) );
         int signedNum = (int)Long.signum(l); 
@@ -58,6 +97,6 @@ public class regex {
        LocalDate date1 = LocalDate.parse(inputString1, dtf);
        long days = ChronoUnit.DAYS.between(LocalDate.now(),date1);
        System.out.println("Dias de diferencia: "+days); 
-       */
+         */
     }
 }

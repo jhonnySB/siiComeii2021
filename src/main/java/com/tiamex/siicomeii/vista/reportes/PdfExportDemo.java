@@ -35,11 +35,16 @@ import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfPageEvent;
 import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfWriter;
+import com.tiamex.siicomeii.reportes.base.pdf.cfg.FormatoPagina;
+
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class PdfExportDemo {
 
@@ -116,18 +121,20 @@ class PdfExportDemo {
                 0, 0, 0));
     }
 
-    private File writeToFile(String filename, Document document)
-            throws DocumentException {
+    private File writeToFile(String filename, Document document) {
         File file = null;
         try {
             file = File.createTempFile(filename, ".pdf");
             file.deleteOnExit();
             FileOutputStream fileOut = new FileOutputStream(file);
             writer = PdfWriter.getInstance(document, fileOut);
+            //writer.setPageEvent(new PdfPageEventLowagie());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (DocumentException ex) {
+            Logger.getLogger(PdfExportDemo.class.getName()).log(Level.SEVERE, null, ex);
         }
         return file;
     }
@@ -158,7 +165,6 @@ class PdfExportDemo {
         int indentation = 0;
         float scaler = ((document.getPageSize().getWidth() - document.leftMargin()- document.rightMargin() - indentation) 
                 / scaledImg.getWidth()) * 100;
-        System.out.println("Scaler: "+scaler);
         scaledImg.scalePercent(scaler);
         //scaledImg.scaleAbsolute(width, height);
         /******** Chart SVG ***************/

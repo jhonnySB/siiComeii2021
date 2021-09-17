@@ -184,6 +184,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
                                         if (obj != null) {
                                             Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                             ui.getFabricaVista().getAgremiadoDlg().eventMostrar();
+                                            ui.getFabricaVista().getAgremiadoDlg().updateDateFilters(true, true);
                                             close();
                                         }else{
                                             Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
@@ -205,6 +206,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
                                         if (obj != null) {
                                             Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                             ui.getFabricaVista().getAgremiadoDlg().eventMostrar();
+                                            ui.getFabricaVista().getAgremiadoDlg().updateDateFilters(true, true);
                                             close();
                                         }else{
                                             Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
@@ -218,6 +220,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
                                         if (obj != null) {
                                             Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                             ui.getFabricaVista().getAgremiadoDlg().eventMostrar();
+                                            ui.getFabricaVista().getAgremiadoDlg().updateDateFilters(true, true);
                                             close();
                                         }else{
                                             Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());

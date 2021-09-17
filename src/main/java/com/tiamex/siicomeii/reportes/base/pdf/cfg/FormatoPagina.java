@@ -65,19 +65,15 @@ public class FormatoPagina extends PdfPageEventHelper {
         try {
             //font = new Font(FontFamily.HELVETICA);
             font = new Font(BaseFont.createFont("C:\\Users\\jhon\\Downloads\\Compressed\\Montserrat\\Montserrat-ExtraLight.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED), 9);
-        } catch (DocumentException ex) {
-            Logger.getLogger(FormatoPagina.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (DocumentException | IOException ex) {
             Logger.getLogger(FormatoPagina.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
         PdfPTable table = new PdfPTable(3);
         try {
-            System.out.println("right: "+document.right());
             table.setWidths(new int[]{24, 24, 2});
             float rightIdent = 10;
             float right = document.right()-rightIdent;
@@ -92,7 +88,7 @@ public class FormatoPagina extends PdfPageEventHelper {
             table.addCell(cell);
             PdfContentByte canvas = writer.getDirectContent();
             canvas.beginMarkedContentSequence(PdfName.ARTIFACT);
-            table.writeSelectedRows(0, -1, document.left(), 30, canvas);
+            table.writeSelectedRows(0, -1, document.left(), 25, canvas);
             canvas.endMarkedContentSequence();
         } catch (DocumentException de) {
             throw new ExceptionConverter(de);
@@ -101,19 +97,13 @@ public class FormatoPagina extends PdfPageEventHelper {
 
     @Override
     public void onCloseDocument(PdfWriter writer, Document document) {
-        ColumnText.showTextAligned(t, Element.ALIGN_LEFT,
-                new Phrase(String.valueOf(writer.getPageNumber()), font),
-                2, 4, 0);
+        ColumnText.showTextAligned(t, Element.ALIGN_LEFT,new Phrase(String.valueOf(writer.getPageNumber()), font),2, 4, 0);
     }
 
     @Override
     public void onStartPage(PdfWriter writer, Document document) {
-
         try {
-            File logo = new File(Main.getBaseDir() + "/logoTiamex.png");
-            String pathlogoHeader = logo.getPath();
-            Image logoHeader = Image.getInstance(pathlogoHeader);
-            logoHeader.scalePercent(35);
+            logoHeader.scalePercent(30);
             float leftIdent = 0,topIdent=20;
             float left = document.left()+leftIdent;
             float top = document.top()-topIdent;
@@ -128,17 +118,19 @@ public class FormatoPagina extends PdfPageEventHelper {
             fecha.setAlignment(Element.ALIGN_RIGHT);
             fecha.setSpacingAfter(0);
             fecha.setSpacingBefore(0);
-            document.add(fecha);
+            //document.add(fecha);
             
+            
+            ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_RIGHT, new Phrase(fechaFormateada ,font), 
+                    (document.right()-document.left()/2+document.leftMargin()),document.top()-10, 0);
+            document.add(new Paragraph(Chunk.NEWLINE));
             DottedLineSeparator separator = new DottedLineSeparator();
             separator.setPercentage(59500f / 523f);
             Chunk linebreak = new Chunk(separator);
-            document.add(linebreak);
+            //document.add(linebreak);
             
         } catch (DocumentException ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        } catch (IOException ex) {
-            Logger.getLogger(FormatoPagina.class.getName()).log(Utils.nivelLoggin(), null, ex);
         }
     }
     

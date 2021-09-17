@@ -55,6 +55,9 @@ public class AgremiadoModalDelete extends TemplateModalDelete {
             if(ControladorAgremiado.getInstance().delete(idAgremiado)>0){
                 Element.makeNotification("Eliminado con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                 ui.getFabricaVista().agremiadoDlg.eventMostrar();
+                if(ui.getFabricaVista().getAgremiadoDlg().dataProvider.getItems().isEmpty()){
+                    ui.getFabricaVista().agremiadoDlg.updateDateFilters(false, false);
+                }
                 close();
             }else{
                 Element.makeNotification("No se pudo eliminar el registro", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
