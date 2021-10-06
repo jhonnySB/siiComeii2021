@@ -9,10 +9,10 @@
     <class>com.tiamex.siicomeii.persistencia.entidad.Pais</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.Tutorial</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.TutorialSesion</class>
-    <class>com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.ProximoEvento</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar</class>
     <class>com.tiamex.siicomeii.persistencia.entidad.Agremiado</class>
+    <class>com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>

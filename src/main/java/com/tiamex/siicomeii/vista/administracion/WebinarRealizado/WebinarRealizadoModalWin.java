@@ -15,15 +15,15 @@ import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue.ValueChangeListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Page;
+import com.vaadin.server.SerializablePredicate;
 import com.vaadin.shared.Position;
-import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
-import com.vaadin.ui.themes.ValoTheme;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,15 +35,6 @@ import java.util.regex.Pattern;
 
 /**@author fred **/
 public final class WebinarRealizadoModalWin extends TemplateModalWin implements Upload.Receiver{
-    
-    /*
-    private DateTimeField fecha;
-    private TextField institucion;
-    private TextField nombre;
-    private TextField ponente;
-    private TextField presentacion;
-    private TextField urlYoutube;
-    */
     private Label fecha;
     private Label institucion;
     private Label nombre;
@@ -52,11 +43,12 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
     private TextField urlYoutube;
     private LocalDateTime dFecha;
     private ComboBox<Agremiado> cmboxAgremiados;
+    private TextField asistentes;
+    private Button btnCharts;
     // 
     private String dInstitucion;
     private String dNombre;
     private String dPonente;
-
     public WebinarRealizadoModalWin() {
         //init();
     }
@@ -76,19 +68,16 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
             dNombre = proxWeb.getTitulo();
             dPonente = proxWeb.getPonente();
             init();
-
     }
 
     public WebinarRealizadoModalWin(long id) {
         //init();
         //loadData(id);
-        
     }
 
     private void init( ) {
         ResponsiveLayout contenido = new ResponsiveLayout();
         Element.cfgLayoutComponent(contenido);
-        
         cmboxAgremiados = new ComboBox<>();
         cmboxAgremiados.setPlaceholder("Agregar agremiados");
         cmboxAgremiados.setEmptySelectionAllowed(false);
@@ -105,8 +94,7 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
         fecha.setCaption("Fecha y hora");
         fecha.setIcon(VaadinIcons.CALENDAR_CLOCK);
         fecha.setCaptionAsHtml(true);
-        fecha.setValue(dFecha.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' y '('hh:mm'hrs.)'", new Locale("es", "MX"))));
-        
+        fecha.setValue(dFecha.format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' y '('hh:mm a')' ", new Locale("es", "MX"))));
         
         institucion = new Label();
         institucion.setCaption("Institución");
@@ -134,6 +122,11 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
         urlYoutube.setPlaceholder("Pega la url de youtube");
         urlYoutube.setRequiredIndicatorVisible(true);
         
+        asistentes = new TextField();
+        Element.cfgComponent(asistentes, "Asistentes");
+        asistentes.setRequiredIndicatorVisible(true);
+        asistentes.setPlaceholder("Total agremiados que asistieron al webinar");
+        
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 6).withComponent(nombre);
         row1.addColumn().withDisplayRules(12, 12, 12, 6).withComponent(ponente);
@@ -143,9 +136,10 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
         row1.setMargin(ResponsiveRow.MarginSize.SMALL, ResponsiveLayout.DisplaySize.XS);
         row1.setVerticalSpacing(true);
         ResponsiveRow row2 = contenido.addRow().withAlignment(Alignment.BOTTOM_CENTER);
-        row2.setCaption("");row2.setCaptionAsHtml(true);
+        row2.setCaption("<hr>");row2.setCaptionAsHtml(true);
         row2.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(presentacion);
         row2.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(urlYoutube);
+        row2.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(asistentes);
         
         try {
             
@@ -166,36 +160,14 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
         
         try {
             WebinarRealizado obj = ControladorWebinarRealizado.getInstance().getById(id);
-            //this.id = obj.getId();
-            //fecha.setValue(obj.getFecha().toString());
-            //institucion.setValue(obj.getInstitucion()); 
-            //nombre.setValue(obj.getNombre()); 
-            //ponente.setValue(obj.getPonente()); 
             this.id = obj.getId();
-            presentacion.setValue(obj.getPresentacion()); //presentacion.setReadOnly(true);
-            urlYoutube.setValue(obj.getUrlYoutube()); //urlYoutube.setReadOnly(true);
+            presentacion.setValue(obj.getPresentacion()); 
+            urlYoutube.setValue(obj.getUrlYoutube());
+            asistentes.setValue(String.valueOf(obj.getAsistentes()));
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     } 
-    
-    protected void loadDataWebRealizado(LocalDateTime dFecha,String dInstitucion,String dNombre,String dPonente) {
-        try {
-            
-            fecha.setValue(dFecha.toString());
-            institucion.setValue(dInstitucion); 
-            nombre.setValue(dNombre); 
-            ponente.setValue(dPonente); 
-            //presentacion.setValue();
-            //urlYoutube.setValue(obj.getUrlYoutube());
-            
-            
-        } catch (Exception ex) {
-            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
-        }
-    }
-    
-
     
     @Override
     protected void buttonAcceptEvent() {
@@ -209,7 +181,7 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
                 obj.setPonente(dPonente);
                 obj.setPresentacion(presentacion.getValue());
                 obj.setUrlYoutube(urlYoutube.getValue());
-
+                obj.setAsistentes(Short.parseShort(asistentes.getValue()));
                 
                     WebinarRealizado webinar = (WebinarRealizado)ControladorWebinarRealizado.getInstance().getByNames(dNombre);
                     
@@ -235,7 +207,7 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
                ui.getFabricaVista().getProximoWebinarDlg().updateDlg();
                  
             } else {
-                Element.makeNotification("Faltan campos por llenar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
@@ -261,26 +233,51 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
     }
     
     private boolean validarCampos() {
-        Binder<WebinarRealizado> binder = new Binder<>();
-
+        Binder<WebinarRealizado> binder = new Binder<>(); 
+        SerializablePredicate<? super String> isIntegerPredicate = (textEntered)->{
+            return isInteger(textEntered);
+        };
+        SerializablePredicate<? super String> rangeValuePredicate = (textEntered)->{
+            if(isInteger(textEntered)){
+                int value = Integer.parseInt(textEntered);
+                if(value>0 & value<100){
+                    return true;
+                }
+            }
+            return false;
+        };
         binder.forField(presentacion).asRequired("Campo requerido").bind(WebinarRealizado::getPresentacion,WebinarRealizado::setPresentacion);
         binder.forField(urlYoutube).asRequired("Campo requerido").bind(WebinarRealizado::getUrlYoutube,WebinarRealizado::setUrlYoutube);
-
+        binder.forField(asistentes).asRequired("Campo requerido").
+                withValidator(isIntegerPredicate, "Debe ingresar un número").
+                withValidator(rangeValuePredicate,"Ingrese un número entre 1 y 100").
+                bind(webinar -> String.valueOf(webinar.getAsistentes()),(webinar, text) -> webinar.setAsistentes(Short.parseShort(text)));
         return binder.validate().isOk();
     }
-    /*
-    private boolean validarCampos() {
-        Binder<WebinarRealizado> binder = new Binder<>();
-
-        binder.forField(fecha).asRequired("Campo requerido").bind(WebinarRealizado::getFecha,WebinarRealizado::setFecha);
-        binder.forField(institucion).asRequired("Campo requerido").bind(WebinarRealizado::getInstitucion,WebinarRealizado::setInstitucion);
-        binder.forField(nombre).asRequired("Campo requerido").bind(WebinarRealizado::getNombre,WebinarRealizado::setNombre);
-        binder.forField(ponente).asRequired("Campo requerido").bind(WebinarRealizado::getPonente,WebinarRealizado::setPonente);
-        binder.forField(presentacion).asRequired("Campo requerido").bind(WebinarRealizado::getPresentacion,WebinarRealizado::setPresentacion);
-        binder.forField(urlYoutube).asRequired("Campo requerido").bind(WebinarRealizado::getUrlYoutube,WebinarRealizado::setUrlYoutube);
-
-        return binder.validate().isOk();
-    }*/
+    
+    public static boolean isInteger(String str) {
+        if (str == null) {
+            return false;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        int i = 0;
+        if (str.charAt(0) == '-') {
+            if (length == 1) {
+                return false;
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char c = str.charAt(i);
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
     
     @Override
     public OutputStream receiveUpload(String filename, String mimeType) {

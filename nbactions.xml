@@ -46,4 +46,22 @@
                 <exec.workingdir>C:\Users\jhon\Documents\NetBeansProjects\up_v2\siicomeii</exec.workingdir>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-compile theme vaadin</actionName>
+            <displayName>compile theme vaadin</displayName>
+            <goals>
+                <goal>vaadin:compile-theme</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-update theme</actionName>
+            <displayName>update theme</displayName>
+            <goals>
+                <goal>vaadin:update-theme</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-compile theme and update widget</actionName>
+            <displayName>compile theme and update widget</displayName>
+        </action>
     </actions>

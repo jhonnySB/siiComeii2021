@@ -13,7 +13,6 @@ import com.tiamex.siicomeii.vista.administracion.WebinarRealizado.WebinarRealiza
 import com.vaadin.data.HasValue;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.icons.VaadinIcons;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.grid.ColumnResizeMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -26,8 +25,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -105,7 +102,7 @@ public abstract class TemplateDlg<T> extends Panel {
         btnAdd.addClickListener((Button.ClickEvent event) -> {
             buttonAddEvent();
         });
-        rowBar = content.addRow().withAlignment(Alignment.BOTTOM_CENTER);
+        rowBar = content.addRow().withAlignment(Alignment.BOTTOM_LEFT);
         Element.cfgLayoutComponent(rowBar, true, false);
         colSearchField = rowBar.addColumn().withDisplayRules(12, 6, 6, 8);
         colSearchField.setComponent(searchField);

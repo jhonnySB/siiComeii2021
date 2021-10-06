@@ -39,6 +39,7 @@ $v-app-background-color: #e8f1fc;
 //----------> Extra Variables
 //$font-white: #ffffff;
 
+
 @import "../valo/valo.scss";
 
 @mixin siiComeiiTheme{
@@ -51,5 +52,6 @@ $v-app-background-color: #e8f1fc;
         text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
         border-color: #414141;
     }
+   
     // Insert your own theme rules here
 }

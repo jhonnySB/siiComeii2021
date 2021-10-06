@@ -32,6 +32,8 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -54,13 +56,16 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javax.imageio.ImageIO;
 
 /**
  * @author fred *
  */
 public final class AsistenciaWebinarModalWin extends TemplateModalWin {
-
+    static String mailMatcher = null;
+    static int beginIndexStr = 0;
     private TextArea correos;
     private TextField webinarRealizado;
     private Label labelAlert;
@@ -85,11 +90,9 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
    
     public AsistenciaWebinarModalWin(long idWebinar, String idBtn) {
         init();
-        //System.out.println(idBtn.substring(0, idBtn.indexOf("_")));
         idBtnLista = idBtn.substring(0, idBtn.indexOf("_"));
         this.idWebinar = idWebinar;
         loadData(idWebinar);
-
     }
 
     private void createNotif(String caption, String desc, VaadinIcons icon, Notification.Type type, boolean html) {
@@ -174,9 +177,9 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
         try { //&nbsp;&nbsp;&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
             agremiadosData = ControladorAgremiado.getInstance().getAllSorted("nombre");
             cmboxAgremiados = new ComboBox<>("",agremiadosData);
-            cmboxAgremiados.setCaptionAsHtml(true); cmboxAgremiados.setCaption( //temporal
+            cmboxAgremiados.setCaptionAsHtml(true); cmboxAgremiados.setCaption( 
                     "Agregar correos"
-                    + "<span style=\"display:inline-block;color:rgba(255,0,0,0.5);padding:0 0 0 45%;\">"
+                    + "<span style=\"display:inline-block;color:rgba(255,0,0,0.5);padding:0 0 0 42%;\">"
                             + "*Correos marcados con &#10004; ya se les envio constancia* </span>");
             cmboxAgremiados.setResponsive(true);
         } catch (Exception ex) {
@@ -201,18 +204,12 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
                 byte[] byteArray = bos.toByteArray();
                 StreamResource.StreamSource streamR = () -> new ByteArrayInputStream(byteArray);
                 r = new StreamResource(streamR, agremiado.getUrlIcon()==true?"check_3_mod.png":"BLANK_ICON_MOD2.png");
-            } catch (Exception ex) {
-                
-                //Logger.getLogger(AsistenciaWebinarModalWin.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(AsistenciaWebinarModalWin.class.getName()).log(Level.SEVERE, null, ex);
             }
             return r;
         });
         
-        //cmboxAgremiados.setItemIconGenerator(Agremiado::getUrlIcon);
-        
-        
-        //
-        //cmboxAgremiados.setCaption("Agregar agremiados");
         cmboxAgremiados.setPlaceholder("Buscar correo de agremiado");
         cmboxAgremiados.setEmptySelectionAllowed(false);
         cmboxAgremiados.setSizeFull();
@@ -220,29 +217,27 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
         cmboxAgremiados.setPageLength(5);
         
         
-        
         cmboxAgremiados.addValueChangeListener((ValueChangeListener) (HasValue.ValueChangeEvent event) -> {
             Agremiado agremiado = (Agremiado)event.getValue();
             String mailSelected = agremiado.getCorreo();
-            String tempPattern = mailSelected;
-            Pattern p = Pattern.compile(tempPattern);
-            
+            Pattern pattern = Pattern.compile(mailSelected);
             if (correos.getValue().isEmpty()) {  
                 correos.setValue(mailSelected);
-                //listAgremiados.add(mailSelected);
             } else {
                 if (listAgremiados.contains(mailSelected.trim())) {
-
-                    Matcher matchMail = p.matcher(correos.getValue());
+                    Matcher matchMail = pattern.matcher(correos.getValue());
+                    mailMatcher = mailSelected;
+                    System.out.println(mailMatcher);
                     if(matchMail.find()){
-                        int lenght = matchMail.end()-matchMail.start();
-                        correos.setSelection(matchMail.start(), lenght);
+                        int length = matchMail.end()-matchMail.start();
+                        correos.setSelection(matchMail.start(), length);
+                        beginIndexStr = matchMail.start();
                     }
                     createNotif("AVISO | ", "El correo seleccionado ya esta en la lista de correos", VaadinIcons.WARNING,
                             Notification.Type.WARNING_MESSAGE, true);
                 } else {
                     //listAgremiados.add(mailSelected);
-                    correos.setValue(correos.getValue() + "," + mailSelected);
+                    correos.setValue(correos.getValue() + "," + mailSelected); mailMatcher = null;
                 }
             }
             try{
@@ -258,7 +253,7 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
         Element.cfgLayoutComponent(contenido);
         correos = new TextArea(""); correos.setReadOnly(true);
         correos.setCaptionAsHtml(true); correos.setCaption("Correos <span style=\"color:red\">*</span>");
-        correos.setPlaceholder("Aquí aparecerán los correos seleccionados");
+        correos.setPlaceholder("Aquí aparecerán los correos seleccionados de la lista desplegable");
         Element.cfgComponent(correos);
         correos.setRequiredIndicatorVisible(true);
         
@@ -274,15 +269,48 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
         webinarRealizado.setEnabled(false);
         
         correos.setWidth("97%");
-        Button btnClearArea = new Button(); 
-        btnClearArea.addStyleNames(ValoTheme.BUTTON_TINY); btnClearArea.addStyleName(ValoTheme.BUTTON_DANGER);
-        btnClearArea.setIcon(VaadinIcons.TRASH); btnClearArea.setDescription("Borrar todo el texto");
-        btnClearArea.setWidth("100%"); btnClearArea.setCaption("");
-        btnClearArea.addClickListener((ClickListener) e->{
+        Button btnClearEntireArea = new Button(); 
+        btnClearEntireArea.addStyleNames(ValoTheme.BUTTON_TINY); btnClearEntireArea.addStyleName(ValoTheme.BUTTON_DANGER);
+        btnClearEntireArea.setIcon(VaadinIcons.TRASH); btnClearEntireArea.setDescription("Borrar todo el texto");
+        btnClearEntireArea.setWidth("50%"); btnClearEntireArea.setCaption("");
+        btnClearEntireArea.addClickListener((ClickListener) e->{
             correos.setValue("");
         });
+        
+        MenuBar btnMenuClear = new MenuBar(); btnMenuClear.addStyleName(ValoTheme.MENUBAR_SMALL);
+        MenuItem btnClearTextArea = btnMenuClear.addItem("", VaadinIcons.TRASH, null);
+        btnClearTextArea.addItem("Todo el texto", null, c -> {
+            correos.setValue("");
+        });
+        btnClearTextArea.addItem("Correo seleccionado", null, c -> {
+            System.out.println(mailMatcher);
+            if(mailMatcher!=null){
+                String value = correos.getValue();
+                if(value.length()>0){
+                   String[] splitedMails = correos.getValue().split(",");
+                   String matcherMail = mailMatcher;
+                   System.out.println("length "+splitedMails.length);
+                   if(splitedMails.length>1){
+                       correos.clear();
+                       if(beginIndexStr>0){
+                           correos.setValue(value.replace(","+matcherMail, ""));
+                       }else{
+                           correos.setValue(value.replace(matcherMail+",", ""));
+                       }
+                       //listAgremiados.remove(matcherMail);
+                       //mailMatch.set(null);
+                       listAgremiados.forEach(mail -> {
+                           System.out.println(mail);
+                       });
+                   }else
+                    correos.setValue("");
+                }
+            }else
+                Notification.show("No hay correo seleccionado", Notification.Type.WARNING_MESSAGE);
+        });
+        
         Button btnSelectAll = new Button();
-        btnSelectAll.addStyleNames(ValoTheme.BUTTON_TINY);btnSelectAll.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        btnSelectAll.addStyleName(ValoTheme.BUTTON_TINY); btnSelectAll.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         btnSelectAll.setIcon(VaadinIcons.AREA_SELECT);btnSelectAll.setDescription("Seleccionar todo");
         btnSelectAll.setWidth("100%");btnSelectAll.setCaption("");
         btnSelectAll.addClickListener((ClickListener) e -> {
@@ -305,7 +333,8 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
         lay.addComponent(new Label("")); 
         lay.setSpacing(true);
         lay.addComponent(btnSelectAll);
-        lay.addComponent(btnClearArea);
+        lay.addComponent(btnMenuClear);
+        //lay.addComponent(btnClearSelectedMail);
         //lay.addComponent(fileUploader);
         
         rC.withDisplayRules(1, 1, 1, 1);
@@ -322,6 +351,23 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
         contentLayout.addComponent(contenido);
         setCaption("Asistencia webinar");
         setWidth("50%");
+    }
+    
+    public class ObjectHolder<T> {
+
+        private T obj;
+
+        public ObjectHolder(T obj) {
+            this.obj = obj;
+        }
+
+        public T get() {
+            return obj;
+        }
+
+        public void set(T obj) {
+            this.obj = obj;
+        }
     }
 
     @Override

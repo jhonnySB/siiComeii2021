@@ -22,6 +22,8 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.SerializablePredicate;
 import com.vaadin.server.StreamResource;
 import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.shared.ui.datefield.DateResolution;
+import com.vaadin.shared.ui.datefield.DateTimeResolution;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -41,6 +43,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.DateFormatter;
@@ -99,8 +102,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         });
 
         ResponsiveLayout layoutReportes = new ResponsiveLayout();
-        ResponsiveRow r = layoutReportes.addRow().withAlignment(Alignment.MIDDLE_RIGHT);
-        r.setSpacing(true);
+        ResponsiveRow r = layoutReportes.addRow().withAlignment(Alignment.MIDDLE_RIGHT);r.setSpacing(true);
         r.addColumn().withComponent(listadoAgremiados);
         r.addColumn().withComponent(btnChart);
         r.addColumn().withComponent(btnAdd);
@@ -122,7 +124,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio").setHidable(true).setHidingToggleCaption("Mostrar Grado Estudio");
         grid.addColumn(Agremiado::getObjPais).setCaption("País").setHidable(true).setHidingToggleCaption("Mostrar País");
         grid.addColumn(Agremiado::getFechaReg).setCaption("Fecha registro").setHidable(true).setHidingToggleCaption("Mostrar Fecha registro")
-                .setId("colFechaReg").setMinimumWidth(370).setMaximumWidth(370);
+                .setId("colFechaReg").setMinimumWidth(355).setMaximumWidth(355);
         grid.addColumn(agremiadoBean -> (agremiadoBean.getSexo() == 'H' ? "Hombre" : "Mujer")).setCaption("Género")
                 .setHidable(true).setHidingToggleCaption("Mostrar Género").setHidden(true);
 
@@ -136,7 +138,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     }
 
     private DateField newDateField(String placeHolder, String description) {
-        DateField dateField = new DateField() {
+        DateField fecha = new DateField() {
             @Override
             protected Result<LocalDate> handleUnparsableDateString(
                     String dateString) {
@@ -148,12 +150,11 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
                 }
             }
         };
-        dateField.setZoneId(ZoneId.systemDefault());
-        dateField.addStyleName(ValoTheme.DATEFIELD_TINY);
-        dateField.setWidth("125px");
-        dateField.setPlaceholder(placeHolder);
-        dateField.setDescription(description);
-        return dateField;
+        fecha.setDefaultValue(LocalDate.now(ZoneId.systemDefault())); fecha.addStyleName(ValoTheme.DATEFIELD_TINY);
+        fecha.setPlaceholder(placeHolder); fecha.setDescription(description); fecha.setWidth("127px"); 
+        fecha.setShowISOWeekNumbers(true); fecha.setZoneId(ZoneId.of("America/Mexico_City"));
+        fecha.setResolution(DateResolution.DAY); fecha.setLocale(new Locale("es", "MX")); 
+        return fecha;
     }
 
     public HorizontalLayout buildFilterDate() {
@@ -163,9 +164,9 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         fechaInicioF = newDateField("Fecha inicio", "Seleccionar fecha de inicio");
         fechaFinF = newDateField("Fecha fin", "Seleccionar fecha fin");
 
-        Label label = new Label("-");
+        Label label = new Label(VaadinIcons.CARET_RIGHT.getHtml()); label.setContentMode(ContentMode.HTML);
 
-        hLayout.addComponent(fechaInicioF);
+        hLayout.addComponent(fechaInicioF); hLayout.setSpacing(false); hLayout.setMargin(false);
         hLayout.addComponent(label);
         hLayout.addComponent(fechaFinF);
 

@@ -227,10 +227,13 @@ public final class ReporteCompletoChart extends BasePDF {
     }
     
     private PdfPTable infoAgremiados(){
-        PdfPTable table = new PdfPTable(new float[]{3,2,2,2,1,1,1}); String tempString = ""; InstitutoGeneralInfo obj;  // mes,año,total
+        PdfPTable table = new PdfPTable(new float[]{3,2,2,1.7F,1,1,1}); String tempString = ""; InstitutoGeneralInfo obj;  // mes,año,total
         BaseColor bgColorRow = new BaseColor(237, 237, 237), fontColor = new BaseColor(112,112,112);
+        PdfPCell emptyCell = new PdfPCell(); emptyCell.setBorder(Rectangle.NO_BORDER); emptyCell.setColspan(3);
         table.setSpacingBefore(10); table.setWidthPercentage(100); boolean zebra=false;
         List<Agremiado> listAgremiados = filteredList ? filterList : getSortedListAgremiados("id");
+        BaseColor bgColor = new BaseColor(196, 219, 255);
+        int constThisMonth=0, constThisYear=0,totalSum=0;
         listAgremiados.sort((Agremiado a1, Agremiado a2) -> {
             return a1.getNombre().compareToIgnoreCase(a2.getNombre());
         });
@@ -242,13 +245,19 @@ public final class ReporteCompletoChart extends BasePDF {
                 table.addCell(buildParaCell(a.getInstitucion(), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
                 table.addCell(buildParaCell(a.getObjPais().getNombre(), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
                 table.addCell(buildParaCell(fechaReg, FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
-                obj = getRecordConstancias(a.getId());
+                obj = getRecordConstancias(a.getId()); constThisMonth+=obj.getAgremiados(); constThisYear+=obj.getHombres(); totalSum+=obj.getMujeres();
                 table.addCell(buildParaCell(String.valueOf(obj.getAgremiados()), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
                 table.addCell(buildParaCell(String.valueOf(obj.getHombres()), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
                 table.addCell(buildParaCell(String.valueOf(obj.getMujeres()), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
                 zebra = !zebra;
             }
         }
+        table.addCell(emptyCell);
+        emptyCell = buildParaCell("Total", FontFamily.HELVETICA, 11, Font.NORMAL, fontColor,Element.ALIGN_RIGHT, zebra, bgColorRow);
+        emptyCell.setHorizontalAlignment(Rectangle.ALIGN_RIGHT);table.addCell(emptyCell);
+        table.addCell(buildParaCell(String.valueOf(constThisMonth), FontFamily.HELVETICA, 10, Font.NORMAL, fontColor,Element.ALIGN_LEFT, zebra, bgColorRow));
+        table.addCell(buildParaCell(String.valueOf(constThisYear), FontFamily.HELVETICA, 10, Font.NORMAL, fontColor,Element.ALIGN_LEFT, zebra, bgColorRow));
+        table.addCell(buildParaCell(String.valueOf(totalSum), FontFamily.HELVETICA, 10, Font.NORMAL, fontColor,Element.ALIGN_LEFT, zebra, bgColorRow));
         return table;
     }
     
@@ -257,9 +266,9 @@ public final class ReporteCompletoChart extends BasePDF {
         FontFamily fontFamily = FontFamily.HELVETICA; int fontSize = 11, fontType = Font.NORMAL, aligment = Element.ALIGN_CENTER;
         boolean bgColor = true; PdfPCell cell; 
         cell = new PdfPCell(buildParaCell("Agremiado", fontFamily, fontSize, fontType, fontColor, Element.ALIGN_CENTER, true,new BaseColor(213, 243, 254)));
-        cell.setColspan(4);table.addCell(cell);
+        cell.setColspan(4); cell.setPadding(7); cell.setHorizontalAlignment(Element.ALIGN_CENTER); table.addCell(cell);
         cell = buildParaCell("Constancias", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,new BaseColor(213, 243, 254));
-        cell.setColspan(3);table.addCell(cell);
+        cell.setColspan(3); cell.setPadding(7); cell.setHorizontalAlignment(Element.ALIGN_CENTER); table.addCell(cell);
         table.addCell(buildParaCell("Nombre", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,bgColorHeader));
         table.addCell(buildParaCell("Instituto", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,bgColorHeader));
         table.addCell(buildParaCell("País", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,bgColorHeader));
@@ -275,16 +284,16 @@ public final class ReporteCompletoChart extends BasePDF {
         int currentMonth=currentDate.getMonthValue(), currentYear=currentDate.getYear(); 
         if(!list.isEmpty()){
             obj.setMujeres(list.size());
-            for(AsistenciaWebinar a:list){
+            list.stream().map(a -> {
                 int loopMonth = a.getObjWebinarRealizado().getFecha().getMonthValue();
                 int loopYear = a.getObjWebinarRealizado().getFecha().getYear();
                 if(loopMonth==currentMonth && loopYear==currentYear){
                     obj.setAgremiados(obj.getAgremiados()+1);
                 }
-                if(loopYear==currentYear){
-                    obj.setHombres(obj.getHombres()+1);
-                }
-            }
+                return loopYear;
+            }).filter(loopYear -> (loopYear==currentYear)).forEachOrdered(_item -> {
+                obj.setHombres(obj.getHombres()+1);
+            });
         }
         return obj;
     }
@@ -325,7 +334,7 @@ public final class ReporteCompletoChart extends BasePDF {
     }
     
     private PdfPCell buildParaCell(String text,FontFamily fontFamily,int fontSize,int fontType,BaseColor baseColor,int align,boolean bgColor,BaseColor colorBg){
-        PdfPCell cell = new PdfPCell(customParagraph(text, fontFamily, fontSize, fontType, baseColor, align, false, 0, 0));
+        PdfPCell cell = new PdfPCell(customParagraph(text, fontFamily, fontSize, fontType, baseColor, align, false, 0, 0)); 
         if(bgColor)
             cell.setBackgroundColor(colorBg);
         return cell;
@@ -469,7 +478,7 @@ public final class ReporteCompletoChart extends BasePDF {
         table.setWidthPercentage(70); table.setSpacingBefore(10); table.setHorizontalAlignment(Element.ALIGN_CENTER);
         int cont=0,listSize = listAgremiados.size();
         listAgremiados.sort((Agremiado a1,Agremiado a2)->{
-            if(a1.getPais()<a2.getPais()){return -1;}if(a1.getPais()>a2.getPais()){return 1;}return 0;
+            return a1.getObjPais().getNombre().compareToIgnoreCase(a2.getObjPais().getNombre());
         });
         String tempCountry=listAgremiados.get(0).getObjPais().getNombre();
         table.addCell(buildParaCell("País", FontFamily.HELVETICA, 11, Font.NORMAL, baseColorRgbh(77, 77, 77), Element.ALIGN_CENTER, true,
@@ -550,8 +559,7 @@ public final class ReporteCompletoChart extends BasePDF {
     private String getCountConstanciasInst() {
         Map<String, InstitutoRecord> institutoMap = new HashMap<>();
         Map<String, InstitutoRecord> institutoMapRanked = new HashMap<>();
-        String highestInst = "";
-        InstitutoRecord obj;
+        String highestInst = ""; InstitutoRecord obj;
         int highestRecord = 0, cont = 0, maxEntry;
         try {
             listAsistencias.sort((o1, o2) -> {
@@ -582,8 +590,8 @@ public final class ReporteCompletoChart extends BasePDF {
                     institutoMapRanked.put(entrySet.getKey(), entrySet.getValue());
                 }
             }
-            maxEntry = findMaxEntry(institutoMapRanked);
-            highestInst = getRankConstancias(institutoMapRanked,maxEntry);
+            //maxEntry = findMaxEntry(institutoMapRanked);
+            highestInst = getRankConstancias(institutoMapRanked,highestRecord);
         } catch (Exception ex) {
             Logger.getLogger(ReporteCompletoChart.class.getName()).log(Level.SEVERE, null, ex);
         }

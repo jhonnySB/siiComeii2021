@@ -16,7 +16,6 @@ import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.ChartDrillupListener;
 import com.vaadin.addon.charts.ChartOptions;
-import com.vaadin.addon.charts.DrilldownCallback;
 import com.vaadin.addon.charts.DrilldownEvent;
 import com.vaadin.addon.charts.model.AxisType;
 import com.vaadin.addon.charts.model.ChartType;
@@ -28,20 +27,14 @@ import com.vaadin.addon.charts.model.DataProviderSeries;
 import com.vaadin.addon.charts.model.DataSeries;
 import com.vaadin.addon.charts.model.DataSeriesItem;
 import com.vaadin.addon.charts.model.Exporting;
-import com.vaadin.addon.charts.model.HorizontalAlign;
 import com.vaadin.addon.charts.model.Lang;
-import com.vaadin.addon.charts.model.Loading;
 import com.vaadin.addon.charts.model.PlotOptionsColumn;
 import com.vaadin.addon.charts.model.PlotOptionsPie;
-import com.vaadin.addon.charts.model.Series;
-import com.vaadin.addon.charts.model.Tooltip;
 import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.themes.VaadinTheme;
 import com.vaadin.addon.charts.util.SVGGenerator;
 import com.vaadin.data.HasValue.ValueChangeListener;
-import com.vaadin.data.provider.DataProvider;
-import com.vaadin.data.provider.DataProviderListener;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FileDownloader;
@@ -66,20 +59,11 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.paint.Color;
-import org.springframework.format.annotation.NumberFormat;
-import org.springframework.format.annotation.NumberFormat.Style;
 
 /**
  *
@@ -121,13 +105,14 @@ public class agremiadosChart<T> extends Panel {
     HashMap<String, Integer> mapInstitutions;
     LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
     final String LABEL_FORMATTER = "'<b>'+ this.point.name +'</b> ('+this.point.y+') : '+ this.percentage.toFixed(2) +'%'";
+    NativeSelect<String> selectBy,selectGraph;
 
     public VerticalLayout getMain() {
         return main;
     }
 
-    public agremiadosChart(List<Agremiado> listaAg_INST) throws Exception {
-        this.filteredList = listaAg_INST;
+    public agremiadosChart(List<Agremiado> filteredList) throws Exception {
+        this.filteredList = filteredList;
         initDlg();
     }
 
@@ -154,31 +139,110 @@ public class agremiadosChart<T> extends Panel {
         rLayoutGraph.setResponsive(true);
         ResponsiveRow rowGraph = rLayoutGraph.addRow();
         rowGraph.setResponsive(true);
-        NativeSelect<String> selectGraph = new NativeSelect<>("Tipo de gráfico:", Arrays.asList("Columna", "Pastel"));
+        
+        selectGraph = new NativeSelect<>("Tipo de gráfico:", Arrays.asList("Columna", "Pastel"));
         selectGraph.setEmptySelectionAllowed(false);
         selectGraph.setResponsive(true);
         selectGraph.setSelectedItem("Pastel");
-
         selectGraph.addValueChangeListener((ValueChangeListener) e -> {
-            String selected = selectGraph.getValue();
+            String selected = e.getValue().toString(), filterValue = selectBy.getValue();
+            List<Agremiado> reorderedList;
             switch (selected) {
-                case "Pastel":  // if checkBox selected
+                case "Pastel":
                     if (checkData.getValue()) {
-                        setLayoutContentChart(getAgremiadoChartPie(filteredList, "instituciones"));
+                        switch(filterValue){
+                            case "Institución":
+                                reorderedList = sortFilteredList("institucion");
+                                setLayoutContentChart(getAgremiadoChartPie(reorderedList, "instituciones", "Agremiados registrados por institución", true));
+                                break;
+                            case "País":
+                                reorderedList = sortFilteredList("pais");
+                                setLayoutContentChart(getAgremiadoChartPie(reorderedList, "paises", "Agremiados registrados por país", false));
+                                break;
+                            case "Género":
+                                 setLayoutContentChart(getAgremiadoChartPie(filteredList, "genero", "Agremiados registrados por género", false));
+                                break;
+                        }
                     } else {
-                        setLayoutContentChart(getAgremiadoChartPie(listaAg_INST, "instituciones"));
+                        switch (filterValue) {
+                            case "Institución":
+                                setLayoutContentChart(getAgremiadoChartPie(listaAg_INST, "instituciones", "Agremiados registrados por institución", true));
+                                break;
+                            case "País":
+                                setLayoutContentChart(getAgremiadoChartPie(listaAg_PAIS, "paises", "Agremiados registrados por país", false));
+                                break;
+                            case "Género":
+                                setLayoutContentChart(getAgremiadoChartPie(listaAg_INST, "genero", "Agremiados registrados por género", false));
+                                break;
+                        }
                     }
                     break;
                 case "Columna":
                     if (checkData.getValue()) {
-                        setLayoutContentChart(getAgremiadoChartColumn(filteredList));
+                        switch (filterValue) {
+                            case "Institución":
+                                reorderedList = sortFilteredList("institucion");
+                                setLayoutContentChart(getAgremiadoChartColumn(reorderedList,"Agremiados registrados por institución","Instituciones"));
+                                break;
+                            case "País":
+                                reorderedList = sortFilteredList("pais");
+                                setLayoutContentChart(getAgremiadoChartColumn(reorderedList,"Agremiados registrados por país","Paises"));
+                                break;
+                            case "Género":
+                                setLayoutContentChart(getAgremiadoChartColumn(filteredList,"Agremiados registrados por género","Género"));
+                                break;
+                        }
                     } else {
-                        setLayoutContentChart(getAgremiadoChartColumn(listaAg_INST));
+                        switch (filterValue) {
+                            case "Institución":
+                                setLayoutContentChart(getAgremiadoChartColumn(listaAg_INST,"Agremiados registrados por institución","Instituciones"));
+                                break;
+                            case "País": System.out.println("column no filter");
+                                setLayoutContentChart(getAgremiadoChartColumn(listaAg_PAIS,"Agremiados registrados por país","Países"));
+                                break;
+                            case "Género":
+                                setLayoutContentChart(getAgremiadoChartColumn(listaAg_INST,"Agremiados registrados por género","Género"));
+                                break;
+                        }
                     }
                     break;
             }
             selectGraph.setSelectedItem(selected);
         });
+        
+        selectBy = new NativeSelect<>("Mostrar por:", Arrays.asList("Institución", "País","Género"));
+        selectBy.setEmptySelectionAllowed(false);selectBy.setResponsive(true);selectBy.setSelectedItem("Institución");
+        selectBy.addValueChangeListener((ValueChangeListener) e -> {
+            String selected = e.getValue().toString(); 
+            switch (selected) {
+                case "Institución": 
+                    if (checkData.getValue()) {
+                        sortFilteredList("institucion");
+                        setLayoutContentChart(getAgremiadoChartPie(filteredList, "instituciones","Agremiados registrados por institución",true));
+                    } else {
+                        setLayoutContentChart(getAgremiadoChartPie(listaAg_INST, "instituciones","Agremiados registrados por institución",true));
+                    }
+                    break;
+                case "País":
+                    if (checkData.getValue()) {
+                        sortFilteredList("pais");
+                        setLayoutContentChart(getAgremiadoChartPie(filteredList, "paises","Agremiados registrados por país",false));
+                    } else {
+                        setLayoutContentChart(getAgremiadoChartPie(listaAg_PAIS, "paises","Agremiados registrados por país",false));
+                    }
+                    break;
+                case "Género":
+                    if (checkData.getValue()) {
+                        setLayoutContentChart(getAgremiadoChartPie(filteredList, "genero","Agremiados registrados por género",false));
+                    } else {
+                        setLayoutContentChart(getAgremiadoChartPie(listaAg_INST, "genero","Agremiados registrados por género",false));
+                    }
+                    break;
+            }
+            selectGraph.setSelectedItem("Pastel");
+            selectBy.setSelectedItem(selected);
+        });
+        
 
         btnFullReport = createExportButton(VaadinIcons.FILE_TEXT_O.getHtml(), currentDate.toString() + ".pdf", createPdfStreamSource(true),
                 "Descargar reporte de todos los datos registrados");
@@ -197,17 +261,62 @@ public class agremiadosChart<T> extends Panel {
 
         checkData.addValueChangeListener((ValueChangeListener) event -> {
             boolean chartTypePie = selectGraph.getValue().compareTo("Pastel") == 0;
+            String filteredValue = selectBy.getValue(); List<Agremiado> reorderedList;
             if ((boolean) event.getValue()) {
-                if (chartTypePie) {
-                    setLayoutContentChart(getAgremiadoChartPie(filteredList, "instituciones"));
+                if (chartTypePie) { 
+                    switch(filteredValue){
+                        case "Institución":
+                            reorderedList = sortFilteredList("institucion");
+                            setLayoutContentChart(getAgremiadoChartPie(reorderedList, "instituciones","Agremiados registrados por institución",true));
+                            break;
+                        case "País":
+                            reorderedList = sortFilteredList("pais");
+                            setLayoutContentChart(getAgremiadoChartPie(reorderedList, "paises","Agremiados registrados por país",false));
+                            break;
+                        case "Género":
+                            setLayoutContentChart(getAgremiadoChartPie(filteredList, "genero","Agremiados registrados por institución",false));
+                            break;
+                    }
                 } else {
-                    setLayoutContentChart(getAgremiadoChartColumn(filteredList));
+                    switch (filteredValue) {
+                        case "Institución":
+                            reorderedList = sortFilteredList("institucion");
+                            setLayoutContentChart(getAgremiadoChartColumn(reorderedList,"Agremiados registrados por institución","Instituciones"));
+                            break;
+                        case "País": 
+                            reorderedList = sortFilteredList("pais");
+                            setLayoutContentChart(getAgremiadoChartColumn(reorderedList,"Agremiados registrados por país","Países"));
+                            break;
+                        case "Género":
+                            setLayoutContentChart(getAgremiadoChartColumn(filteredList,"Agremiados registrados por institución","Género"));
+                            break;
+                    }
                 }
             } else {
                 if (chartTypePie) {
-                    setLayoutContentChart(getAgremiadoChartPie(listaAg_INST, "instituciones"));
+                    switch (filteredValue) {
+                        case "Institución":
+                            setLayoutContentChart(getAgremiadoChartPie(listaAg_INST, "instituciones", "Agremiados registrados por institución", true));
+                            break;
+                        case "País":
+                            setLayoutContentChart(getAgremiadoChartPie(listaAg_PAIS, "paises", "Agremiados registrados por país", false));
+                            break;
+                        case "Género":
+                            setLayoutContentChart(getAgremiadoChartPie(listaAg_INST, "genero", "Agremiados registrados por institución", false));
+                            break;
+                    }
                 } else {
-                    setLayoutContentChart(getAgremiadoChartColumn(listaAg_INST));
+                    switch (filteredValue) {
+                        case "Institución":
+                            setLayoutContentChart(getAgremiadoChartColumn(listaAg_INST, "Agremiados registrados por institución", "Instituciones"));
+                            break;
+                        case "País":
+                            setLayoutContentChart(getAgremiadoChartColumn(listaAg_PAIS, "Agremiados registrados por país", "Países"));
+                            break;
+                        case "Género":
+                            setLayoutContentChart(getAgremiadoChartColumn(listaAg_INST, "Agremiados registrados por institución", "Género"));
+                            break;
+                    }
                 }
             }
         });
@@ -216,6 +325,7 @@ public class agremiadosChart<T> extends Panel {
         ResponsiveLayout chartOptionsLayout = new ResponsiveLayout();
         ResponsiveRow rowChart = chartOptionsLayout.addRow(); //  bottom_left
         rowChart.addColumn().withComponent(checkData);
+        rowChart.addColumn().withComponent(selectBy);
         rowChart.addColumn().withComponent(selectGraph);
 
         //rowGraph.addColumn().withComponent(checkData);
@@ -244,7 +354,7 @@ public class agremiadosChart<T> extends Panel {
 
         contentChart = new ResponsiveLayout();
         contentChart.setSizeFull();
-        contentChart.addComponent(getAgremiadoChartPie(listaAg_INST, "instituciones"));
+        contentChart.addComponent(getAgremiadoChartPie(listaAg_INST, "instituciones","Agremiados registrados por institución",true));
         //ResponsiveRow rowChart = contentChart.addRow();
         //rowChart.addColumn().withComponent(getAgremiadoChartPie());
         //r1.addColumn().withComponent(contentChart).withDisplayRules(12, 12, 10, 10);
@@ -267,6 +377,18 @@ public class agremiadosChart<T> extends Panel {
         this.setContent(content);
         this.setCaptionAsHtml(true);
         this.setHeight(Element.windowHeightPx());
+    }
+    
+    public List<Agremiado> sortFilteredList(String sortBy){
+        List<Agremiado> reorderedList = new ArrayList<>(filteredList);
+        reorderedList.sort((Agremiado a1,Agremiado a2)->{
+            if(sortBy.compareTo("institucion")==0){
+                return a1.getInstitucion().compareToIgnoreCase(a2.getInstitucion());
+            }else{
+                return a1.getObjPais().getNombre().compareTo(a2.getObjPais().getNombre());
+            }
+        });
+        return reorderedList;
     }
 
     private void setLayoutContentChart(Component component) {
@@ -310,8 +432,7 @@ public class agremiadosChart<T> extends Panel {
         ReporteCompletoChart reporte = new ReporteCompletoChart();
         try {
             if (fullReport) {
-                Configuration exportConfig = chart.getConfiguration();
-                exportConfig.setExporting(false);
+                Configuration exportConfig = chart.getConfiguration(); exportConfig.setExporting(false);
                 String svgMain = SVGGenerator.getInstance().generate(exportConfig);
                 String svgGenre = buildChart(ChartType.PIE, "Género", "Agremiados hombres y mujeres registrados", false, listaAg_INST, "genero");
                 String svgCountries = buildChart(ChartType.PIE, "Países", "Lugares de procedencia de los agremiados registrados", false, 
@@ -399,66 +520,104 @@ public class agremiadosChart<T> extends Panel {
     private DataProviderSeries<Agremiado> setDataSeriesColumn(String seriesName, boolean colorByPoint, List<Agremiado> data) {
         PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
         plotOptionsColumn.setColorByPoint(colorByPoint);
-
         ListDataProvider<Agremiado> dataProvider = new ListDataProvider<>(data);
         DataProviderSeries<Agremiado> series = new DataProviderSeries<>(dataProvider);
         series.setName(seriesName);
         series.setPlotOptions(plotOptionsColumn);
         return series;
     }
-
-    private Chart getAgremiadoChartColumn(List<Agremiado> data) {
-        Configuration config = createChart(ChartType.COLUMN, "Agremiados", "Agremiados registrados por institución", true);
-        plotOptColumn(config, AxisType.CATEGORY, "Instituciones", "Agremiados", true);
+    // Configuration config, AxisType axisTypeX, String titleAxisX, String titleAxisY, boolean dtLblEnable
+    private Chart getAgremiadoChartColumn(List<Agremiado> data,String subTitle,String seriesName) {
+        Configuration config = createChart(ChartType.COLUMN, "Agremiados", subTitle, true);
+        plotOptColumn(config, AxisType.CATEGORY, seriesName, "Agremiados", true);
         config.getLegend().setEnabled(false);
+        if(seriesName.compareTo("Género")==0){
+            fillChartColumn(data,config);
+        }else
+            fillChartColumn(data,config,seriesName);
+        return chart;
+    }
+    
+    private void fillChartColumn(List<Agremiado> data, Configuration config) {
         try {
-            int contInst = 0;
-            mapInstitutions = new HashMap<>();
+            int contH = 0,contM = 0; mapInstitutions = new HashMap<>();
             if (data.size() > 0) {
-                String ins = "";
                 Iterator<Agremiado> it = data.iterator();
                 while (it.hasNext()) {
                     Agremiado a = it.next();
-                    String objValue = a.getInstitucion();
-
-                    if (ins.compareToIgnoreCase(objValue) != 0) {
-                        if (contInst != 0) {
-                            mapInstitutions.replace(ins, contInst);
-                        }
-                        mapInstitutions.put(objValue, 0);
-                        ins = objValue;
-                        contInst = 0;
-                    }
-                    contInst = contInst + 1;
-                    if (!it.hasNext()) {
-                        mapInstitutions.replace(ins, contInst);
+                    if(a.getSexo() == 'H'){
+                        contH = contH + 1;
+                    }else{
+                        contM = contM + 1;
                     }
                 }
-                DataProviderSeries<Agremiado> series = setDataSeriesColumn("Instituciones", true, data);
-                series.setX(Agremiado::getInstitucion);
+                DataSeries series = new DataSeries();
+                series.setName("Género");
+                series.add(new DataSeriesItem("Hombres",contH));
+                series.add(new DataSeriesItem("Mujeres",contM));
+                PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
+                plotOptionsColumn.setColorByPoint(true); series.setPlotOptions(plotOptionsColumn);
+                config.addSeries(series);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(agremiadosChart.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+   
+    private void fillChartColumn(List<Agremiado> data,Configuration config,String seriesName){
+        try {
+            int cont = 0; boolean filterByInstituto = (seriesName.compareTo("Instituciones")==0); System.out.println("filter "+filterByInstituto);
+            mapInstitutions = new HashMap<>();
+            if (data.size() > 0) {
+                String tempValue = "";
+                Iterator<Agremiado> it = data.iterator();
+                while (it.hasNext()) {
+                    Agremiado a = it.next();
+                    String objValue = filterByInstituto ? a.getInstitucion() : a.getObjPais().getNombre();
+                    System.out.println(objValue);
+                    if (tempValue.compareToIgnoreCase(objValue) != 0) {
+                        if (cont != 0) {
+                            mapInstitutions.replace(tempValue, cont);
+                        }
+                        mapInstitutions.put(objValue, 0);
+                        tempValue = objValue;
+                        cont = 0;
+                    }
+                    cont = cont + 1;
+                    if (!it.hasNext()) {
+                        mapInstitutions.replace(tempValue, cont);
+                    }
+                }
+                DataProviderSeries<Agremiado> series = setDataSeriesColumn(seriesName, true, data);
+                if(filterByInstituto){
+                    series.setX(Agremiado::getInstitucion);
+                }else{
+                    series.setX(agremiadoBean -> (filterByInstituto ? agremiadoBean.getInstitucion() : agremiadoBean.getObjPais().getNombre()));
+                }
                 series.setY(agremiado -> {
-                    return mapInstitutions.get(agremiado.getInstitucion());
+                    if(filterByInstituto){
+                        return mapInstitutions.get(agremiado.getInstitucion());
+                    }else
+                        return mapInstitutions.get(agremiado.getObjPais().getNombre());
                 });
                 config.addSeries(series);
             }
         } catch (Exception ex) {
             Logger.getLogger(agremiadosChart.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return chart;
     }
 
-    private Chart getAgremiadoChartPie(List<Agremiado> data, String filterBy) {
-        Configuration config = createChart(ChartType.PIE, "Agremiados", "Agremiados registrados por institución", true);
+    private Chart getAgremiadoChartPie(List<Agremiado> data, String filterBy,String subTitle,boolean drillDown) {
+        Configuration config = createChart(ChartType.PIE, "Agremiados", subTitle, true);
         plotOptPie(config, true, true, LABEL_FORMATTER, 0);
-        fillChartDataPie(config, data, "Agremiados", true, filterBy);
+        fillChartDataPie(config, data, "Agremiados", drillDown, filterBy);
         return chart;
     }
 
     private void fillChartDataPie(Configuration config, List<Agremiado> data, String seriesName, boolean drillDownData, String filterBy) {
         if (drillDownData==true) {
             setDrillDownDataPie(config, seriesName, data);
-        } else {
+        } else { 
             setDataPie(config, seriesName, data, filterBy);
         }
     }
@@ -470,7 +629,7 @@ public class agremiadosChart<T> extends Panel {
             case "instituciones":
                 dataPieInstitutos(config, series, data);
                 break;
-            case "paises": 
+            case "paises":
                 dataPiePaises(config, series, data);
                 break;
             case "genero":
@@ -631,7 +790,7 @@ public class agremiadosChart<T> extends Panel {
 
     private void setDrillUpListener(List<Agremiado> data) {
         chart.addChartDrillupListener((ChartDrillupListener) event -> {
-            setLayoutContentChart(getAgremiadoChartPie(data, "instituciones"));
+            setLayoutContentChart(getAgremiadoChartPie(data, "instituciones","Agremiados registrados por institución",true));
         });
     }
 

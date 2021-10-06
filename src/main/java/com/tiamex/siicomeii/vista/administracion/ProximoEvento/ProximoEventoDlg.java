@@ -5,11 +5,13 @@ import com.tiamex.siicomeii.persistencia.entidad.ProximoEvento;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
 import com.vaadin.data.HasValue.ValueChangeListener;
+import com.vaadin.data.Result;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.SerializablePredicate;
 import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.shared.ui.datefield.DateResolution;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
@@ -20,9 +22,12 @@ import com.vaadin.ui.themes.ValoTheme;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,16 +70,30 @@ public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
         eventMostrar();
     }
     
+    public DateField buildDateField(String placeHolder,String description){
+        DateField dateField = new DateField() {
+            @Override
+            protected Result<LocalDate> handleUnparsableDateString(String dateString) {
+                try {
+                    LocalDate parsedAtServer = LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE);
+                    return Result.ok(parsedAtServer);
+                } catch (DateTimeParseException e) {
+                    return Result.error("Fecha no válida");
+                }
+            }
+        };
+        dateField.setDefaultValue(LocalDate.now(ZoneId.systemDefault()));
+        dateField.addStyleName(ValoTheme.DATEFIELD_TINY);dateField.setPlaceholder(placeHolder);
+        dateField.setDescription(description);dateField.setWidth("150px");
+        dateField.setShowISOWeekNumbers(true);dateField.setZoneId(ZoneId.of("America/Mexico_City"));
+        dateField.setResolution(DateResolution.DAY);dateField.setLocale(new Locale("es", "MX"));
+        return dateField;
+    }
+    
     public HorizontalLayout buildFilterDate(){
         HorizontalLayout hLayout = new HorizontalLayout();
-        fechaInicioF = new DateField(); fechaInicioF.setZoneId(ZoneId.systemDefault());
-        fechaInicioF.addStyleName(ValoTheme.DATEFIELD_TINY);
-        fechaInicioF.setWidth("150px");
-        fechaInicioF.setPlaceholder("Fecha inicio"); fechaInicioF.setDescription("Selecciona la fecha de inicio");
-        fechaFinF = new DateField(); fechaFinF.setZoneId(ZoneId.systemDefault());
-        fechaFinF.addStyleName(ValoTheme.DATEFIELD_TINY); 
-        fechaFinF.setWidth("150px");
-        fechaFinF.setPlaceholder("Fecha fin"); fechaFinF.setDescription("Selecciona la fecha final");
+        fechaInicioF = buildDateField("Fecha inicio","Selecciona la fecha de inicio");
+        fechaFinF = buildDateField("Fecha fin","Selecciona la fecha final");
         if(dataProvider.getItems().isEmpty()){
             fechaInicioF.setEnabled(false);
             fechaFinF.setEnabled(false);

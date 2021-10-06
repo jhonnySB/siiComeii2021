@@ -1077,7 +1077,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "8.11.0";
+	content: "8.12.3";
 }
 
 .v-widget {
@@ -12592,6 +12592,10 @@ div.v-layout.v-horizontal.v-widget {
 	margin-left: 0;
 }
 
+.siiComeiiTheme .v-tabsheet-tabitemcell:not([aria-hidden="true"]) ~ td .v-caption {
+	margin-left: 21px;
+}
+
 .siiComeiiTheme .v-tabsheet-tabitemcell:focus {
 	outline: none;
 }
@@ -12806,6 +12810,10 @@ div.v-layout.v-horizontal.v-widget {
 
 .siiComeiiTheme .v-tabsheet-framed  > .v-tabsheet-tabcontainer td:first-child .v-caption, .siiComeiiTheme .v-tabsheet-framed  > .v-tabsheet-tabcontainer [aria-hidden="true"] + td .v-caption {
 	margin-left: 0;
+}
+
+.siiComeiiTheme .v-tabsheet-framed  > .v-tabsheet-tabcontainer :not([aria-hidden="true"]) ~ td .v-caption {
+	margin-left: 4px;
 }
 
 .siiComeiiTheme .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-tabsheet-tabitem .v-caption {

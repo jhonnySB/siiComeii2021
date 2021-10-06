@@ -68,6 +68,12 @@ public class WebinarRealizado implements Serializable{
     public String getUrlYoutube(){return urlYoutube;}
     public void setUrlYoutube(String valor){urlYoutube = valor;}
     
+    @Basic(optional=false)
+    @Column(name="asistentes",nullable=false)
+    private short asistentes;
+    public short getAsistentes(){return asistentes;}
+    public void setAsistentes(short valor){asistentes = valor;}
+    
     /** Relaciones **/
     @OneToMany(mappedBy="objWebinarRealizado",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
     private List<AsistenciaWebinar> listaAsistenciaWebinar;

@@ -15,6 +15,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.threeten.extra.YearWeek;
 
 /**
  *
@@ -33,7 +35,17 @@ import java.util.regex.Pattern;
 public class regex {
 
     public static void main(String[] args) {
-
+        ZoneId zoneId = ZoneId.of("America/Mexico_City");
+        YearWeek currentYearWeek = YearWeek.now(zoneId);
+        LocalDate ld = LocalDate.of( 2021 , Month.OCTOBER , 4 ) ;
+        YearWeek webinarYearWeek = YearWeek.from(ld);
+        currentYearWeek.equals(webinarYearWeek);
+        System.out.println(currentYearWeek.equals(webinarYearWeek));
+        
+        LocalDateTime date = LocalDateTime.now(ZoneId.of("America/Mexico_City"));
+        //System.out.println(LocalDateTime.now(ZoneId.of("America/Mexico_City")).getDayOfWeek());
+        
+        /*
         String some = "some string";
         String other = "some string";
         boolean identical = some == other;
