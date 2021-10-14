@@ -1,6 +1,7 @@
 package com.tiamex.siicomeii.vista.utils;
 
 import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.VerticalLayout;
@@ -39,7 +40,7 @@ public class ShowPDFDlg extends Window
         this.setContent(main);
         this.setWidth("80%");
         this.setHeight("70%");
-        this.setResizable(false);
+        this.setResizable(true);
         this.setModal(true);
         }
     }

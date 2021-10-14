@@ -182,6 +182,20 @@ public class GenericDao<CLASS,ID extends Serializable> implements GenericDaoInte
         }
     }
     
+    public List<CLASS> getByInstituto(String i) {
+        try {
+            em = SingletonPU.createEntityManager();
+            String statement = "SELECT t FROM " + this.getPersistentClass().getSimpleName() 
+                    + " t WHERE UPPER(t.institucion)=UPPER('"+i+"') ORDER BY t.institucion";
+            Query query = em.createQuery(statement);
+            List<CLASS> list = query.getResultList();
+            return list;
+        } catch (Exception ex) {
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+            throw ex;
+        }
+    }
+    
     public Object getByNames(String nombre){
         try{
             em = SingletonPU.createEntityManager();

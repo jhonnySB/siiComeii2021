@@ -54,7 +54,7 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
                 }
 
                 wdw.setHeight(panelChart.getHeight() + 41, panelChart.getHeightUnits());
-                wdw.setWidth("75%");
+                wdw.setWidth("75%"); wdw.setHeightUndefined();
                 wdw.setContent(panelChart);
                 ui.addWindow(wdw);
             } catch (Exception ex) {

@@ -11,7 +11,7 @@ import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.SiiComeiiUI;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
-import com.tiamex.siicomeii.reportes.base.pdf.ReporteCompletoChart;
+import com.tiamex.siicomeii.reportes.base.pdf.ReporteChartAgremiado;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.ChartDrillupListener;
@@ -429,7 +429,7 @@ public class agremiadosChart<T> extends Panel {
 
     private File doExportPDF(boolean fullReport) {
         File file = null;
-        ReporteCompletoChart reporte = new ReporteCompletoChart();
+        ReporteChartAgremiado reporte = new ReporteChartAgremiado();
         try {
             if (fullReport) {
                 Configuration exportConfig = chart.getConfiguration(); exportConfig.setExporting(false);

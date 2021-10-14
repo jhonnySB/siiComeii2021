@@ -88,6 +88,15 @@ public abstract class GenericController<SERVICE,CLASS,ID extends Serializable>{
         }
     }
     
+    public List<CLASS> getByInstituto(String i) {
+        try {
+            return service.getByInstituto(i);
+        } catch (Exception ex) {
+            Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+            throw ex;
+        }
+    }
+    
     public Object getByNames(String nombre){
         try{ 
             return service.getByNames(nombre);

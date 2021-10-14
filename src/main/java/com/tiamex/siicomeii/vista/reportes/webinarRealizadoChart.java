@@ -10,11 +10,17 @@ import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.SiiComeiiUI;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
+import com.tiamex.siicomeii.controlador.ControladorAsistenciaWebinar;
+import com.tiamex.siicomeii.controlador.ControladorProximoWebinar;
 import com.tiamex.siicomeii.controlador.ControladorWebinarRealizado;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
+import com.tiamex.siicomeii.persistencia.entidad.AsistenciaWebinar;
+import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
-import com.tiamex.siicomeii.reportes.base.pdf.ReporteCompletoChart;
+import com.tiamex.siicomeii.reportes.base.pdf.ReporteChartAgremiado;
+import com.tiamex.siicomeii.reportes.base.pdf.ReporteChartWebRealizado;
 import com.tiamex.siicomeii.vista.utils.Element;
+import com.tiamex.siicomeii.vista.utils.ShowPDFDlg;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.ChartDrillupListener;
 import com.vaadin.addon.charts.ChartOptions;
@@ -42,6 +48,9 @@ import com.vaadin.addon.charts.themes.VaadinTheme;
 import com.vaadin.addon.charts.util.SVGGenerator;
 import com.vaadin.data.HasValue.ValueChangeListener;
 import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.event.FieldEvents.FocusListener;
+import com.vaadin.event.selection.SingleSelectionEvent;
+import com.vaadin.event.selection.SingleSelectionListener;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.StreamResource;
@@ -72,18 +81,28 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import com.vaadin.addon.charts.model.style.Color;
+import com.vaadin.addon.charts.model.style.SolidColor;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
+import java.time.format.DateTimeFormatter;
+import java.util.function.Predicate;
 import org.threeten.extra.YearWeek;
-
+import com.google.common.collect.Lists;
+import com.google.common.base.Functions;
 /**
  *
  * @author jhon
@@ -116,7 +135,6 @@ public class webinarRealizadoChart<T> extends Panel {
     Exporting exporting;
     protected Grid<T> grid;
     public VerticalLayout main;
-    Chart chart;
     CheckBox checkData;
     List<Agremiado> listaAg_INST = ControladorAgremiado.getInstance().getAllSorted("institucion");
     List<Agremiado> listaAg_PAIS = ControladorAgremiado.getInstance().getAllSorted("pais");
@@ -124,13 +142,23 @@ public class webinarRealizadoChart<T> extends Panel {
     HashMap<String, Integer> mapInstitutions;
     final String LABEL_FORMATTER = "'<b>'+ this.point.name +'</b> ('+this.point.y+') : '+ this.percentage.toFixed(2) +'%'";
     NativeSelect<String> selectBy, selectGraph;
+    MenuBar menuDownload;
     // webinar
-    ComboBox<WebinarRealizado> comboBox;
-    List<WebinarRealizado> listaWebR = ControladorWebinarRealizado.getInstance().getAllSorted("nombre");
+    ComboBox<String> comboBox,comboYearSel;
+    NativeSelect<Integer> selectYear;
+    List<WebinarRealizado> listaWebR = ControladorWebinarRealizado.getInstance().getAllSorted("nombre"),listaComboBox,copyListWebR;
+    List<ProximoWebinar> listaProxWeb = ControladorProximoWebinar.getInstance().getAll();
+    List<Agremiado> listaAgremiados = ControladorAgremiado.getInstance().getAll();
+    List<AsistenciaWebinar> listAsistencia = ControladorAsistenciaWebinar.getInstance().getAll();
+    List<List<WebinarRealizado>> orderedByYearList;
+    Map<String,Integer> mapInstitutoWeb = new HashMap<>();
     final LocalDate currentDate = LocalDate.now(ZoneId.of("America/Mexico_City"));
     final Locale locale = Locale.forLanguageTag("es-MX");
+    List<Integer> listYears;
+    Chart generalChart;
     int highestRecord;
-
+    Panel scrollPanelChart;
+    
     public VerticalLayout getMain() {
         return main;
     }
@@ -156,9 +184,6 @@ public class webinarRealizadoChart<T> extends Panel {
         radioBtn.setCaption("<span style=\"font-size:14px\">Escala del gráfico");
         radioBtn.setCaptionAsHtml(true);
 
-        /*VerticalLayout vLayout = new VerticalLayout();
-        vLayout.setResponsive(true);
-        vLayout.setMargin(true); */
         ResponsiveLayout rLayoutGraph = new ResponsiveLayout();
         rLayoutGraph.setResponsive(true);
         ResponsiveRow rowGraph = rLayoutGraph.addRow();
@@ -222,7 +247,6 @@ public class webinarRealizadoChart<T> extends Panel {
                                 //setLayoutContentChart(getAgremiadoChartColumn(listaAg_INST,"Agremiados registrados por institución","Instituciones"));
                                 break;
                             case "País":
-                                System.out.println("column no filter");
                                 //setLayoutContentChart(getAgremiadoChartColumn(listaAg_PAIS,"Agremiados registrados por país","Países"));
                                 break;
                             case "Género":
@@ -268,16 +292,6 @@ public class webinarRealizadoChart<T> extends Panel {
             }
             selectGraph.setSelectedItem("Pastel");
             selectBy.setSelectedItem(selected);
-        });
-
-        btnFullReport = createExportButton(VaadinIcons.FILE_TEXT_O.getHtml(), currentDate.toString() + ".pdf", createPdfStreamSource(true),
-                "Descargar reporte de todos los datos registrados");
-        btnReportChart = createExportButton(VaadinIcons.BAR_CHART_H.getHtml(), currentDate.toString() + ".pdf", createPdfStreamSource(false),
-                "Descargar reporte de los datos filtrados en la tabla");
-        btnReportChart.addClickListener((ClickListener) listener -> {
-            if (filteredList.isEmpty()) {
-                Notification.show(null, "No hay datos filtrados en la tabla", Notification.Type.ERROR_MESSAGE);
-            }
         });
 
         checkData = new CheckBox();
@@ -347,29 +361,101 @@ public class webinarRealizadoChart<T> extends Panel {
                 }
             }
         });
-        updateCheckBoxData();
-        ///
-        Collection<WebinarRealizado> data = ControladorWebinarRealizado.getInstance().getAll();
-        comboBox = new ComboBox<>("Buscar webinar", data);
-        comboBox.setResponsive(true);
-        comboBox.setTextInputAllowed(true);
-        comboBox.setWidth(90, Unit.PERCENTAGE);
+        //getSvgStrings();
+        
+        
+        /*btnFullReport = createExportButton(VaadinIcons.FILE_TEXT_O.getHtml(), currentDate.toString() + ".pdf", createPdfStreamSource(true),
+                "Descargar reporte de todos los datos registrados");*/
+        btnFullReport = new Button(); btnFullReport.setResponsive(true); 
+        btnFullReport.setDescription("Descargar reporte de todos los datos registrados");
+        btnFullReport.setIcon(VaadinIcons.FILE_TEXT_O); btnFullReport.addStyleName(ValoTheme.BUTTON_SMALL);
+        btnFullReport.addClickListener((ClickListener) listener->{
+            if(listaWebR.isEmpty() && listAsistencia.isEmpty()){
+                Notification.show("", "Sin registros", Notification.Type.ERROR_MESSAGE);
+            }else{
+                ui.addWindow(new ShowPDFDlg(new StreamResource(createPdfStreamSource(true,0),
+                        currentDate.format(DateTimeFormatter.ISO_DATE))));
+            }
+        });
+        
+        /*btnReportChart = createExportButton(VaadinIcons.BAR_CHART_H.getHtml(), currentDate.toString() + ".pdf", createPdfStreamSource(false),
+                "Descargar reporte de los datos filtrados en la tabla");
+        btnReportChart.addClickListener((ClickListener) listener -> {
+        }); */
+        
+        comboBox = new ComboBox<>("Buscar institución:", getInstitutos());
+        comboBox.setResponsive(true); comboBox.setPlaceholder("Ingrese nombre");
+        comboBox.setTextInputAllowed(true); comboBox.setPageLength(10);
+        comboBox.setWidth(90F, Unit.PERCENTAGE);  comboBox.addStyleName("searchbox");
         comboBox.setCaptionAsHtml(true);
-        comboBox.setEmptySelectionAllowed(false);
-        comboBox.setItemCaptionGenerator(WebinarRealizado::getNombre);
-
+        comboBox.setEmptySelectionAllowed(true);
+        comboBox.setEmptySelectionCaption("Todos los registros");
+        comboBox.setStyleGenerator(str->{
+            if(mapInstitutoWeb.get(str)>0)
+                return "websR";
+            return "noWebsR";
+        }); 
+        comboBox.setItemCaptionGenerator(str->{
+            int total = mapInstitutoWeb.get(str);
+            if(total==0)
+                return str+" - Ninguno.";
+            if(total==1)
+                return str+" - "+total+" realizado.";
+            return str+" - "+total+" realizados.";
+        });
+        comboBox.addSelectionListener((SingleSelectionEvent<String> event)->{
+            if(event.getSelectedItem().isPresent()){
+                String selectedItem = event.getValue();
+                listaComboBox = ControladorWebinarRealizado.getInstance().getByInstituto(selectedItem);
+                scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados 2021",
+                        "Webinars realizados en todo el año", 2021));
+                if (mapInstitutoWeb.get(selectedItem) > 0) {
+                    selectYear.setEnabled(true);
+                    selectYear.setSelectedItem(2021);
+                } else {
+                    selectYear.clear();
+                    selectYear.setEnabled(false);
+                }
+            }else{
+                scrollPanelChart.setContent(generalChart);
+                selectYear.setEnabled(true);
+                selectYear.setSelectedItem(2021);
+            }
+        });
+        selectYear = new NativeSelect<>("Año:",getYears()); selectYear.setEmptySelectionAllowed(false);
+        selectYear.setWidth(90F, Unit.PERCENTAGE); selectYear.setEmptySelectionAllowed(true);
+        selectYear.setEmptySelectionCaption("Seleccionar año");
+        selectYear.setItemCaptionGenerator(year->{
+            return String.valueOf(year);
+        });
+        selectYear.setEnabled(false);
+        selectYear.addSelectionListener((SingleSelectionListener) listener->{
+            if(listener.isUserOriginated()){
+                String year = "";
+                if (listener.getSelectedItem().isPresent()) {
+                    year = String.valueOf(listener.getSelectedItem().get());
+                }
+                scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados " + year,
+                            "Webinars realizados en todo el año", year.isEmpty() ? 0 : Integer.valueOf(year)));
+            }
+            
+        });
+        
         ResponsiveLayout downloadLayout = new ResponsiveLayout();
         String htmlIcon = VaadinIcons.DOWNLOAD.getHtml();
         downloadLayout.setCaption("<span style=\"font-size:12px\">Opciones de descarga " + htmlIcon + "</span>");
         downloadLayout.setDescription("Se muestran algunas opciones para descargar el gráfico y el reporte en PDF");
         downloadLayout.setCaptionAsHtml(true);
-        ResponsiveRow rr = downloadLayout.addRow();
-        rr.addColumn().withComponent(btnFullReport).withDisplayRules(12, 12, 6, 6);
-        rr.addColumn().withComponent(btnReportChart).withDisplayRules(12, 12, 6, 6);
 
-        Panel infoPanel = new Panel();
+        createMenuDownload();
+        ResponsiveRow rr = downloadLayout.addRow(); rr.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
+        rr.addColumn().withComponent(comboYearSel).withDisplayRules(12, 12, 7, 7);
+        rr.addColumn().withComponent(btnFullReport).withDisplayRules(12, 12, 5, 5);
+        
+
+        Panel infoPanel = new Panel(); infoPanel.addStyleName("captionPanelNoPadding");
         infoPanel.setCaption(
-                "<span style=\"padding:0;\">Información y descargas " + VaadinIcons.INFO_CIRCLE.getHtml() + "</span>");
+                "<span style=\"padding:0;\">Información General y descargas " + VaadinIcons.INFO_CIRCLE.getHtml() + "</span>");
         infoPanel.setCaptionAsHtml(true);
         infoPanel.setResponsive(true);
         infoPanel.setWidth(90f, Unit.PERCENTAGE);
@@ -407,15 +493,19 @@ public class webinarRealizadoChart<T> extends Panel {
         lblInfo.setContentMode(ContentMode.HTML);
         rowInfoP.addColumn().withComponent(lblInfo);
         String totalConst = listaWebR.isEmpty() ? "Ninguna" : String.valueOf(listaWebR.size());
-        String ranking = getCountConstanciasInst(listaWebR);
+        String ranking = getCountConstanciasInst(listAsistencia);
         lblInfo.setValue("Total enviadas: " + totalConst + "<br>"
-                + "Institución(es) con más constancias recibidas (" + highestRecord + "):" + "<br>" + ranking);
-
+                + "Institución(es) con mayor constancias recibidas (" + highestRecord + "):" + "<br>" + ranking);
         infoPanel.setContent(layoutInfoP);
         ResponsiveLayout chartOptionsLayout = new ResponsiveLayout();
         ResponsiveRow rowChart = chartOptionsLayout.addRow();
-        rowChart.setSpacing(true);
-        rowChart.addColumn().withComponent(comboBox);
+        rowChart.setSpacing(true); 
+        
+        ResponsiveLayout layoutComboSelect = new ResponsiveLayout(); layoutComboSelect.setResponsive(true);
+        ResponsiveRow rComboSelect = layoutComboSelect.addRow(); rComboSelect.setResponsive(true);
+        rComboSelect.addColumn().withComponent(comboBox).withDisplayRules(12,12,12,12); 
+        rComboSelect.addColumn().withComponent(selectYear).withDisplayRules(12, 12, 12, 12);
+        rowChart.addColumn().withComponent(layoutComboSelect);
         rowChart.addColumn().withComponent(infoPanel);
 
         rowGraph.addColumn().withComponent(chartOptionsLayout);
@@ -430,12 +520,11 @@ public class webinarRealizadoChart<T> extends Panel {
 
         contentChart = new ResponsiveLayout();
         contentChart.setSizeFull();
-        Panel scrollPanel = new Panel();
-        Chart resizedChart = getAgremiadoChartColumn(listaWebR, "Webinars realizados en todo el año");
-        resizedChart.setWidth(1000, Unit.PIXELS);
-        resizedChart.setHeight(400, Unit.PIXELS);
-        scrollPanel.setContent(resizedChart);
-        contentChart.addComponent(scrollPanel);
+        scrollPanelChart = new Panel(); int currentYear = currentDate.getYear();
+        generalChart = getAgremiadoChartColumn(listaWebR, "Webinars realizados " + currentYear,
+                "Webinars realizados en todo el año", currentYear);
+        scrollPanelChart.setContent(generalChart);
+        contentChart.addComponent(scrollPanelChart);
 
         r1.addColumn().withComponent(contentChart, ResponsiveColumn.ColumnComponentAlignment.CENTER).withDisplayRules(12, 12, 9, 9);
         Lang lang = new Lang();
@@ -452,13 +541,77 @@ public class webinarRealizadoChart<T> extends Panel {
         ChartOptions.get().setTheme(new VaadinTheme());
 
         this.setCaption("Estadísitcas de Agremiados");
-        this.setSizeFull();
+        this.setWidthFull(); this.setHeightUndefined();
         this.setContent(content);
         this.setCaptionAsHtml(true);
-        this.setHeight(Element.windowHeightPx());
     }
-
-    private String getCountConstanciasInst(List<WebinarRealizado> data) {
+    
+    private void createMenuDownload(){
+        Collection<String> items = new ArrayList<>();
+        listaWebR.stream().map(web -> String.valueOf(web.getFecha().getYear())).filter(year -> (items.isEmpty() || !items.contains(year))).
+                forEachOrdered(year -> {
+            items.add(year);
+        });
+        comboYearSel = new ComboBox(); comboYearSel.setResponsive(true); comboYearSel.setWidth(100, Unit.PERCENTAGE);
+        comboYearSel.setDescription("Descargar reporte de los webinars deñ año seleccionado"); 
+        comboYearSel.setItems(Lists.transform(getYears(), Functions.toStringFunction()));
+        comboYearSel.setPlaceholder("Año"); comboYearSel.addStyleName(ValoTheme.COMBOBOX_SMALL);
+        comboYearSel.setEmptySelectionAllowed(false); comboYearSel.setPageLength(7);
+        comboYearSel.addSelectionListener((SingleSelectionListener) listener->{
+            String  item = String.valueOf(listener.getSelectedItem().get());
+            int year = Integer.valueOf(item);
+            ui.addWindow(new ShowPDFDlg(new StreamResource(createPdfStreamSource(false,year),
+                    currentDate.format(DateTimeFormatter.ISO_DATE))));
+        });
+    }
+    
+    private List<Integer> getYears(){
+        List<Integer> list = new ArrayList<>();
+        int currentYear,oldestYear,index = 0; 
+        currentYear = oldestYear = currentDate.getYear();
+        for(WebinarRealizado web:listaWebR){
+            if(web.getFecha().getYear()<oldestYear){
+                oldestYear = web.getFecha().getYear();
+            }
+        }
+        list.add(oldestYear);
+        if(oldestYear!=currentYear){
+            for(;oldestYear<currentYear;oldestYear+=1){
+                list.add(list.get(index)+1); index++;
+            }
+        }
+        return list;
+    }
+   
+    
+    private Collection<String> getInstitutos(){
+        Collection<String> newList = new ArrayList<>();
+        listaAgremiados.forEach(agremiado->{
+            String i = agremiado.getInstitucion();
+            if (newList.isEmpty() || !newList.stream().
+                    filter(obj -> obj.equalsIgnoreCase(i)).findFirst().isPresent()) {
+                mapInstitutoWeb.put(i, 0);
+                newList.add(i);
+            }
+        });
+        listaProxWeb.forEach(ProWeb -> {
+            String i = ProWeb.getInstitucion();
+            if (newList.isEmpty() || !newList.stream().
+                    filter(obj -> obj.equalsIgnoreCase(i)).findFirst().isPresent()) {
+                mapInstitutoWeb.put(i, 0);
+                newList.add(i);
+            }
+        });
+        listaWebR.forEach(webRealizado->{
+            String webR = webRealizado.getInstitucion();
+            if(mapInstitutoWeb.containsKey(webR)){
+                mapInstitutoWeb.replace(webR, mapInstitutoWeb.get(webR)+1);
+            }
+        });
+        return newList.stream().sorted().collect(Collectors.toCollection(ArrayList::new));
+    }
+    
+    public String getCountConstanciasInst(List<AsistenciaWebinar> data) {
         Map<String, InstitutoRecord> institutoMap = new HashMap<>();
         Map<String, InstitutoRecord> institutoMapRanked = new HashMap<>();
         String highestInst = "";
@@ -466,12 +619,12 @@ public class webinarRealizadoChart<T> extends Panel {
         highestRecord = 0;
         int cont = 0;
         try {
-            data.sort((WebinarRealizado w1, WebinarRealizado w2) -> {
-                return w1.getInstitucion().compareToIgnoreCase(w2.getInstitucion());
+            data.sort((o1, o2) -> {
+                return o1.getObjAgremiado().getInstitucion().compareToIgnoreCase(o2.getObjAgremiado().getInstitucion());
             });
-            for (WebinarRealizado w : data) {
-                String loopInstituto = w.getInstitucion();
-                LocalDate loopDate = w.getFecha().toLocalDate();
+            for (AsistenciaWebinar a : data) {
+                String loopInstituto = a.getObjAgremiado().getInstitucion();
+                LocalDate loopDate = a.getObjWebinarRealizado().getFecha().toLocalDate();
                 cont++;
                 if (cont > highestRecord) {
                     highestRecord = cont;
@@ -489,39 +642,41 @@ public class webinarRealizadoChart<T> extends Panel {
                     institutoMap.put(loopInstituto, obj);
                 }
             }
-            institutoMap.entrySet().stream().filter(entrySet -> (entrySet.getValue().getTotal() == highestRecord)).forEachOrdered(entrySet -> {
+            institutoMap.entrySet().stream().filter((Map.Entry<String, InstitutoRecord> entrySet) -> 
+                    {
+                return entrySet.getValue().getTotal() == highestRecord;
+            }).forEachOrdered(entrySet -> {
                 institutoMapRanked.put(entrySet.getKey(), entrySet.getValue());
             });
-            highestInst = getRankConstancias(institutoMapRanked, highestRecord);
+            highestInst = getRankConstancias(institutoMapRanked);
         } catch (Exception ex) {
-            Logger.getLogger(ReporteCompletoChart.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ReporteChartAgremiado.class.getName()).log(Level.SEVERE, null, ex);
         }
         return highestInst;
     }
 
-    private String getRankConstancias(Map<String, InstitutoRecord> map, int maxEntry) {
+    private String getRankConstancias(Map<String, InstitutoRecord> map) {
         String results;
         Stream<Map.Entry<String, InstitutoRecord>> sortedStream = map.entrySet().stream().
                 sorted(Map.Entry.comparingByValue());
-        results = getTextRanked(sortedStream, maxEntry);
+        results = getTextRanked(sortedStream);
         return results;
     }
 
-    private String getTextRanked(Stream<Map.Entry<String, InstitutoRecord>> sortedStream, int highestRecord) {
+    private String getTextRanked(Stream<Map.Entry<String, InstitutoRecord>> sortedStream) {
         String results = "";
-        int cont = 0;
         Map<String, InstitutoRecord> newMap = new HashMap<>();
         sortedStream.forEach(entry -> {
             newMap.put(entry.getKey(), entry.getValue());
         });
         for (Map.Entry<String, InstitutoRecord> entrySet : newMap.entrySet()) {
-            results = "- " + entrySet.getKey();
-            if (cont > 0) {
-                results = results + "<br>";
+            if(results.isEmpty()){
+                results = "- " + entrySet.getKey();
+            }else{
+                results = results + "<br>"+"- "+entrySet.getKey();
             }
-            cont++;
         }
-        results = results + ".";
+        results = results+".";
         return results;
     }
 
@@ -541,7 +696,7 @@ public class webinarRealizadoChart<T> extends Panel {
             }
             return date;
         }).forEachOrdered(_item -> {
-            obj.setTotal(+1);
+            obj.setTotal(obj.getTotal()+1);
         });
         return obj;
     }
@@ -563,25 +718,11 @@ public class webinarRealizadoChart<T> extends Panel {
         contentChart.addComponent(component);
     }
 
-    private void updateCheckBoxData() {
-        if (filteredList.isEmpty()) {
-            checkData.setEnabled(false);
-        }
-    }
 
-    private Button createExportButton(String caption, String filename, StreamResource.StreamSource ss, String desc) {
-        Button b = new Button(caption);
-        b.setCaptionAsHtml(true);
-        b.setDescription(desc);
-        FileDownloader downloader = new FileDownloader(new StreamResource(ss, filename));
-        downloader.extend(b);
-        return b;
-    }
-
-    private StreamResource.StreamSource createPdfStreamSource(boolean fullReport) {
+    private StreamResource.StreamSource createPdfStreamSource(boolean fullReport,int year) {
         StreamResource.StreamSource ss
                 = () -> {
-                    File result = doExportPDF(fullReport);
+                    File result = doExportPDF(fullReport,year);
                     if (result != null) {
                         try {
                             return new FileInputStream(result);
@@ -594,34 +735,72 @@ public class webinarRealizadoChart<T> extends Panel {
         return ss;
     }
 
-    private File doExportPDF(boolean fullReport) {
+    private File doExportPDF(boolean fullReport,int yearSelected) {
         File file = null;
-        ReporteCompletoChart reporte = new ReporteCompletoChart();
+        ReporteChartWebRealizado reporte = new ReporteChartWebRealizado();
         try {
             if (fullReport) {
-                Configuration exportConfig = chart.getConfiguration();
-                exportConfig.setExporting(false);
-                String svgMain = SVGGenerator.getInstance().generate(exportConfig);
-                String svgGenre = buildChart(ChartType.PIE, "Género", "Agremiados hombres y mujeres registrados", false, listaAg_INST, "genero");
-                String svgCountries = buildChart(ChartType.PIE, "Países", "Lugares de procedencia de los agremiados registrados", false,
-                        listaAg_PAIS, "paises");
-                String svgInst = buildChart(ChartType.PIE, "Instituciones", "Instituciones de procedencia de los agremiados registrados", false,
-                        listaAg_INST, "instituciones");
-                file = reporte.writePdf("reporte_" + currentDate.toString(), svgMain, svgGenre, svgCountries, svgInst, 300F, 200F, null, false);
+                file = reporte.writePdf("Webinar_realizados_completo", getSvgStrings(0),listYears,orderedByYearList);
             } else {
-                if (!filteredList.isEmpty()) {
-                    String svgGenre = buildChart(ChartType.PIE, "Género", "Agremiados hombres y mujeres registrados", false, filteredList, "genero");
-                    String svgCountries = buildChart(ChartType.PIE, "Países", "Lugares de procedencia de los agremiados registrados",
-                            false, getListCountries(filteredList), "paises");
-                    String svgInst = buildChart(ChartType.PIE, "Instituciones", "Instituciones de procedencia de los agremiados registrados",
-                            false, getListInstituto(filteredList), "instituciones");
-                    file = reporte.writePdf("reporte_" + currentDate.toString(), null, svgGenre, svgCountries, svgInst, 300F, 200F, filteredList, true);
-                }
+                file = reporte.writePdf("webRealizados", getSvgStrings(yearSelected),yearSelected,orderedByYearList,listYears);
             }
         } catch (Exception ex) {
             Logger.getLogger(webinarRealizadoChart.class.getName()).log(Level.SEVERE, null, ex);
         }
         return file;
+    }
+    
+    private List<String> getSvgStrings(int yearSel){
+        List<String> list = new ArrayList<>(); int month=0;int countYears = 0; 
+        listYears = new ArrayList<>();copyListWebR = new ArrayList<>(listaWebR);
+        List<WebinarRealizado> yearList;orderedByYearList = new ArrayList<>();
+        copyListWebR.sort((WebinarRealizado w1,WebinarRealizado w2)->{
+            int y1=w1.getFecha().getYear(), y2 = w2.getFecha().getYear(),
+                    m1 = w1.getFecha().getMonthValue(),m2=w2.getFecha().getMonthValue();
+            if(y2<y1)return -1;
+            if(y2>y1)return 1;
+            if(m1<m2)return -1;
+            if(m1>m2)return 1;
+            return 0;
+        });
+        if(yearSel==0){
+            countYears = copyListWebR.stream().map(web -> web.getFecha().getYear()).
+                    filter(year -> (listYears.isEmpty() || !listYears.contains(year))).map((Integer year) -> {
+                listYears.add(year);
+                return year;
+            }).map(_item -> 1).reduce(countYears, Integer::sum);
+            for (int i = 0; i < countYears; i++) {
+                yearList = new ArrayList<>(copyListWebR);
+                final int yearToCheck = listYears.get(i);
+                yearList.removeIf((Predicate<WebinarRealizado>) web -> {
+                    return web.getFecha().getYear() != yearToCheck;
+                });
+                orderedByYearList.add(yearList);
+                list.add(buildChartPieSvg(ChartType.PIE, "Webinars Realizados " + yearToCheck,
+                        "Webinars realizados durante el año por las instituciones", yearList));
+            }  
+        }else{
+            copyListWebR.removeIf((Predicate<WebinarRealizado>) web->{
+                return web.getFecha().getYear()!= yearSel;
+            });
+            for(WebinarRealizado web:copyListWebR){
+                int m = web.getFecha().getMonthValue();
+                if(month==0 || month!=m){
+                    listYears.add(m);
+                    yearList = new ArrayList<>(copyListWebR);
+                    final int monthToCheck = m;
+                    yearList.removeIf((Predicate<WebinarRealizado>) w->{
+                        return w.getFecha().getMonthValue()!=monthToCheck;
+                    });
+                    orderedByYearList.add(yearList);
+                    list.add(buildChartPieSvg(ChartType.PIE, "Webinars Realizados de " + 
+                            Month.of(m).getDisplayName(TextStyle.FULL, locale).toUpperCase(),
+                            "Webinars realizados durante el mes por las instituciones", yearList));
+                    month = m;
+                }
+            }
+        }
+        return list;
     }
 
     private List<Agremiado> getListInstituto(List<Agremiado> sourceList) {
@@ -643,22 +822,31 @@ public class webinarRealizadoChart<T> extends Panel {
         return sourceList;
     }
 
+    private String buildChartPieSvg(ChartType charType, String titleChart, String subTitleChart,List<WebinarRealizado> data) {
+        Configuration config = createChart(charType, titleChart, subTitleChart, false).getConfiguration();
+        plotOptPie(config, true, true, LABEL_FORMATTER, 0);
+        fillChartDataPie(config, data, titleChart);
+        return SVGGenerator.getInstance().generate(config);
+    }
+    
     // Configuration config,List<Agremiado> data,String seriesName,boolean drillDownData
-    private String buildChart(ChartType charType, String titleChart, String subTitleChart, boolean exporting, List<Agremiado> data,
+    /*private String buildChart(ChartType charType, String titleChart, String subTitleChart, boolean exporting, List<Agremiado> data,
             String filterBy) {
         Configuration config = createChart(charType, titleChart, subTitleChart, exporting);
         plotOptPie(config, true, true, LABEL_FORMATTER, 0);
         fillChartDataPie(config, data, titleChart, false, filterBy);
         return SVGGenerator.getInstance().generate(config);
-    }
+    } */
 
-    private Configuration createChart(ChartType chartType, String titleChart, String subTitleChart, boolean exporting) {
-        chart = new Chart(chartType);
+    private Chart createChart(ChartType chartType, String titleChart, String subTitleChart, boolean exporting) {
+        Chart chart = new Chart(chartType);
+        chart.setWidth(1000, Unit.PIXELS);
+        chart.setHeight(472, Unit.PIXELS);
         Configuration config = chart.getConfiguration();
         config.setTitle(titleChart);
         config.setSubTitle(subTitleChart);
         chart.getConfiguration().setExporting(exporting);
-        return config;
+        return chart;
     }
 
     private void plotOptPie(Configuration config, boolean showInLegend, boolean dtLblEnable, String dtLblFormatter, float conectorPadding) {
@@ -676,7 +864,7 @@ public class webinarRealizadoChart<T> extends Panel {
         XAxis x = new XAxis();
         x.setType(axisTypeX);
         x.setCrosshair(new Crosshair());
-        x.setTitle("Webinars realizados");
+        x.setTitle("Mes");
         x.setCategories("Enero","Febero","Marzo","Abril","Mayo","junio","Julio",
                 "Agosto","Septiembre","Octubre","Nomviembre","Diciembre");
         Labels labels = new Labels();
@@ -685,17 +873,16 @@ public class webinarRealizadoChart<T> extends Panel {
         config.addxAxis(x);
 
         YAxis y = new YAxis();
-        y.setTitle("Agremiados");
+        y.setTitle("Webinars Realizados");
+        y.setAllowDecimals(false);
         config.addyAxis(y);
 
         PlotOptionsColumn column = new PlotOptionsColumn();
         column.setCursor(Cursor.POINTER);
+        column.setColorByPoint(true);
         column.setDataLabels(new DataLabels(dtLblEnable));
         config.setPlotOptions(column);
 
-        Tooltip tooltip = new Tooltip();
-        tooltip.setShared(true);
-        config.setTooltip(tooltip);
     }
 
     private DataProviderSeries<Agremiado> setDataSeriesColumn(String seriesName, boolean colorByPoint, List<Agremiado> data) {
@@ -709,69 +896,46 @@ public class webinarRealizadoChart<T> extends Panel {
     }
 
     // Configuration config, AxisType axisTypeX, String titleAxisX, String titleAxisY, boolean dtLblEnable
-    private Chart getAgremiadoChartColumn(List<WebinarRealizado> data, String subTitle) {
-        Configuration config = createChart(ChartType.COLUMN, "Webinars Realizados", subTitle, true);
+    private Chart getAgremiadoChartColumn(List<WebinarRealizado> data,String title, String subTitle,int filteredYear) {
+        Chart chart = createChart(ChartType.COLUMN, title, subTitle, true);
+        Configuration config = chart.getConfiguration();
         plotOptColumn(config, AxisType.CATEGORY, true);
-        config.getLegend().setEnabled(true);
-        fillChartColumn(data, config);
-        /*if(seriesName.compareTo("Género")==0){
-            fillChartColumn(data,config);
-        }else
-            fillChartColumn(data,config,seriesName); */
+        config.getLegend().setEnabled(false);
+        fillChartColumn(data, config,filteredYear);
         return chart;
     }
 
-    private void fillChartColumn(List<WebinarRealizado> data, Configuration config) {
+    private boolean yearIsPresent(List<WebinarRealizado> data,int year){
+        boolean currentYearWebs = false;
+        for (WebinarRealizado web : data) {
+            if (web.getFecha().getYear() == year) {
+                currentYearWebs = true;
+                break;
+            }
+        }
+        return currentYearWebs;
+    }
+    
+    private void fillChartColumn(List<WebinarRealizado> data, Configuration config,int filteredYear) {
         try {
-            int contH = 0, contM = 0;
-            mapInstitutions = new HashMap<>();
-            if (data.size() > 0) {
-                data.sort((WebinarRealizado w1, WebinarRealizado w2) -> {
-                    LocalDateTime date1 = w1.getFecha(), date2 = w2.getFecha();
-                    System.out.println("date 1: "+date1.getYear()+","+date1.getMonthValue());
-                    System.out.println("date 2: "+date2.getYear()+","+date2.getMonthValue());
-                    if( (date1.getYear()<date2.getYear()) && (date1.getMonthValue() < date2.getMonthValue())){
-                        System.out.println("lesser");
-                        return -1;
+            int[] values = new int[]{0,0,0,0,0,0,0,0,0,0,0,0};
+            if (!data.isEmpty()) {
+                if(yearIsPresent(data,filteredYear)){
+                    List<WebinarRealizado> copyData = new ArrayList<>(data);
+                    copyData.removeIf((WebinarRealizado webinar) -> {
+                        return webinar.getFecha().getYear() != filteredYear;
+                    });
+                    Iterator<WebinarRealizado> it = copyData.iterator();
+                    while (it.hasNext()) {
+                        WebinarRealizado web = it.next();
+                        values[web.getFecha().getMonthValue() - 1] += 1;
                     }
-                    if( (date1.getYear()>date2.getYear()) && (date1.getMonthValue() > date2.getMonthValue())){
-                        System.out.println("greater");
-                        return 1;
-                    }
-                    System.out.println("Equals");
-                    return 0; 
-                });
-                
-                data.forEach(w->{System.out.println(w.getFecha());});
-                
-                Iterator<WebinarRealizado> it = data.iterator();
-                Random rd = new Random();
-                int bound = 30;
-                
-                
-                
-                ListSeries serie = new ListSeries("Webinars Realizados", 
-                rd.nextInt(bound),rd.nextInt(bound),rd.nextInt(bound),rd.nextInt(bound),rd.nextInt(bound),
-                rd.nextInt(bound),rd.nextInt(bound),rd.nextInt(bound),rd.nextInt(bound),rd.nextInt(bound),
-                rd.nextInt(bound),rd.nextInt(bound));
-                config.addSeries(serie);
-                /*while (it.hasNext()) {
-                    WebinarRealizado webinar = it.next();
-                    if(a.getSexo() == 'H'){
-                        contH = contH + 1;
-                    }else{
-                        contM = contM + 1;
-                    }
-                } */
 
-                DataSeries series = new DataSeries();
-                series.setName("Género");
-                series.add(new DataSeriesItem("Hombres", contH));
-                series.add(new DataSeriesItem("Mujeres", contM));
-                PlotOptionsColumn plotOptionsColumn = new PlotOptionsColumn();
-                plotOptionsColumn.setColorByPoint(true);
-                series.setPlotOptions(plotOptionsColumn);
-                //config.addSeries(series);
+                    ListSeries serie = new ListSeries("Webinars Realizados",
+                            values[0], values[1], values[2], values[3], values[4], values[5],
+                            values[6], values[7], values[8], values[9], values[10], values[11]);
+                    config.addSeries(serie);
+                }
             }
         } catch (Exception ex) {
             Logger.getLogger(webinarRealizadoChart.class.getName()).log(Level.SEVERE, null, ex);
@@ -782,15 +946,13 @@ public class webinarRealizadoChart<T> extends Panel {
         try {
             int cont = 0;
             boolean filterByInstituto = (seriesName.compareTo("Instituciones") == 0);
-            System.out.println("filter " + filterByInstituto);
             mapInstitutions = new HashMap<>();
-            if (data.size() > 0) {
+            if (!data.isEmpty()) {
                 String tempValue = "";
                 Iterator<Agremiado> it = data.iterator();
                 while (it.hasNext()) {
                     Agremiado a = it.next();
                     String objValue = filterByInstituto ? a.getInstitucion() : a.getObjPais().getNombre();
-                    System.out.println(objValue);
                     if (tempValue.compareToIgnoreCase(objValue) != 0) {
                         if (cont != 0) {
                             mapInstitutions.replace(tempValue, cont);
@@ -825,21 +987,43 @@ public class webinarRealizadoChart<T> extends Panel {
     }
 
     private Chart getAgremiadoChartPie(List<Agremiado> data, String filterBy, String subTitle, boolean drillDown) {
-        Configuration config = createChart(ChartType.PIE, "Agremiados", subTitle, true);
+        Chart chart = createChart(ChartType.PIE, "Agremiados", subTitle, true);
+        Configuration config = chart.getConfiguration();
         plotOptPie(config, true, true, LABEL_FORMATTER, 0);
-        fillChartDataPie(config, data, "Agremiados", drillDown, filterBy);
+        //fillChartDataPie(config, data, "Agremiados", drillDown, filterBy);
         return chart;
     }
 
-    private void fillChartDataPie(Configuration config, List<Agremiado> data, String seriesName, boolean drillDownData, String filterBy) {
-        if (drillDownData == true) {
-            setDrillDownDataPie(config, seriesName, data);
-        } else {
-            setDataPie(config, seriesName, data, filterBy);
+    private void fillChartDataPie(Configuration config, List<WebinarRealizado> data, String seriesName) {
+        DataSeries series = new DataSeries();
+        series.setName(seriesName);
+        data.sort((WebinarRealizado w1,WebinarRealizado w2)->{
+            return w1.getInstitucion().compareToIgnoreCase(w2.getInstitucion());
+        });
+        if(!data.isEmpty()){
+            Iterator<WebinarRealizado> it = data.iterator();
+            String i = data.get(0).getInstitucion();
+            int cont = 0;
+            while (it.hasNext()) {
+                WebinarRealizado web = it.next();
+                if (i.compareToIgnoreCase(web.getInstitucion()) != 0) {
+                    series.add(new DataSeriesItem(i, cont));
+                    cont = 0;
+                    i = web.getInstitucion();
+                }
+                cont++;
+                if (!it.hasNext()) {
+                    series.add(new DataSeriesItem(i, cont));
+                }
+            }
         }
+        
+        config.addSeries(series);
+
     }
 
-    private void setDataPie(Configuration config, String seriesName, List<Agremiado> data, String filterBy) {
+
+    /*private void setDataPie(Configuration config, String seriesName, List<Agremiado> data, String filterBy) {
         DataSeries series = new DataSeries();
         series.setName(seriesName);
         switch (filterBy) {
@@ -853,7 +1037,7 @@ public class webinarRealizadoChart<T> extends Panel {
                 dataPieGenero(config, series, data);
                 break;
         }
-    }
+    }*/
 
     private void dataPiePaises(Configuration config, DataSeries series, List<Agremiado> data) {
         try {
@@ -998,18 +1182,19 @@ public class webinarRealizadoChart<T> extends Panel {
                 }
                 config.addSeries(series);
             }
-            setDrillDownCallBackPie(chart, totalGenero, instituciones);
-            setDrillUpListener(data);
+            //setDrillDownCallBackPie(chart, totalGenero, instituciones);
+            //setDrillUpListener(data);
         } catch (Exception ex) {
             Logger.getLogger(webinarRealizadoChart.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /*
     private void setDrillUpListener(List<Agremiado> data) {
         chart.addChartDrillupListener((ChartDrillupListener) event -> {
             setLayoutContentChart(getAgremiadoChartPie(data, "instituciones", "Agremiados registrados por institución", true));
         });
-    }
+    }*/
 
     private void setDrillDownCallBackPie(Chart chart, List<int[]> totalGenero, List<String> instituciones) {
         chart.setDrilldownCallback((DrilldownEvent event) -> {
@@ -1116,6 +1301,7 @@ public class webinarRealizadoChart<T> extends Panel {
         }
 
     }
+}
 
     /*   callback function
     private Function<Agremiado,Object> callback(){
@@ -1147,4 +1333,20 @@ public class webinarRealizadoChart<T> extends Panel {
 
                 }
                 config.addSeries(dataSeries); */
-}
+
+/*data.sort((WebinarRealizado w1, WebinarRealizado w2) -> {
+                    int y1 = w1.getFecha().getYear(), y2 = w2.getFecha().getYear(),
+                            m1=w1.getFecha().getMonthValue(),m2=w2.getFecha().getMonthValue();
+                    if(y1<y2)
+                        return -1;
+                    if(y1>y2)
+                        return 1;
+                    if(y1==y2){
+                        if(m1<m2)
+                            return -1;
+                        if(m1>m2){
+                            return 1;
+                        }
+                    }
+                    return 0;
+                });*/

@@ -53,7 +53,7 @@ public final class ListadoAsistentesPDF extends BasePDF {
             writer.setPageEvent(new FormatoPagina());
             document.open();
             ///////  ------Inicio del doc------ ////////////
-
+            /*
             Image logoHeader = Image.getInstance(Main.getBaseDir() + "/logoTiamex.png");
             logoHeader.setAlignment(Element.ALIGN_LEFT);
             logoHeader.scalePercent(35);
@@ -85,7 +85,7 @@ public final class ListadoAsistentesPDF extends BasePDF {
             document.add(linebreak);
             document.add(elementsPDF.getParagraph("ASISTENTES AL WEBINAR: " + webinar.getNombre().toUpperCase() + " " + webinar.getFecha().getYear(),
                     format.getFontSubtitleBold(), Element.ALIGN_CENTER));
-            document.add(new Chunk());
+            document.add(new Chunk()); */
 
             List<AsistenciaWebinar> listaAsistentes = ControladorAsistenciaWebinar.getInstance().getByWebinar(webinar.getId());
             int totalAsistentes = listaAsistentes.size();

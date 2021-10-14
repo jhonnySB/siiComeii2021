@@ -1,10 +1,51 @@
 @import "siiComeiiTheme.scss";
 @import "addons.scss";
-
 // This file prefixes all rules with the theme name to avoid causing conflicts with other themes.
 // The actual styles should be defined in aguaLimpiaTheme.scss
 
 .siiComeiiTheme{
-  @include addons;
-  @include siiComeiiTheme;
+    @include addons;
+    @include siiComeiiTheme;
+    .v-filterselect-item-websR {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 15px;
+        font-weight: bold;
+    }
+    .v-filterselect-item-noWebsR {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 15px;
+        color: rgba(25, 25, 25,0.4) !important;
+        cursor: default !important;
+        //override from inherited selected item
+        background-color: white !important;
+        background-image: none !important;
+        background-image: none !important;
+    }
+
+    .v-filterselect-searchbox:before {
+        font-family: FontAwesome;
+        content: "\f002";
+        left: 10px;
+        position: absolute;
+        top: 5px;
+        //line-height: 50px;
+    }
+
+    .v-filterselect-searchbox .v-filterselect-input{
+        padding-left: 30px;
+    }
+
+
+    .v-panel-caption-captionPanelNoPadding{
+        line-height: 35px;
+        font-size: 13px;
+    }
+    
+    .v-menubar-menuMonths{
+        //left: 405px !important;
+        //top: 300px !important;
+        @include valo-menubar-popup-style($primary-stylename: "v-menubar");
+        color: red;
+        
+    }
 }

@@ -1,17 +1,13 @@
 package com.tiamex.siicomeii.vista.administracion.Agremiado;
 
-import com.jarektoro.responsivelayout.ResponsiveColumn;
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
-import com.tiamex.siicomeii.controlador.ControladorProximoEvento;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
-import com.tiamex.siicomeii.persistencia.entidad.ProximoEvento;
 import com.tiamex.siicomeii.reportes.base.pdf.ListadoAgremiadosPDF;
 import com.tiamex.siicomeii.reportes.base.pdf.ListadoWebinarsPDF;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.reportes.agremiadosChart;
-import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.ShowPDFDlg;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
 import com.vaadin.data.HasValue;
@@ -23,20 +19,15 @@ import com.vaadin.server.SerializablePredicate;
 import com.vaadin.server.StreamResource;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.datefield.DateResolution;
-import com.vaadin.shared.ui.datefield.DateTimeResolution;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.DateField;
-import com.vaadin.ui.DateTimeField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -46,7 +37,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.text.DateFormatter;
 
 /**
  * @author fred *
@@ -196,15 +186,6 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
                 dataProvider.setFilter(filter(false));
                 btnClear.setEnabled(true);
             }
-            /*else {
-                if(fechaInicioF.getValue()!= null && fechaFinF.getValue() != null){
-                    //filterList = new ArrayList<>();
-                    //dataProvider.setFilter(filter());
-                    btnClear.setEnabled(true);
-                }else{
-                    dataProvider.clearFilters();
-                }
-            } */
 
         });
 
@@ -230,14 +211,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
             LocalDate fechaReg = agremiado.getFechaReg();
             if (rangeFilter) {
                 LocalDate fechaFin = fechaFinF.getValue();
-                /*
-                if (fechaInicio.compareTo(fechaReg) * fechaReg.compareTo(fechaFin) >= 0) {
-                    if (!filterList.contains(agremiado)) {
-                        filterList.add(agremiado);
-                    }
-                } */
                 predicate = fechaInicio.compareTo(fechaReg) * fechaReg.compareTo(fechaFin) >= 0;
-                //return fechaInicio.compareTo(newFecha) * newFecha.compareTo(fechaFin) >= 0;
             } else {
                 predicate = fechaInicio.compareTo(fechaReg) == 0;
             }

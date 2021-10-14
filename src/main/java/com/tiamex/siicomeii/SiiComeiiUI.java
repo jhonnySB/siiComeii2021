@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 @SpringUI
 @PreserveOnRefresh
 @Viewport("width=device-width, initial-scale=1")
-@StyleSheet({"https://fonts.googleapis.com/css?family=Montserrat&display=swap"})
+@StyleSheet({"https://fonts.googleapis.com/css2?family=Birthstone&family=Open+Sans:ital,wght@0,300;1,400&display=swap"})
 public class SiiComeiiUI extends UI {
 
     private FabricaVista fabricaVista;

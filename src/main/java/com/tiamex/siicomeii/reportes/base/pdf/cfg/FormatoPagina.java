@@ -119,11 +119,9 @@ public class FormatoPagina extends PdfPageEventHelper {
             fecha.setSpacingAfter(0);
             fecha.setSpacingBefore(0);
             //document.add(fecha);
-            
-            
             ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_RIGHT, new Phrase(fechaFormateada ,font), 
                     (document.right()-document.left()/2+document.leftMargin()),document.top()-10, 0);
-            document.add(new Paragraph(Chunk.NEWLINE));
+            document.add(new Paragraph(Chunk.NEWLINE)); document.add(new Paragraph(Chunk.NEWLINE));
             DottedLineSeparator separator = new DottedLineSeparator();
             separator.setPercentage(59500f / 523f);
             Chunk linebreak = new Chunk(separator);

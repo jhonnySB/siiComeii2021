@@ -37,40 +37,6 @@ public final class ListadoAgremiadosPDF extends BasePDF {
             //writer.setPageEvent(new Header());
             writer.setPageEvent(new FormatoPagina());
             document.open();
-            ///////  ------Inicio del doc------ ////////////
-            //ENCABEZADO
-            /*
-            Image logoHeader = Image.getInstance(Main.getBaseDir() + "/logoTiamex.png");
-            logoHeader.setAlignment(Element.ALIGN_LEFT);
-            logoHeader.scalePercent(35);
-            logoHeader.setSpacingAfter(0);
-            logoHeader.setSpacingBefore(0);
-            Locale varRegional = new Locale("es", "MX");
-            LocalDate fechaActual = LocalDate.now(ZoneId.of("America/Mexico_City"));
-            String fechaFormateada = fechaActual.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", varRegional));
-            Paragraph fecha = new Paragraph("Fecha de creación: "+fechaFormateada, new Font(Font.FontFamily.HELVETICA, 9));
-            fecha.setAlignment(Element.ALIGN_RIGHT);
-            fecha.setSpacingAfter(0);
-            fecha.setSpacingBefore(0);
-            PdfPTable tableHeader = new PdfPTable(2);
-            PdfPCell cell1 = new PdfPCell();
-            cell1.addElement(logoHeader);
-            cell1.setBorder(Rectangle.NO_BORDER);
-            tableHeader.addCell(cell1);
-            cell1 = new PdfPCell();
-            cell1.addElement(fecha);
-            cell1.setBorder(Rectangle.NO_BORDER);
-            tableHeader.addCell(cell1);
-            tableHeader.setWidthPercentage(100);
-            tableHeader.setSpacingAfter(5);
-            tableHeader.setSpacingBefore(0);
-            document.add(tableHeader);
-            DottedLineSeparator separator = new DottedLineSeparator();
-            separator.setPercentage(59500f / 523f);
-            Chunk linebreak = new Chunk(separator);
-            document.add(linebreak);        */
-            
-            // CONTENIDO
             
             document.add(elementsPDF.getParagraph("AGREMIADOS REGISTRADOS", format.getFontSubtitleBold(), Element.ALIGN_CENTER));
             document.add(new Chunk());
@@ -79,7 +45,7 @@ public final class ListadoAgremiadosPDF extends BasePDF {
             int totalAgremiados = ControladorAgremiado.getInstance().getAll().size();
 
             if (totalAgremiados > 0) {
-                PdfPTable table = null;
+                PdfPTable table;
                 PdfPCell cell;
                 String pais = "";
                 int cont = 0;
