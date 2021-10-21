@@ -79,9 +79,7 @@ public class MainPanel extends Panel {
         home.setSizeFull();
 
         try {
-            //contenidoPrincipal.addComponent(home);
-            //contenidoPrincipal.addComponent(new Inicio());
-            //contenidoPrincipal.addComponent(new ChartExportDemo());
+            setContenidoPrincipal(new Inicio());
         } catch (Exception ex) {
             Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -148,8 +146,8 @@ public class MainPanel extends Panel {
         
         MenuBar.MenuItem homeTab = menuPrincipal.addItem("Inicio", VaadinIcons.HOME, comando -> {
             try {
-                //setContenidoPrincipal(new Inicio());
-                setContenidoPrincipal(new ChartExportDemo());
+                setContenidoPrincipal(new Inicio());
+                //setContenidoPrincipal(new ChartExportDemo());
             } catch (Exception ex) {
                 Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -175,6 +173,7 @@ public class MainPanel extends Panel {
             try {
                 setContenidoPrincipal(ui.getFabricaVista().getUsuarioDlg());
             } catch (Exception ex) {
+                ex.printStackTrace();
                 Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
 

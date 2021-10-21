@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.Table;
@@ -55,11 +56,12 @@ public class ProximoWebinar implements Serializable{
     public LocalDateTime getFecha(){return fecha;}
     public void setFecha(LocalDateTime valor){fecha = valor;}
     
-    @Basic(optional=false)
-    @Column(name="imagen",nullable=false,columnDefinition = "LONGTEXT")
-    private String imagen;
-    public String getImagen(){return imagen;}
-    public void setImagen(String valor){imagen = valor;}
+    @Lob
+    @Basic(optional=false,fetch = FetchType.EAGER)
+    @Column(name="imagen",nullable=true)
+    private byte[] imagen;
+    public byte[] getImagen(){return imagen;}
+    public void setImagen(byte[] valor){imagen = valor;}
     
     @Basic(optional=false)
     @Column(name="usuario",nullable=false)

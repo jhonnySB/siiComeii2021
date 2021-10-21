@@ -13,7 +13,11 @@ import com.tiamex.siicomeii.vista.utils.UploadReceiverImg;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.Result;
+import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.DateTimeField;
@@ -21,6 +25,9 @@ import com.vaadin.ui.Image;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
+import com.vaadin.ui.themes.ValoTheme;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,10 +43,9 @@ import java.util.regex.Pattern;
 /**
  * @author fred *
  */
-public final class ProximoWebinarModalWin extends TemplateModalWin implements Upload.Receiver {
+public final class ProximoWebinarModalWin extends TemplateModalWin {
 
     private DateTimeField fecha;
-    private TextField imagen;
     private TextField institucion;
     private TextField ponente;
     private TextField titulo;
@@ -47,7 +53,10 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
     private long idProxWeb = 0;
     private ResponsiveRow row1;
     private WebinarRealizado webR;
-
+    Image image; Upload uploader;
+    UploadReceiverImg receiver;
+    long fileLength;
+    private final ThemeResource picture = new ThemeResource("images/picture.png");
     public ProximoWebinarModalWin() {
         init();
     }
@@ -58,10 +67,9 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
         loadData(id);
     }
 
-    private void init() {
+    private void init( ) {
         ResponsiveLayout contenido = new ResponsiveLayout();
         Element.cfgLayoutComponent(contenido);
-        //fecha = new DateTimeField();
         fecha = new DateTimeField("") {
             @Override
             protected Result<LocalDateTime> handleUnparsableDateString(
@@ -82,13 +90,8 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
         fecha.setPlaceholder("Seleccionar");
         fecha.setShowISOWeekNumbers(true);
         fecha.setZoneId(ZoneId.of("America/Mexico_City"));
-        fecha.setLocale(new Locale("es", "MX"));
+        fecha.setLocale(Locale.forLanguageTag("es-MX"));
         Element.cfgComponent(fecha, "Fecha y Hora");
-
-        imagen = new TextField();
-        Element.cfgComponent(imagen, "Imagen");
-        imagen.setPlaceholder("Ingrese URL de la imagen");
-        imagen.setRequiredIndicatorVisible(true);
 
         institucion = new TextField();
         Element.cfgComponent(institucion, "Institución");
@@ -104,39 +107,52 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
         Element.cfgComponent(titulo, "Título");
         titulo.setPlaceholder("Ingrese título");
         titulo.setRequiredIndicatorVisible(true);
-
+        titulo.setWidth("97%");
+        
         usuario = new TextField();
         Element.cfgComponent(usuario, "Usuario");
         usuario.setValue(ui.getUsuario().getNombre());
         //usuario.setEnabled(false);
         usuario.setReadOnly(true);
 
-        Image image = new Image("Imagen cargada: ");
-        image.setResponsive(true);
-        image.setSizeFull();
-        UploadReceiverImg receiver = new UploadReceiverImg(image);
-        Upload uploader = new Upload("", receiver);
+        image = new Image("Imagen seleccionada: "); image.setIcon(VaadinIcons.PICTURE);
+        image.setResponsive(true); image.setEnabled(true);
+        image.setWidth(50, Unit.PERCENTAGE);image.setHeight(50, Unit.PERCENTAGE);
+        uploader = new Upload();
+        receiver = new UploadReceiverImg(image);
         uploader.setResponsive(true);
+        uploader.setButtonStyleName("v-button v-button-friendly");
+        uploader.setReceiver(receiver);
         uploader.setCaptionAsHtml(true);
-        uploader.setCaption("Imagen <span style=\"color:red\">*</span>");
+        uploader.setCaption("<b>Imagen</b>");
         uploader.setAcceptMimeTypes("image/*");
-        uploader.setImmediateMode(false);
+        uploader.setImmediateMode(true);
         uploader.setButtonCaption("Cargar imagen");
         uploader.addFailedListener(receiver);
         uploader.addFinishedListener(receiver);
         uploader.addSucceededListener(receiver);
-
+        uploader.addProgressListener(receiver);
+        uploader.addListener((Listener) listener -> {
+            long size = ((Upload) listener.getComponent()).getUploadSize();
+            if (size > 26214400) {
+                Notification.show("Error", "Solo se permiten archivos JPEG y PNG", Notification.Type.ERROR_MESSAGE);
+                uploader.interruptUpload();
+            }
+        });
+        image.setSource(picture);
+        
         row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         eventCheckBox();
-        titulo.setWidth("97%");
-        row1.addColumn().withDisplayRules(8, 8, 8, 8).withComponent(titulo);
-        row1.addColumn().withDisplayRules(4, 4, 4, 4).withComponent(fecha);
-        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
-        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(ponente);
+
+        ResponsiveRow row2 = contenido.addRow().withAlignment(Alignment.TOP_LEFT);
+        row2.addColumn().withDisplayRules(8, 8, 8, 8).withComponent(titulo);
+        row2.addColumn().withDisplayRules(4, 4, 4, 4).withComponent(fecha);
+        row2.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
+        row2.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(ponente);
         //row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(usuario);
         //row1.addColumn().withDisplayRules(6, 6, 6, 6).withComponent(imagen);
-        row1.addColumn().withDisplayRules(6, 6, 6, 6).withComponent(uploader);
-        row1.addColumn().withDisplayRules(6, 6, 6, 6).withComponent(image);
+        row2.addColumn().withDisplayRules(6, 6, 6, 6).withComponent(uploader);
+        row2.addColumn().withDisplayRules(6, 6, 6, 6).withComponent(image);
 
         contentLayout.addComponent(contenido);
         setCaptionAsHtml(true);
@@ -150,7 +166,7 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
                 webR = (WebinarRealizado) ControladorWebinarRealizado.getInstance().getByNames(dTitulo);
 
                 if (webR != null) { // webinar archivado
-                    accept.setVisible(false);
+                    
                     editBox.setResponsive(true);
                     editBox.setCaption("Editar y actualizar");
                     editBox.setValue(false);
@@ -158,16 +174,10 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
                     editBox.setDescription("Marca esta casilla para poder editar los datos");
                     //editBox.setIcon(VaadinIcons.EDIT); 
                     editBox.addValueChangeListener((HasValue.ValueChangeEvent<Boolean> event) -> {
-                        checkBoxValueChanged();
+                        checkBoxValueChanged(event.getValue());
                     });
                     row1.addColumn().withComponent(editBox);
-
-                    fecha.setReadOnly(true);
-                    imagen.setReadOnly(true);
-                    institucion.setReadOnly(true);
-                    ponente.setReadOnly(true);
-                    titulo.setReadOnly(true);
-
+                    checkBoxValueChanged(false);
                     setCaption("Proximo webinar (Archivado)");
                 } else {
                     setCaption("Proximo webinar");
@@ -182,21 +192,21 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
         }
     }
 
-    public void checkBoxValueChanged() {
-        if (editBox.getValue() == true) {
+    public void checkBoxValueChanged(boolean value) {
+        if (value) {
             fecha.setReadOnly(false);
-            imagen.setReadOnly(false);
             institucion.setReadOnly(false);
             ponente.setReadOnly(false);
             titulo.setReadOnly(false);
+            uploader.setEnabled(true);
             accept.setVisible(true);
         } else {
             fecha.setReadOnly(true);
-            imagen.setReadOnly(true);
             institucion.setReadOnly(true);
             ponente.setReadOnly(true);
             titulo.setReadOnly(true);
             accept.setVisible(false);
+            uploader.setEnabled(false);
         }
     }
 
@@ -204,11 +214,14 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
     protected void loadData(long id) {
         try {
             ProximoWebinar obj = ControladorProximoWebinar.getInstance().getById(id);
+            String title = obj.getTitulo();
             this.id = obj.getId();
-            imagen.setValue(obj.getImagen());
+            uploader.setButtonCaption("Cargar otra imagen");
+            if(obj.getImagen()!=null)
+                image.setSource(new StreamResource(() -> new ByteArrayInputStream(obj.getImagen()),"image_"+title));
             institucion.setValue(obj.getInstitucion());
             ponente.setValue(obj.getPonente());
-            titulo.setValue(obj.getTitulo());
+            titulo.setValue(title);
             fecha.setValue(obj.getFecha());
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
@@ -217,29 +230,29 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
 
     @Override
     protected void buttonAcceptEvent() {
-        try {
-            if (validarCampos()) {
+        try { 
+            if (validarCampos()) { 
                 ProximoWebinar obj = new ProximoWebinar();
                 obj.setId(id);
                 obj.setFecha(fecha.getValue());
-                obj.setImagen(imagen.getValue());
+                if(receiver.newFileReceived())
+                    obj.setImagen(receiver.getContentByte());
                 obj.setInstitucion(institucion.getValue());
                 obj.setPonente(ponente.getValue());
                 obj.setTitulo(titulo.getValue());
                 obj.setUsuario(ui.getUsuario().getId());
-                boolean banSave = true;
+                //boolean banSave = true;
                 if (regexName()) {
                     Element.makeNotification("Solo se permiten letras para el nombre del ponente", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
                 } else {
                     ProximoWebinar proxWebinar = (ProximoWebinar) ControladorProximoWebinar.getInstance().getByTitulos(titulo.getValue());
                     if (id == 0) { // nuevo registro (botón agregar)
-                        banSave = false;
-                        if (proxWebinar != null) { // nuevo registro con entrada de correo duplicada
+                        //banSave = false;
+                        if (proxWebinar != null) { // nuevo registro con entrada duplicada
                             Element.makeNotification("Ya existe un registro con el mismo título: '" + proxWebinar.getTitulo() + "'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
-                        } else { // nuevo registro con nuevo correo
+                        } else { // nuevo registro
                             obj = ControladorProximoWebinar.getInstance().save(obj);
                             if (obj != null) {
-
                                 Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                 ui.getFabricaVista().getProximoWebinarDlg().eventMostrar();
                                 close();
@@ -253,10 +266,10 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
                         if (proxWebinar != null) { // 
 
                             if (compareWebinars(proxWebinar)) { // el mismo registro
-                                banSave = false;
+                                //banSave = false;
                                 close();
                             } else if (proxWebinar.getId() != id) {
-                                banSave = false;
+                                //banSave = false;
                                 Element.makeNotification("Ya existe un webinar con el mismo título", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
                             } else {
                                 obj = ControladorProximoWebinar.getInstance().save(obj);
@@ -266,7 +279,7 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
                                     //eventCheckBox();
                                     close();
                                 } else {
-                                    banSave = false;
+                                    //banSave = false;
                                     Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                 }
                             }
@@ -279,13 +292,13 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
                                 //eventCheckBox();
                                 close();
                             } else {
-                                banSave = false;
+                                //banSave = false;
                                 Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                             }
 
                         }
 
-                        if (banSave == true) {
+                        if (editBox.getValue()) {
                             WebinarRealizado objWebR = new WebinarRealizado();
                             objWebR.setId(webR.getId());
                             objWebR.setFecha(fecha.getValue());
@@ -309,13 +322,14 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
-    protected boolean compareWebinars(ProximoWebinar webinar) {
+    protected boolean compareWebinars(ProximoWebinar webinar) { //webinar.getImagen().compareTo(imagen.getValue()) == 0
         return (webinar.getFecha().compareTo(fecha.getValue()) == 0 && webinar.getId() == id
-                && webinar.getImagen().compareTo(imagen.getValue()) == 0 && webinar.getInstitucion().compareTo(institucion.getValue()) == 0
-                && webinar.getPonente().compareTo(ponente.getValue()) == 0);
+                && webinar.getInstitucion().compareTo(institucion.getValue()) == 0 
+                && webinar.getPonente().compareTo(ponente.getValue()) == 0 && !receiver.newFileReceived());
     }
 
     protected boolean regexName() {
@@ -335,7 +349,7 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
         Binder<ProximoWebinar> binder = new Binder<>();
 
         binder.forField(fecha).asRequired("Campo requerido").bind(ProximoWebinar::getFecha, ProximoWebinar::setFecha);
-        binder.forField(imagen).asRequired("Campo requerido").bind(ProximoWebinar::getImagen, ProximoWebinar::setImagen);
+        //binder.forField(imagen).asRequired("Campo requerido").bind(ProximoWebinar::getImagen, ProximoWebinar::setImagen);
         binder.forField(institucion).asRequired("Campo requerido").bind(ProximoWebinar::getInstitucion, ProximoWebinar::setInstitucion);
         binder.forField(ponente).asRequired("Campo requerido").bind(ProximoWebinar::getPonente, ProximoWebinar::setPonente);
         binder.forField(titulo).asRequired("Campo requerido").bind(ProximoWebinar::getTitulo, ProximoWebinar::setTitulo);
@@ -344,8 +358,4 @@ public final class ProximoWebinarModalWin extends TemplateModalWin implements Up
         return binder.validate().isOk();
     }
 
-    @Override
-    public OutputStream receiveUpload(String filename, String mimeType) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }

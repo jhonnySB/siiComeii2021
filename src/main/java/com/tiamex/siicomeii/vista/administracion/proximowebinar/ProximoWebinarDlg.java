@@ -9,64 +9,110 @@ import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.vaadin.hene.popupbutton.PopupButton;
 
-/** @author fred **/
-public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
+/**
+ * @author fred *
+ */
+public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
 
-    Label lblFecha ;
+    Label lblFecha;
     Label lblTime;
-    Label lblEstado ;
+    Label lblEstado;
     ProximoWebinar proxWeb;
-    
-    public ProximoWebinarDlg() throws Exception{
+
+    public ProximoWebinarDlg() throws Exception {
         init();
     }
 
-    private void init(){
+    private void init() {
         banBoton = 4;
-        
+        //grid.setBodyRowHeight(150);
         grid.addColumn(ProximoWebinar::getTitulo).setCaption("Titulo").setHidable(false).setMaximumWidth(200);
         grid.addComponentColumn(this::buildFechaForm).setCaption("Fecha").setMinimumWidth(600).setHidable(true).setHidingToggleCaption("Mostrar Fecha").setResizable(true);
         grid.addColumn(ProximoWebinar::getPonente).setCaption("Ponente").setHidable(true).setHidingToggleCaption("Mostrar Ponente");
         grid.addColumn(ProximoWebinar::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución");
-        grid.addColumn(ProximoWebinar::getImagen).setCaption("Imagen").setHidable(true).setHidden(true).setHidingToggleCaption("Mostrar Imagen");
-        
+        //grid.addColumn(ProximoWebinar::getImagen).setCaption("Imagen").setHidable(true).setHidden(true).setHidingToggleCaption("Mostrar Imagen");
+        grid.addComponentColumn((ProximoWebinar web) -> {
+            if (web.getImagen() != null) {
+                return createPopupImageBtn(web.getImagen(), web.getTitulo());
+            }
+            return new Label("Sin imagen");
+        }).setCaption("Imagen").setHidable(true).setHidden(false).setHidingToggleCaption("Mostrar imagen");
         setCaption("<b>Próximos webinars</b>");
         eventMostrar();
     }
-    
+
+    private PopupButton createPopupImageBtn(byte[] bytes, String title) {
+        PopupButton popBtn = new PopupButton();
+        VerticalLayout vL = new VerticalLayout();
+        vL.setResponsive(true);
+        vL.addStyleName(ValoTheme.ACCORDION_BORDERLESS);
+        vL.setSpacing(false); vL.setMargin(false);
+        popBtn.setCaption("Ver imagen");
+        popBtn.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
+        popBtn.setDirection(Alignment.BOTTOM_CENTER);
+        Image img = new Image();
+        img.setSource(new StreamResource(() -> new ByteArrayInputStream(bytes), "image_proxWebinar_" + title));
+        img.setWidth(200, Unit.PIXELS);
+        img.setHeight(200, Unit.PIXELS);
+        img.setResponsive(true);
+        img.setAlternateText("No se pudo cargar la imagen");
+        Button closeBtn = new Button();
+        closeBtn.setIcon(VaadinIcons.CLOSE_SMALL);
+        closeBtn.addStyleName(ValoTheme.BUTTON_TINY);
+        closeBtn.addStyleName(ValoTheme.BUTTON_DANGER);
+        closeBtn.addClickListener((ClickListener) listener->{popBtn.setPopupVisible(false);});
+        vL.addComponent(closeBtn);
+        vL.addComponent(img);
+        popBtn.setContent(vL);
+        return popBtn;
+    }
+
     private ResponsiveLayout buildFechaForm(ProximoWebinar webinar) {
         ResponsiveLayout layout = new ResponsiveLayout();
         ResponsiveRow row = layout.addRow().withAlignment(Alignment.MIDDLE_LEFT);
         Element.cfgLayoutComponent(row, true, false);
-        
+
         proxWeb = webinar;
 
         //
         buildDatesLabels();
         //
-        
+
         row.addColumn().withComponent(lblFecha);
         row.addColumn().withComponent(lblTime);
         row.addColumn().withComponent(lblEstado);
-        
+
         return layout;
     }
-    
-    public void buildDatesLabels(){
-        
+
+    public void buildDatesLabels() {
+
         boolean antiguo = false;
-        
-        lblFecha = new Label(); lblTime = new Label(); lblEstado=new Label();
-        
+
+        lblFecha = new Label();
+        lblTime = new Label();
+        lblEstado = new Label();
+
         lblFecha.setValue(proxWeb.getFechaFrm());
         lblFecha.setResponsive(true);
         lblFecha.setWidthFull();
@@ -76,7 +122,7 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
         lblFecha.setContentMode(ContentMode.HTML);
         lblTime.setContentMode(ContentMode.HTML);
         lblEstado.setContentMode(ContentMode.HTML);
-        
+
         long diasTotales = ChronoUnit.DAYS.between(LocalDate.now(), proxWeb.getFecha().toLocalDate()); //System.out.println("diasTotales: "+diasTotales);
         int signedDias = Long.signum(diasTotales); //System.out.println("signedDias: "+signedDias);
         int unsignedDias = (int) Math.abs(diasTotales); //System.out.println("unsignedDias: "+unsignedDias);
@@ -232,51 +278,50 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
             upWebinar.setDescription("El webinar está próximo o en progreso...");
         }
     }
-    
-    
+
     @Override
-    protected void eventMostrar() { 
+    protected void eventMostrar() {
         grid.setItems(ControladorProximoWebinar.getInstance().getAll());
     }
 
     @Override
-    protected void buttonSearchEvent(){
-        try{
-            if(!searchField.isEmpty()){
+    protected void buttonSearchEvent() {
+        try {
+            if (!searchField.isEmpty()) {
                 resBusqueda.setHeight("35px");
                 String strBusqueda = searchField.getValue();
                 Collection<ProximoWebinar> webinars = ControladorProximoWebinar.getInstance().getByTitulo(strBusqueda);
                 int proxWebinar = webinars.size();
-                if(proxWebinar>1){
-                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron "+Integer.toString(proxWebinar)+" coincidencias para la búsqueda '"+strBusqueda+"'"+" </span></b>");
-                }else if(proxWebinar==1){
-                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró "+Integer.toString(proxWebinar)+" coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>");
-                }else{
-                     resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>"); 
+                if (proxWebinar > 1) {
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron " + Integer.toString(proxWebinar) + " coincidencias para la búsqueda '" + strBusqueda + "'" + " </span></b>");
+                } else if (proxWebinar == 1) {
+                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró " + Integer.toString(proxWebinar) + " coincidencia para la búsqueda '" + strBusqueda + "'" + " </span></b>");
+                } else {
+                    resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '" + strBusqueda + "'" + " </span></b>");
                 }
                 grid.setItems(webinars);
-            }else{
+            } else {
                 resBusqueda.setValue(null);
                 resBusqueda.setHeight("10px");
                 grid.setItems(ControladorProximoWebinar.getInstance().getAll());
             }
-            
-        }catch (Exception ex){
+
+        } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     @Override
     protected void eventDeleteButtonGrid(ProximoWebinar obj) {
         try {
             ui.addWindow(new ProximoWebinarModalDelete(obj.getId()));
         } catch (Exception ex) {
             Logger.getLogger(ProximoWebinarDlg.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
     }
 
     @Override
-    protected void buttonAddEvent(){
+    protected void buttonAddEvent() {
         ui.addWindow(new ProximoWebinarModalWin());
     }
 
@@ -290,7 +335,7 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar>{
     }
 
     @Override
-    protected void eventAsistenciaButton(ProximoWebinar obj,String idBtn) {
+    protected void eventAsistenciaButton(ProximoWebinar obj, String idBtn) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

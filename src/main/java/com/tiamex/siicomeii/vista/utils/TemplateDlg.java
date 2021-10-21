@@ -129,7 +129,6 @@ public abstract class TemplateDlg<T> extends Panel {
         grid.addSelectionListener((SelectionEvent<T> event) -> {
             gridEvent();
         });
-        grid.setSelectionMode(SelectionMode.SINGLE);
         grid.setColumnReorderingAllowed(true);
         grid.addComponentColumn(this::buildEditButton).setId("botones").setCaption("Acción");
 
@@ -156,14 +155,14 @@ public abstract class TemplateDlg<T> extends Panel {
         Element.cfgLayoutComponent(row, true, false);
 
         Button button = new Button(VaadinIcons.EDIT);
-        button.addStyleName(ValoTheme.BUTTON_LINK);
+        button.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
         button.setDescription("Editar");
         button.addClickListener(e -> {
             eventEditButtonGrid(obj);
         });
 
         delete = new Button(VaadinIcons.TRASH);
-        delete.addStyleName(ValoTheme.BUTTON_LINK);
+        delete.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_DANGER);
         delete.setDescription("Eliminar");
         delete.addClickListener(e -> {
             eventDeleteButtonGrid(obj);
@@ -177,10 +176,10 @@ public abstract class TemplateDlg<T> extends Panel {
                 grid.getColumn("botones").setMinimumWidth(180).setMaximumWidth(180).
                         setEditable(false).clearExpandRatio();
                 buttonListado = new Button(VaadinIcons.FILE_TEXT_O);
-                buttonListado.addStyleName(ValoTheme.BUTTON_LINK);
+                buttonListado.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
                 buttonListado.addClickListener(e -> eventListaAsistentes(obj));
                 buttonWebinar = new Button(VaadinIcons.ENVELOPE);
-                buttonWebinar.addStyleName(ValoTheme.BUTTON_LINK);
+                buttonWebinar.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
                 buttonWebinar.addClickListener(e -> eventAsistenciaButton(obj, e.getButton().getId()));
                 if (updateButtonCorreo()) {
                     buttonWebinar.setDescription("Enviar constancias a Agremiados por correo");
@@ -208,7 +207,7 @@ public abstract class TemplateDlg<T> extends Panel {
                 grid.getColumn("botones").setMinimumWidth(240).setMaximumWidth(240).
                         setEditable(false).clearExpandRatio();
                 buttonConstancias = new Button(VaadinIcons.LIST);
-                buttonConstancias.addStyleName(ValoTheme.BUTTON_LINK);
+                buttonConstancias.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
                 row.addColumn().withComponent(buttonConstancias);
                 buttonConstancias.addClickListener(e -> eventWebinarsAgremiado(obj));
                 break;
@@ -216,7 +215,7 @@ public abstract class TemplateDlg<T> extends Panel {
                 grid.getColumn("botones").setMinimumWidth(310).setMaximumWidth(310).
                         setEditable(false).clearExpandRatio().setCaption("Acción");
                 tutorialsesion = new Button(VaadinIcons.ACADEMY_CAP);
-                tutorialsesion.addStyleName(ValoTheme.BUTTON_LINK);
+                tutorialsesion.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
                 tutorialsesion.addClickListener(e -> eventTutorialSesiones(obj));
                 tutorialsesion.setEnabled(true);
                 tutorialsesion.setDescription("Ingresar sesiones");
@@ -227,7 +226,7 @@ public abstract class TemplateDlg<T> extends Panel {
                 grid.getColumn("botones").setMinimumWidth(240).setMaximumWidth(240).
                         setEditable(false).clearExpandRatio().setCaption("Acción");
                 upWebinar = new Button(VaadinIcons.ARCHIVE);
-                upWebinar.addStyleName(ValoTheme.BUTTON_LINK);
+                upWebinar.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
                 upWebinar.addClickListener(e -> this.eventWebinarRealizado(obj));
                 upWebinar.setEnabled(true);
                 upWebinar.setDescription("Agregar a webinars realizados");

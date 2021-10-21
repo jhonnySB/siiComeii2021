@@ -33,7 +33,7 @@
 //$v-selection-overlay-padding-vertical: 3px;
 //$v-panel-border: 1px solid v-shade;
 
-$v-app-loading-text: "SISTEMA SIICOMEII CARGANDO...";
+$v-app-loading-text: "Cargando componentes...";
 $v-background-color: #fafafa;
 $v-app-background-color: #e7ebf2;
 $v-panel-background-color: #fff;
@@ -76,4 +76,8 @@ $v-selection-item-border-radius: 0;
         border-color: #414141;
     } */
     // Insert your own theme rules here
+    .v-loading-indicator, .v-loading-indicator-delay, .v-loading-indicator-wait{
+        height: 7px;
+        background-color: #15f107;
+    }
 }

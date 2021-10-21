@@ -46,6 +46,29 @@
         //top: 300px !important;
         @include valo-menubar-popup-style($primary-stylename: "v-menubar");
         color: red;
-        
+    }
+    
+    .rl-row-custom-row{
+        padding: 10px 10px 0px;
+    }
+    
+    .rl-row-custom-row2{
+        padding: 0px 10px 10px;
+    }
+    
+    .v-label-label-error-info{
+        color:red;
+        padding: 0px !important;
+        margin: 0px !important;
+    }
+    
+    .topbar{
+        margin-left: 0px ; 
+        margin-top: 0px ; 
+        z-index: 20000 ; 
+        position: absolute ; 
+        overflow: visible ; 
+        visibility: visible ;
+        top: 0px !important;
     }
 }

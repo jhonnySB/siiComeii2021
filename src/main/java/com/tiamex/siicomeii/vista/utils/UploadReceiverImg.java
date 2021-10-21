@@ -5,6 +5,7 @@
  */
 package com.tiamex.siicomeii.vista.utils;
 
+import com.vaadin.server.ClientConnector.AttachListener;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
@@ -15,6 +16,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FailedListener;
 import com.vaadin.ui.Upload.FinishedListener;
+import com.vaadin.ui.Upload.ProgressListener;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Upload.StartedListener;
 import com.vaadin.ui.Upload.SucceededListener;
@@ -37,75 +39,72 @@ import javax.imageio.stream.ImageInputStream;
  *
  * @author jhon
  */
-public class UploadReceiverImg implements Receiver, SucceededListener,FailedListener,FinishedListener,StartedListener,StreamSource {
+public class UploadReceiverImg implements Receiver, SucceededListener, FailedListener, FinishedListener, StartedListener, StreamSource,
+        ProgressListener{
+
     public File file;
     ByteArrayOutputStream bos;
     Image imagen;
-    public final List<String> MIMES_ALLOWED = Arrays.asList("text/plain","text/csv","application/csv",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/vnd.ms-excel",
-            "application/vnd.ms-excel.sheet.macroEnabled.12");
+    boolean error = false,newFileReceived = false;
+    public final List<String> MIMES_ALLOWED = Arrays.asList("image/jpeg","image/png","image/gif");
 
-    
-    public UploadReceiverImg(Image imagen){
+    public UploadReceiverImg(Image imagen) {
         this.imagen = imagen;
     }
     
+    public UploadReceiverImg( ) {
+    }
+
     @Override
     public OutputStream receiveUpload(String filename, String mimeType) {
+        this.newFileReceived =true;
         bos = new ByteArrayOutputStream(10240);
         return bos;
     }
 
     @Override
-    public void uploadSucceeded(Upload.SucceededEvent event) {   
-        
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        BufferedImage image;
-        try {
-            OutputStream outputStream;
-            FileOutputStream fos = new FileOutputStream(event.getFilename());
-            outputStream = fos;
-            //image = ImageIO.read(bis);
-            //ImageIO.write(image, "png", bos);
-            StreamResource resource = new StreamResource(this, "test.png");
-            imagen.setSource(resource);
-        } catch (IOException ex) {
-            Logger.getLogger(UploadReceiverImg.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        
-        //Return a stream from the buffer
-        //ByteArrayInputStream(imagebuffer.toByteArray());
-        
-        //FileResource resource = new FileResource(img);
-        //imagen.setSource(resource);
+    public void uploadSucceeded(Upload.SucceededEvent event) {
+        //image = ImageIO.read(bis);
+        //ImageIO.write(image, "png", bos);
+        String fullFileName = event.getFilename();
+        StreamResource resource = new StreamResource(this,fullFileName);
+        event.getUpload().setButtonCaption("Cargar otra imagen");
+        imagen.setCaption("Imagen seleccionada: "+fullFileName);
+        imagen.setEnabled(true);
+        imagen.setSource(resource);
     }
-
+    
+    public boolean newFileReceived(){
+        return newFileReceived;
+    }
+    
+    public byte[] getContentByte(){
+        return bos.toByteArray();
+    }
+    
+    
     @Override
-    public void uploadFailed(Upload.FailedEvent event) {
-        
+    public void uploadFailed(Upload.FailedEvent event){
     }
 
     @Override
     public void uploadFinished(Upload.FinishedEvent event) {
-        
+
     }
 
     @Override
     public void uploadStarted(Upload.StartedEvent event) {
-        System.out.println("MIME: "+event.getMIMEType().trim());
-        String mimeType = event.getMIMEType();
-        if(!MIMES_ALLOWED.contains(mimeType)){
-            event.getUpload().interruptUpload();
-            Notification.show("ERROR", "Archivo no soportado", Notification.Type.ERROR_MESSAGE);
-        }
-        
+
     }
 
     @Override
     public InputStream getStream() {
         return new ByteArrayInputStream(bos.toByteArray());
-        
     }
-    
+
+    @Override
+    public void updateProgress(long readBytes, long contentLength) {
+       
+    }
+
 }

@@ -9,6 +9,7 @@ import com.tiamex.siicomeii.vista.administracion.tutorialSesion.TutorialSesionDl
 import com.tiamex.siicomeii.vista.administracion.usuario.UsuarioDlg;
 import com.tiamex.siicomeii.vista.administracion.usuarioGrupo.UsuarioGrupoDlg;
 import com.tiamex.siicomeii.vista.administracion.proximowebinar.ProximoWebinarDlg;
+import com.tiamex.siicomeii.vista.administracion.proximowebinar.ProximoWebinarModalWin;
 import com.tiamex.siicomeii.vista.administracion.tutorial.TutorialDlg;
 import com.tiamex.siicomeii.vista.reportes.agremiadosChart;
 import java.io.IOException;

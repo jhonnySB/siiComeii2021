@@ -449,8 +449,8 @@ public class webinarRealizadoChart<T> extends Panel {
 
         createMenuDownload();
         ResponsiveRow rr = downloadLayout.addRow(); rr.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
-        rr.addColumn().withComponent(comboYearSel).withDisplayRules(12, 12, 7, 7);
-        rr.addColumn().withComponent(btnFullReport).withDisplayRules(12, 12, 5, 5);
+        rr.addColumn().withComponent(btnFullReport).withDisplayRules(12, 12, 7, 7);
+        rr.addColumn().withComponent(comboYearSel).withDisplayRules(12, 12, 5, 5);
         
 
         Panel infoPanel = new Panel(); infoPanel.addStyleName("captionPanelNoPadding");

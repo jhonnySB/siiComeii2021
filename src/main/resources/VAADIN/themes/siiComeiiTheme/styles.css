@@ -1639,7 +1639,7 @@ div.v-layout.v-horizontal.v-widget {
 	text-align: center;
 	left: 0;
 	right: 0;
-	content: "Facebook Valo";
+	content: "Cargando componentes...";
 }
 
 .siiComeiiTheme .v-loading-indicator {
@@ -15407,13 +15407,9 @@ div.v-layout.v-horizontal.v-widget {
 	overflow: hidden;
 }
 
-.siiComeiiTheme .v-grid-row-selected > .v-grid-cell, .siiComeiiTheme .v-overlay-container .v-grid-row-selected > .v-grid-cell {
-	background-color: #A4A4A4;
-	background-image: -webkit-linear-gradient(top, #A4A4A4 2%, #A4A4A4 98%);
-	background-image: linear, to bottom, #A4A4A4 2%, #A4A4A4 98%;
-	color: #fff;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
-	border-color: #414141;
+.siiComeiiTheme .v-loading-indicator, .siiComeiiTheme .v-loading-indicator-delay, .siiComeiiTheme .v-loading-indicator-wait {
+	height: 7px;
+	background-color: #15f107;
 }
 
 .siiComeiiTheme .v-filterselect-item-websR {
@@ -15555,4 +15551,28 @@ div.v-layout.v-horizontal.v-widget {
 
 .siiComeiiTheme .v-menubar-menuMonths [class*="disabled"] {
 	cursor: default;
+}
+
+.siiComeiiTheme .rl-row-custom-row {
+	padding: 10px 10px 0px;
+}
+
+.siiComeiiTheme .rl-row-custom-row2 {
+	padding: 0px 10px 10px;
+}
+
+.siiComeiiTheme .v-label-label-error-info {
+	color: red;
+	padding: 0px !important;
+	margin: 0px !important;
+}
+
+.siiComeiiTheme .topbar {
+	margin-left: 0px;
+	margin-top: 0px;
+	z-index: 20000;
+	position: absolute;
+	overflow: visible;
+	visibility: visible;
+	top: 0px !important;
 }
