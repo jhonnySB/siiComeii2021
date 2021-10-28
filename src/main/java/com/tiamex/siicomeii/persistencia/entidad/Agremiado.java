@@ -152,14 +152,6 @@ public class Agremiado implements Serializable {
         return updated_at.getTime();
     }
 
-    @Basic(optional = false)
-    @Column(name = "urlIcon")
-    private boolean urlIcon;
-
-    public boolean getUrlIcon() {
-        return urlIcon;
-    }
-
     /**
      * Relaciones *
      */
