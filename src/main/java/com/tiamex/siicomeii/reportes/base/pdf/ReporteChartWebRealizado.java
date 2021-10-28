@@ -75,14 +75,14 @@ public final class ReporteChartWebRealizado extends BasePDF {
     List<List<WebinarRealizado>> copyListWebROrdered;
     List<WebinarRealizado> copyListWebR;
     List<Agremiado> filterList;
-    int highestAgremiadosI,year;
+    int highestAgremiadosI, year;
     boolean filteredList;
     List<String> stringSvgs;
     List<Integer> listYears, listMonths;
     String instituto;
     LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
     final Locale locale = Locale.forLanguageTag("es-MX");
-    
+
     public List<Agremiado> getSortedListAgremiados(String filterField) {
         List<Agremiado> list = null;
         try {
@@ -92,8 +92,8 @@ public final class ReporteChartWebRealizado extends BasePDF {
         }
         return list;
     }
-    
-    private void initDocumentProperties(String title){
+
+    private void initDocumentProperties(String title) {
         document = new Document();
         document.setMargins(10, 10, 10, 10);
         document.setPageSize(PageSize.LETTER);
@@ -103,7 +103,7 @@ public final class ReporteChartWebRealizado extends BasePDF {
         document.addCreator("TIAMEX SA de CV");
     }
 
-    public File writePdf(String pdffilename, List<String> stringSvgs,List<Integer> listYears,List<List<WebinarRealizado>> copyListWebROrdered) {
+    public File writePdf(String pdffilename, List<String> stringSvgs, List<Integer> listYears, List<List<WebinarRealizado>> copyListWebROrdered) {
         this.copyListWebROrdered = copyListWebROrdered;
         this.stringSvgs = stringSvgs;
         this.listYears = listYears;
@@ -118,12 +118,13 @@ public final class ReporteChartWebRealizado extends BasePDF {
         }
         return file;
     }
-    
-    public File writePdf(String pdffilename, List<String> stringSvgs,int year,List<List<WebinarRealizado>> copyListWebROrdered,List<Integer> listMonths) 
-    {
-        this.stringSvgs = stringSvgs;this.year = year;
-        this.copyListWebROrdered = copyListWebROrdered; this.listMonths = listMonths;
-        initDocumentProperties("Reporte del año "+year+" de la institución "+instituto);
+
+    public File writePdf(String pdffilename, List<String> stringSvgs, int year, List<List<WebinarRealizado>> copyListWebROrdered, List<Integer> listMonths) {
+        this.stringSvgs = stringSvgs;
+        this.year = year;
+        this.copyListWebROrdered = copyListWebROrdered;
+        this.listMonths = listMonths;
+        initDocumentProperties("Reporte del año " + year);
         File file = null;
         try {
             file = writeToFile(pdffilename, document);
@@ -139,7 +140,7 @@ public final class ReporteChartWebRealizado extends BasePDF {
         File file = null;
         try {
             file = File.createTempFile(filename, ".pdf");
-            file.deleteOnExit(); 
+            file.deleteOnExit();
             FileOutputStream fileOut = new FileOutputStream(file);
             writer = PdfWriter.getInstance(document, fileOut);
             writer.setPageEvent(new FormatoPagina());
@@ -150,50 +151,60 @@ public final class ReporteChartWebRealizado extends BasePDF {
         }
         return file;
     }
-    
+
     private void writePdfContentSelected() throws DocumentException, IOException {
-        if(listMonths.isEmpty()){
-            document.add(customParagraph("NO HAY DATOS QUE MOSTRAR DEL "+year, FontFamily.HELVETICA, 35, 
-                        Font.BOLD, BaseColor.LIGHT_GRAY,Element.ALIGN_CENTER, false, 0, 0));
-        }else{
+        int sizeList = listMonths.size();
+        if (listMonths.isEmpty()) {
+            document.add(customParagraph("NO HAY DATOS QUE MOSTRAR DEL AÑO" + year, FontFamily.HELVETICA, 35,
+                    Font.BOLD, BaseColor.LIGHT_GRAY, Element.ALIGN_CENTER, false, 0, 0));
+        } else {
             try {
-                document.add(customParagraph("Reporte de los webinars realizados del año "+year, FontFamily.HELVETICA, 20, 
-                        Font.BOLD, BaseColor.LIGHT_GRAY,Element.ALIGN_CENTER, false, 0, 0));
-                for(int i =0; i<listMonths.size();i++){
-                    document.add(customParagraph(Month.of(listMonths.get(i)).getDisplayName(TextStyle.FULL, locale).toUpperCase(), 
-                            FontFamily.HELVETICA, 22, Font.UNDERLINE, baseColorRgbh(77, 195, 255),Element.ALIGN_CENTER, false, 0, 0));
+                document.add(customParagraph("Reporte de los webinars realizados del año " + year, FontFamily.HELVETICA, 20,
+                        Font.BOLD, BaseColor.LIGHT_GRAY, Element.ALIGN_CENTER, false, 0, 0));
+                for (int i = 0; i < sizeList; i++) {
+
+                    document.add(customParagraph(Month.of(listMonths.get(i)).getDisplayName(TextStyle.FULL, locale).toUpperCase(),
+                            FontFamily.HELVETICA, 22, Font.UNDERLINE, baseColorRgbh(77, 195, 255), Element.ALIGN_CENTER, false, 0, 0));
                     Image chart = createSvgImg(stringSvgs.get(i));
                     chart.scalePercent(65F);
                     chart.setAlignment(Rectangle.ALIGN_CENTER);
                     document.add(chart);
-                    PdfPTable table = new PdfPTable(2); table.setWidthPercentage(100);
-                    PdfPCell cell = new PdfPCell(createTableWebRealizados(i,false)); //
-                    cell.setBorder(Rectangle.NO_BORDER); cell.setPaddingRight(6);
+                    PdfPTable table = new PdfPTable(2);
+                    table.setWidthPercentage(100);
+                    PdfPCell cell = new PdfPCell(createTableWebRealizados(i, false)); //
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setPaddingRight(6);
                     table.addCell(cell);
-                    cell = new PdfPCell(createTableConstancias(listMonths.get(i),true)); //
-                    cell.setBorder(Rectangle.NO_BORDER); cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                    cell = new PdfPCell(createTableConstancias(listMonths.get(i), true)); //
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                     cell.setPaddingLeft(6);
                     table.addCell(cell);
                     document.add(table);
-                    document.add(BR);
-                    if (writer.getVerticalPosition(false) < 320)
-                        document.newPage();
+                    sizeList--;
+                    if (sizeList != 0) {
+                        document.add(BR);
+                        if (writer.getVerticalPosition(false) < 320) {
+                            document.newPage();
+                        }
+                    }
                 }
             } catch (DocumentException ex) {
                 Logger.getLogger(ReporteChartWebRealizado.class.getName()).log(Level.SEVERE, null, ex);
-            }   
+            }
         }
     }
-    
+
     private void writePdfContentFull() throws DocumentException, IOException {
-        if(listYears.isEmpty()){
-            document.add(customParagraph("NO HAY DATOS QUE MOSTRAR", FontFamily.HELVETICA, 35,Font.BOLD, 
+        int sizeList = listYears.size();
+        if (listYears.isEmpty()) {
+            document.add(customParagraph("NO HAY DATOS QUE MOSTRAR", FontFamily.HELVETICA, 35, Font.BOLD,
                     BaseColor.LIGHT_GRAY, Element.ALIGN_CENTER, false, 0, 0));
-        }else{
+        } else {
             try {
                 document.add(customParagraph("Reporte de todos los webinars realizados registrados", FontFamily.HELVETICA, 20,
-                        Font.BOLD, BaseColor.LIGHT_GRAY,Element.ALIGN_CENTER, false, 0, 0));
-                for (int i = 0; i < listYears.size(); i++) {
+                        Font.BOLD, BaseColor.LIGHT_GRAY, Element.ALIGN_CENTER, false, 0, 0));
+                for (int i = 0; i < sizeList; i++) {
                     document.add(customParagraph("" + listYears.get(i), FontFamily.HELVETICA, 22, Font.UNDERLINE, baseColorRgbh(77, 195, 255),
                             Element.ALIGN_CENTER, false, 0, 0));
                     Image chart = createSvgImg(stringSvgs.get(i));
@@ -212,16 +223,19 @@ public final class ReporteChartWebRealizado extends BasePDF {
                     cell.setPaddingLeft(6);
                     table.addCell(cell);
                     document.add(table);
-                    document.add(BR);
-                    if (writer.getVerticalPosition(true) < 320) {
-                        document.newPage();
+                    sizeList--;
+                    if (sizeList != 0) {
+                        document.add(BR);
+                        if (writer.getVerticalPosition(false) < 320) {
+                            document.newPage();
+                        }
                     }
                 }
             } catch (DocumentException ex) {
                 Logger.getLogger(ReporteChartWebRealizado.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
     }
 
     private Image createSvgImg(String svgStrChart) {
@@ -246,65 +260,71 @@ public final class ReporteChartWebRealizado extends BasePDF {
         }
         return imgTemp;
     }
-    
-    public PdfPTable createTableConstancias(int year,boolean month) throws DocumentException{
-        PdfPTable table = new PdfPTable(2); PdfPCell cell;
-        cell = buildParaCell("Constancias enviadas", FontFamily.HELVETICA, 11, Font.BOLD, new BaseColor(112,112,112),
+
+    public PdfPTable createTableConstancias(int year, boolean month) throws DocumentException {
+        PdfPTable table = new PdfPTable(2);
+        PdfPCell cell;
+        cell = buildParaCell("Constancias enviadas", FontFamily.HELVETICA, 11, Font.BOLD, new BaseColor(112, 112, 112),
                 Element.ALIGN_CENTER, true, new BaseColor(213, 243, 254));
-        cell.setColspan(2); cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        cell.setColspan(2);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(cell);
         //
-        cell = buildParaCell("Institución(es) con mayor constancias: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112,112,112),
-                Element.ALIGN_CENTER, true, new BaseColor(232,232,232));
+        cell = buildParaCell("Institución(es) con mayor constancias: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112, 112, 112),
+                Element.ALIGN_CENTER, true, new BaseColor(232, 232, 232));
         cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         table.addCell(cell);
-        cell = buildParaCell(getRankConstancias(year,month), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112,112,112),
+        cell = buildParaCell(getRankConstancias(year, month), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112, 112, 112),
                 Element.ALIGN_CENTER, false, null);
         cell.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
         table.addCell(cell);
         //
-        cell = buildParaCell("Agremiado(s) con mayor constancias: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112,112,112),
-                Element.ALIGN_CENTER, true, new BaseColor(232,232,232));
+        cell = buildParaCell("Agremiado(s) con mayor constancias: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112, 112, 112),
+                Element.ALIGN_CENTER, true, new BaseColor(232, 232, 232));
         cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         table.addCell(cell);
-        cell = buildParaCell(getRankAgremiados(year), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112,112,112),
+        cell = buildParaCell(getRankAgremiados(year), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112, 112, 112),
                 Element.ALIGN_CENTER, false, null);
         cell.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
         table.addCell(cell);
         //
-        cell = buildParaCell("Total enviadas: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112,112,112),
-                Element.ALIGN_CENTER, true, new BaseColor(232,232,232)); 
+        cell = buildParaCell("Total enviadas: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112, 112, 112),
+                Element.ALIGN_CENTER, true, new BaseColor(232, 232, 232));
         cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         table.addCell(cell);
-        table.addCell(buildParaCell(getTotalConstByYear(year), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112,112,112),
+        table.addCell(buildParaCell(getTotalConstByYear(year), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112, 112, 112),
                 Element.ALIGN_CENTER, false, null));
-        
+
         return table;
     }
-    
-    private String getTotalConstByYear(int year){
+
+    private String getTotalConstByYear(int year) {
         List<AsistenciaWebinar> l = new ArrayList<>(listAsistencias);
-        l.removeIf((a)->{return a.getObjWebinarRealizado().getFecha().getYear()!=year;});
-        return l.size()>0 ? String.valueOf(l.size()) : "Sin registros";
+        l.removeIf((a) -> {
+            return a.getObjWebinarRealizado().getFecha().getYear() != year;
+        });
+        return l.size() > 0 ? String.valueOf(l.size()) : "Sin registros";
     }
-    
-    private PdfPTable createTableWebRealizados(int indexList,boolean months) throws DocumentException{
-        PdfPTable table = new PdfPTable(2); PdfPCell cell;
-        cell = buildParaCell("Webinars Realizados", FontFamily.HELVETICA, 11, Font.BOLD, new BaseColor(112,112,112),
+
+    private PdfPTable createTableWebRealizados(int indexList, boolean months) throws DocumentException {
+        PdfPTable table = new PdfPTable(2);
+        PdfPCell cell;
+        cell = buildParaCell("Webinars Realizados", FontFamily.HELVETICA, 11, Font.BOLD, new BaseColor(112, 112, 112),
                 Element.ALIGN_CENTER, true, new BaseColor(213, 243, 254));
-        cell.setColspan(2); cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        cell.setColspan(2);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(cell);
         //
-        cell = buildParaCell("Institución(es) con mayor webinars: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112,112,112),
-                Element.ALIGN_CENTER, true, new BaseColor(232,232,232));
+        cell = buildParaCell("Institución(es) con mayor webinars: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112, 112, 112),
+                Element.ALIGN_CENTER, true, new BaseColor(232, 232, 232));
         cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         table.addCell(cell);
-        cell = buildParaCell(getRankWebinar(indexList), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112,112,112),
+        cell = buildParaCell(getRankWebinar(indexList), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112, 112, 112),
                 Element.ALIGN_CENTER, false, null);
         cell.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
         table.addCell(cell);
         //
-        if(months){
+        if (months) {
             cell = buildParaCell("Mes(es) con mayor webinars: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112, 112, 112),
                     Element.ALIGN_CENTER, true, new BaseColor(232, 232, 232));
             cell.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -315,28 +335,28 @@ public final class ReporteChartWebRealizado extends BasePDF {
             table.addCell(cell);
         }
         //
-        cell = buildParaCell("Total realizados: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112,112,112),
-                Element.ALIGN_CENTER, true, new BaseColor(232,232,232)); 
+        cell = buildParaCell("Total realizados: ", FontFamily.HELVETICA, 11, Font.NORMAL, new BaseColor(112, 112, 112),
+                Element.ALIGN_CENTER, true, new BaseColor(232, 232, 232));
         cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         table.addCell(cell);
-        table.addCell(buildParaCell(String.valueOf(copyListWebROrdered.get(indexList).size()), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112,112,112),
+        table.addCell(buildParaCell(String.valueOf(copyListWebROrdered.get(indexList).size()), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112, 112, 112),
                 Element.ALIGN_CENTER, false, null));
-        
+
         return table;
     }
-    
+
     private String getRankAgremiados(int year) {
         List<AsistenciaWebinar> copyList = new ArrayList<>(listAsistencias);
         copyList.removeIf((a) -> {
             return a.getObjWebinarRealizado().getFecha().getYear() != year;
         });
-        if(copyList.isEmpty()){
+        if (copyList.isEmpty()) {
             return "Sin registros.";
-        }else{
+        } else {
             String results = "";
             Map<String, InstitutoRecord> map = new HashMap<>();
             Map<String, InstitutoRecord> mapRanked = new HashMap<>();
-            
+
             InstitutoRecord obj;
             int highestRecord = 0, cont = 0;
             try {
@@ -379,10 +399,10 @@ public final class ReporteChartWebRealizado extends BasePDF {
             }
             return results;
         }
-        
+
     }
-    
-    private String getRankConstancias(int value,boolean month){
+
+    private String getRankConstancias(int value, boolean month) {
         List<AsistenciaWebinar> copyList = new ArrayList<>(listAsistencias);
         Map<String, Integer> mapRank = new LinkedHashMap<>();
         copyList.sort((a1, a2) -> {
@@ -390,15 +410,15 @@ public final class ReporteChartWebRealizado extends BasePDF {
         });
         copyList.removeIf((a) -> {
             LocalDateTime date = a.getObjWebinarRealizado().getFecha();
-            return month ? date.getYear() != year || date.getMonthValue() != value 
+            return month ? date.getYear() != year || date.getMonthValue() != value
                     : date.getYear() != value;
         });
-        if(copyList.isEmpty()){
+        if (copyList.isEmpty()) {
             return "Sin registros.";
-        }else{
+        } else {
             String results = "", i;
             int maxVal = 0;
-            
+
             Iterator<AsistenciaWebinar> it = copyList.iterator();
             while (it.hasNext()) {
                 AsistenciaWebinar a = it.next();
@@ -425,45 +445,47 @@ public final class ReporteChartWebRealizado extends BasePDF {
             results = results + ". (" + maxVal + " constancia(s)";
             return results;
         }
-        
+
     }
-    
-    private String getRankMonth(int indexList){
+
+    private String getRankMonth(int indexList) {
         List<WebinarRealizado> list = copyListWebROrdered.get(indexList);
-        list.sort((WebinarRealizado w1,WebinarRealizado w2)->{
-            int m1 = w1.getFecha().getMonthValue(),  m2 = w2.getFecha().getMonthValue();
-            return m1<m2 ? -1 : m1>m2 ? 1 : 0;
+        list.sort((WebinarRealizado w1, WebinarRealizado w2) -> {
+            int m1 = w1.getFecha().getMonthValue(), m2 = w2.getFecha().getMonthValue();
+            return m1 < m2 ? -1 : m1 > m2 ? 1 : 0;
         });
-        return getTextRank(list,1);
+        return getTextRank(list, 1);
     }
-    
-    private String getRankWebinar(int indexList){
+
+    private String getRankWebinar(int indexList) {
         List<WebinarRealizado> list = copyListWebROrdered.get(indexList);
-        list.sort((WebinarRealizado w1,WebinarRealizado w2)->{
+        list.sort((WebinarRealizado w1, WebinarRealizado w2) -> {
             return w1.getInstitucion().compareToIgnoreCase(w2.getInstitucion());
         });
-        return getTextRank(list,0);
+        return getTextRank(list, 0);
     }
-    
-    private String getTextRank(List<WebinarRealizado> data,int filterType){
-        if(data.isEmpty()){
+
+    private String getTextRank(List<WebinarRealizado> data, int filterType) {
+        if (data.isEmpty()) {
             return "Sin registros.";
-        }else{
-            String i,loopI,results = ""; int maxVal = 0,cont=0;
-            Map<String,Integer> mapRank = new LinkedHashMap<>();
+        } else {
+            String i, loopI, results = "";
+            int maxVal = 0, cont = 0;
+            Map<String, Integer> mapRank = new LinkedHashMap<>();
             Iterator<WebinarRealizado> it = data.iterator();
-            i = filterType==0 ? data.get(0).getInstitucion() : 
-                        data.get(0).getFecha().getMonth().getDisplayName(TextStyle.FULL,locale);
+            i = filterType == 0 ? data.get(0).getInstitucion()
+                    : data.get(0).getFecha().getMonth().getDisplayName(TextStyle.FULL, locale);
             while (it.hasNext()) {
                 WebinarRealizado web = it.next();
-                loopI = filterType==0 ? web.getInstitucion() : 
-                        web.getFecha().getMonth().getDisplayName(TextStyle.FULL,locale);
-                if(loopI.compareToIgnoreCase(i)!=0){
+                loopI = filterType == 0 ? web.getInstitucion()
+                        : web.getFecha().getMonth().getDisplayName(TextStyle.FULL, locale);
+                if (loopI.compareToIgnoreCase(i) != 0) {
                     mapRank.put(i, cont);
-                    i = loopI; cont = 0;
+                    i = loopI;
+                    cont = 0;
                 }
                 cont++;
-                if(!it.hasNext()){
+                if (!it.hasNext()) {
                     mapRank.put(i, cont);
                 }
                 if (cont > maxVal) {
@@ -484,20 +506,22 @@ public final class ReporteChartWebRealizado extends BasePDF {
             return results;
         }
     }
-     
-    public void createDetailedSection(){
+
+    public void createDetailedSection() {
         try {
             document.add(customParagraph("Agremiados por País", FontFamily.HELVETICA, 14, Font.NORMAL, baseColorRgbh(77, 195, 255),
                     Element.ALIGN_CENTER, false, 0, 0));
-            document.add( filteredList ? setInfo(filterList) : setInfo(getSortedListAgremiados("pais")) );
+            document.add(filteredList ? setInfo(filterList) : setInfo(getSortedListAgremiados("pais")));
             document.add(BR);
-            if (writer.getVerticalPosition(true) < 100)
+            if (writer.getVerticalPosition(true) < 100) {
                 document.newPage();
+            }
             document.add(customParagraph("Agremiados por Institución", FontFamily.HELVETICA, 14, Font.NORMAL, baseColorRgbh(77, 195, 255),
                     Element.ALIGN_CENTER, false, 0, 0));
             fitTableI(getInfoI());
-            if (writer.getVerticalPosition(true) < 100)
+            if (writer.getVerticalPosition(true) < 100) {
                 document.newPage();
+            }
             document.add(customParagraph("Agremiados registrados", FontFamily.HELVETICA, 14, Font.NORMAL, baseColorRgbh(77, 195, 255),
                     Element.ALIGN_CENTER, false, 0, 0));
             document.add(infoAgremiados());
@@ -505,84 +529,106 @@ public final class ReporteChartWebRealizado extends BasePDF {
             Logger.getLogger(ReporteChartWebRealizado.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private PdfPTable infoAgremiados(){
-        PdfPTable table = new PdfPTable(new float[]{3,2,2,1.7F,1,1,1}); String tempString = ""; InstitutoGeneralInfo obj;  // mes,año,total
-        BaseColor bgColorRow = new BaseColor(237, 237, 237), fontColor = new BaseColor(112,112,112);
-        PdfPCell emptyCell = new PdfPCell(); emptyCell.setBorder(Rectangle.NO_BORDER); emptyCell.setColspan(3);
-        table.setSpacingBefore(10); table.setWidthPercentage(100); boolean zebra=false;
+
+    private PdfPTable infoAgremiados() {
+        PdfPTable table = new PdfPTable(new float[]{3, 2, 2, 1.7F, 1, 1, 1});
+        String tempString = "";
+        InstitutoGeneralInfo obj;  // mes,año,total
+        BaseColor bgColorRow = new BaseColor(237, 237, 237), fontColor = new BaseColor(112, 112, 112);
+        PdfPCell emptyCell = new PdfPCell();
+        emptyCell.setBorder(Rectangle.NO_BORDER);
+        emptyCell.setColspan(3);
+        table.setSpacingBefore(10);
+        table.setWidthPercentage(100);
+        boolean zebra = false;
         List<Agremiado> listAgremiados = filteredList ? filterList : getSortedListAgremiados("id");
         BaseColor bgColor = new BaseColor(196, 219, 255);
-        int constThisMonth=0, constThisYear=0,totalSum=0;
+        int constThisMonth = 0, constThisYear = 0, totalSum = 0;
         listAgremiados.sort((Agremiado a1, Agremiado a2) -> {
             return a1.getNombre().compareToIgnoreCase(a2.getNombre());
         });
         createHeaders(table);
         for (Agremiado a : listAgremiados) {
             String fechaReg = a.getFechaReg().format(DateTimeFormatter.ISO_DATE);
-            if (tempString.compareToIgnoreCase(a.getNombre())!=0) {
-                table.addCell(buildParaCell(a.getNombre(), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
-                table.addCell(buildParaCell(a.getInstitucion(), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
-                table.addCell(buildParaCell(a.getObjPais().getNombre(), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
-                table.addCell(buildParaCell(fechaReg, FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
-                obj = getRecordConstancias(a.getId()); constThisMonth+=obj.getAgremiados(); constThisYear+=obj.getHombres(); totalSum+=obj.getMujeres();
-                table.addCell(buildParaCell(String.valueOf(obj.getAgremiados()), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
-                table.addCell(buildParaCell(String.valueOf(obj.getHombres()), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
-                table.addCell(buildParaCell(String.valueOf(obj.getMujeres()), FontFamily.COURIER, 10, Font.NORMAL, fontColor,Element.ALIGN_CENTER, zebra, bgColorRow));
+            if (tempString.compareToIgnoreCase(a.getNombre()) != 0) {
+                table.addCell(buildParaCell(a.getNombre(), FontFamily.COURIER, 10, Font.NORMAL, fontColor, Element.ALIGN_CENTER, zebra, bgColorRow));
+                table.addCell(buildParaCell(a.getInstitucion(), FontFamily.COURIER, 10, Font.NORMAL, fontColor, Element.ALIGN_CENTER, zebra, bgColorRow));
+                table.addCell(buildParaCell(a.getObjPais().getNombre(), FontFamily.COURIER, 10, Font.NORMAL, fontColor, Element.ALIGN_CENTER, zebra, bgColorRow));
+                table.addCell(buildParaCell(fechaReg, FontFamily.COURIER, 10, Font.NORMAL, fontColor, Element.ALIGN_CENTER, zebra, bgColorRow));
+                obj = getRecordConstancias(a.getId());
+                constThisMonth += obj.getAgremiados();
+                constThisYear += obj.getHombres();
+                totalSum += obj.getMujeres();
+                table.addCell(buildParaCell(String.valueOf(obj.getAgremiados()), FontFamily.COURIER, 10, Font.NORMAL, fontColor, Element.ALIGN_CENTER, zebra, bgColorRow));
+                table.addCell(buildParaCell(String.valueOf(obj.getHombres()), FontFamily.COURIER, 10, Font.NORMAL, fontColor, Element.ALIGN_CENTER, zebra, bgColorRow));
+                table.addCell(buildParaCell(String.valueOf(obj.getMujeres()), FontFamily.COURIER, 10, Font.NORMAL, fontColor, Element.ALIGN_CENTER, zebra, bgColorRow));
                 zebra = !zebra;
             }
         }
         table.addCell(emptyCell);
-        emptyCell = buildParaCell("Total", FontFamily.HELVETICA, 11, Font.NORMAL, fontColor,Element.ALIGN_RIGHT, zebra, bgColorRow);
-        emptyCell.setHorizontalAlignment(Rectangle.ALIGN_RIGHT);table.addCell(emptyCell);
-        table.addCell(buildParaCell(String.valueOf(constThisMonth), FontFamily.HELVETICA, 10, Font.NORMAL, fontColor,Element.ALIGN_LEFT, zebra, bgColorRow));
-        table.addCell(buildParaCell(String.valueOf(constThisYear), FontFamily.HELVETICA, 10, Font.NORMAL, fontColor,Element.ALIGN_LEFT, zebra, bgColorRow));
-        table.addCell(buildParaCell(String.valueOf(totalSum), FontFamily.HELVETICA, 10, Font.NORMAL, fontColor,Element.ALIGN_LEFT, zebra, bgColorRow));
+        emptyCell = buildParaCell("Total", FontFamily.HELVETICA, 11, Font.NORMAL, fontColor, Element.ALIGN_RIGHT, zebra, bgColorRow);
+        emptyCell.setHorizontalAlignment(Rectangle.ALIGN_RIGHT);
+        table.addCell(emptyCell);
+        table.addCell(buildParaCell(String.valueOf(constThisMonth), FontFamily.HELVETICA, 10, Font.NORMAL, fontColor, Element.ALIGN_LEFT, zebra, bgColorRow));
+        table.addCell(buildParaCell(String.valueOf(constThisYear), FontFamily.HELVETICA, 10, Font.NORMAL, fontColor, Element.ALIGN_LEFT, zebra, bgColorRow));
+        table.addCell(buildParaCell(String.valueOf(totalSum), FontFamily.HELVETICA, 10, Font.NORMAL, fontColor, Element.ALIGN_LEFT, zebra, bgColorRow));
         return table;
     }
-    
-    private void createHeaders(PdfPTable table){
-        BaseColor fontColor = new BaseColor(112,112,112), bgColorHeader = new BaseColor(196, 219, 255);
-        FontFamily fontFamily = FontFamily.HELVETICA; int fontSize = 11, fontType = Font.NORMAL, aligment = Element.ALIGN_CENTER;
-        boolean bgColor = true; PdfPCell cell; 
-        cell = new PdfPCell(buildParaCell("Agremiado", fontFamily, fontSize, fontType, fontColor, Element.ALIGN_CENTER, true,new BaseColor(213, 243, 254)));
-        cell.setColspan(4); cell.setPadding(7); cell.setHorizontalAlignment(Element.ALIGN_CENTER); table.addCell(cell);
-        cell = buildParaCell("Constancias", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,new BaseColor(213, 243, 254));
-        cell.setColspan(3); cell.setPadding(7); cell.setHorizontalAlignment(Element.ALIGN_CENTER); table.addCell(cell);
-        table.addCell(buildParaCell("Nombre", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,bgColorHeader));
-        table.addCell(buildParaCell("Instituto", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,bgColorHeader));
-        table.addCell(buildParaCell("País", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,bgColorHeader));
-        table.addCell(buildParaCell("Fecha registro", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,bgColorHeader));
-        table.addCell(buildParaCell("Este mes", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,bgColorHeader));
-        table.addCell(buildParaCell("Este año", fontFamily, fontSize , fontType, fontColor, aligment, bgColor,bgColorHeader));
-        table.addCell(buildParaCell("Total recibidas", fontFamily, fontSize, fontType, fontColor, aligment, bgColor,bgColorHeader));
+
+    private void createHeaders(PdfPTable table) {
+        BaseColor fontColor = new BaseColor(112, 112, 112), bgColorHeader = new BaseColor(196, 219, 255);
+        FontFamily fontFamily = FontFamily.HELVETICA;
+        int fontSize = 11, fontType = Font.NORMAL, aligment = Element.ALIGN_CENTER;
+        boolean bgColor = true;
+        PdfPCell cell;
+        cell = new PdfPCell(buildParaCell("Agremiado", fontFamily, fontSize, fontType, fontColor, Element.ALIGN_CENTER, true, new BaseColor(213, 243, 254)));
+        cell.setColspan(4);
+        cell.setPadding(7);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(cell);
+        cell = buildParaCell("Constancias", fontFamily, fontSize, fontType, fontColor, aligment, bgColor, new BaseColor(213, 243, 254));
+        cell.setColspan(3);
+        cell.setPadding(7);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(cell);
+        table.addCell(buildParaCell("Nombre", fontFamily, fontSize, fontType, fontColor, aligment, bgColor, bgColorHeader));
+        table.addCell(buildParaCell("Instituto", fontFamily, fontSize, fontType, fontColor, aligment, bgColor, bgColorHeader));
+        table.addCell(buildParaCell("País", fontFamily, fontSize, fontType, fontColor, aligment, bgColor, bgColorHeader));
+        table.addCell(buildParaCell("Fecha registro", fontFamily, fontSize, fontType, fontColor, aligment, bgColor, bgColorHeader));
+        table.addCell(buildParaCell("Este mes", fontFamily, fontSize, fontType, fontColor, aligment, bgColor, bgColorHeader));
+        table.addCell(buildParaCell("Este año", fontFamily, fontSize, fontType, fontColor, aligment, bgColor, bgColorHeader));
+        table.addCell(buildParaCell("Total recibidas", fontFamily, fontSize, fontType, fontColor, aligment, bgColor, bgColorHeader));
     }
-    
-    private InstitutoGeneralInfo getRecordConstancias(long id){
-        InstitutoGeneralInfo obj = new InstitutoGeneralInfo(0,0,0);
+
+    private InstitutoGeneralInfo getRecordConstancias(long id) {
+        InstitutoGeneralInfo obj = new InstitutoGeneralInfo(0, 0, 0);
         List<AsistenciaWebinar> list = ControladorAsistenciaWebinar.getInstance().getByAsistencia(id);
-        int currentMonth=currentDate.getMonthValue(), currentYear=currentDate.getYear(); 
-        if(!list.isEmpty()){
+        int currentMonth = currentDate.getMonthValue(), currentYear = currentDate.getYear();
+        if (!list.isEmpty()) {
             obj.setMujeres(list.size());
             list.stream().map(a -> {
                 int loopMonth = a.getObjWebinarRealizado().getFecha().getMonthValue();
                 int loopYear = a.getObjWebinarRealizado().getFecha().getYear();
-                if(loopMonth==currentMonth && loopYear==currentYear){
-                    obj.setAgremiados(obj.getAgremiados()+1);
+                if (loopMonth == currentMonth && loopYear == currentYear) {
+                    obj.setAgremiados(obj.getAgremiados() + 1);
                 }
                 return loopYear;
-            }).filter(loopYear -> (loopYear==currentYear)).forEachOrdered(_item -> {
-                obj.setHombres(obj.getHombres()+1);
+            }).filter(loopYear -> (loopYear == currentYear)).forEachOrdered(_item -> {
+                obj.setHombres(obj.getHombres() + 1);
             });
         }
         return obj;
     }
-    
+
     private void fitTableI(Map<String, InstitutoGeneralInfo> map) {
-        PdfPTable childTable = new PdfPTable(4); boolean zebra = false;
-        childTable.setHeaderRows(1); BaseColor bgColorHeader = new BaseColor(77,77,77),bgColorRow = new BaseColor(237, 237, 237),
-                fontColor = new BaseColor(112,112,112);
-        childTable.setWidthPercentage(70); childTable.setSpacingBefore(10); childTable.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPTable childTable = new PdfPTable(4);
+        boolean zebra = false;
+        childTable.setHeaderRows(1);
+        BaseColor bgColorHeader = new BaseColor(77, 77, 77), bgColorRow = new BaseColor(237, 237, 237),
+                fontColor = new BaseColor(112, 112, 112);
+        childTable.setWidthPercentage(70);
+        childTable.setSpacingBefore(10);
+        childTable.setHorizontalAlignment(Element.ALIGN_CENTER);
         String instituto = "";
         childTable.addCell(buildParaCell("Instituto", FontFamily.HELVETICA, 11, Font.NORMAL, bgColorHeader, Element.ALIGN_CENTER, true,
                 new BaseColor(196, 219, 255)));
@@ -592,19 +638,20 @@ public final class ReporteChartWebRealizado extends BasePDF {
                 new BaseColor(196, 219, 255)));
         childTable.addCell(buildParaCell("Mujeres", FontFamily.HELVETICA, 11, Font.NORMAL, bgColorHeader, Element.ALIGN_CENTER, true,
                 new BaseColor(196, 219, 255)));
-        for(Map.Entry<String,InstitutoGeneralInfo> entrySet: map.entrySet()) {
+        for (Map.Entry<String, InstitutoGeneralInfo> entrySet : map.entrySet()) {
             String key = entrySet.getKey();
-            int agremiados = entrySet.getValue().getAgremiados(),hombres = entrySet.getValue().getHombres(),mujeres = entrySet.getValue().getMujeres();
-            if (key.compareToIgnoreCase(instituto)!=0) {
-                childTable.addCell(buildParaCell(key,FontFamily.COURIER,10,Font.NORMAL,baseColorRgbh(112, 112, 112),Element.ALIGN_LEFT,zebra,
+            int agremiados = entrySet.getValue().getAgremiados(), hombres = entrySet.getValue().getHombres(), mujeres = entrySet.getValue().getMujeres();
+            if (key.compareToIgnoreCase(instituto) != 0) {
+                childTable.addCell(buildParaCell(key, FontFamily.COURIER, 10, Font.NORMAL, baseColorRgbh(112, 112, 112), Element.ALIGN_LEFT, zebra,
                         bgColorRow));
-                childTable.addCell(buildParaCell(String.valueOf(agremiados),FontFamily.COURIER,10,Font.NORMAL,fontColor,
-                        Element.ALIGN_CENTER,zebra,bgColorRow));
-                childTable.addCell(buildParaCell(String.valueOf(hombres),FontFamily.COURIER,10,Font.NORMAL,fontColor,
-                        Element.ALIGN_CENTER,zebra,bgColorRow));
-                childTable.addCell(buildParaCell(String.valueOf(mujeres),FontFamily.COURIER,10,Font.NORMAL,fontColor,
-                        Element.ALIGN_CENTER,zebra,bgColorRow));
-            } zebra = !zebra;
+                childTable.addCell(buildParaCell(String.valueOf(agremiados), FontFamily.COURIER, 10, Font.NORMAL, fontColor,
+                        Element.ALIGN_CENTER, zebra, bgColorRow));
+                childTable.addCell(buildParaCell(String.valueOf(hombres), FontFamily.COURIER, 10, Font.NORMAL, fontColor,
+                        Element.ALIGN_CENTER, zebra, bgColorRow));
+                childTable.addCell(buildParaCell(String.valueOf(mujeres), FontFamily.COURIER, 10, Font.NORMAL, fontColor,
+                        Element.ALIGN_CENTER, zebra, bgColorRow));
+            }
+            zebra = !zebra;
         }
         try {
             document.add(childTable);
@@ -612,33 +659,35 @@ public final class ReporteChartWebRealizado extends BasePDF {
             Logger.getLogger(ReporteChartWebRealizado.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private PdfPCell buildParaCell(String text,FontFamily fontFamily,int fontSize,int fontType,BaseColor baseColor,int align,boolean bgColor,BaseColor colorBg){
-        PdfPCell cell = new PdfPCell(customParagraph(text, fontFamily, fontSize, fontType, baseColor, align, false, 0, 0)); 
-        if(bgColor)
+
+    private PdfPCell buildParaCell(String text, FontFamily fontFamily, int fontSize, int fontType, BaseColor baseColor, int align, boolean bgColor, BaseColor colorBg) {
+        PdfPCell cell = new PdfPCell(customParagraph(text, fontFamily, fontSize, fontType, baseColor, align, false, 0, 0));
+        if (bgColor) {
             cell.setBackgroundColor(colorBg);
+        }
         return cell;
     }
-    
+
     public void createConstanciasSection() {
         try {
             document.add(customParagraph("Constancias", FontFamily.HELVETICA, 14, Font.NORMAL, baseColorRgbh(77, 195, 255), Element.ALIGN_LEFT,
                     false, 0, 0));
-            PdfPTable table = new PdfPTable(2); table.setWidthPercentage(100);
+            PdfPTable table = new PdfPTable(2);
+            table.setWidthPercentage(100);
             PdfPCell cell = new PdfPCell();
-            Map<Long,List<AsistenciaWebinar>> listAsistenciasFiltered = new HashMap<>();
-            int sumTotalAsis=0;
-            if(filteredList){
+            Map<Long, List<AsistenciaWebinar>> listAsistenciasFiltered = new HashMap<>();
+            int sumTotalAsis = 0;
+            if (filteredList) {
                 listAsistencias.clear();
                 filterList.forEach(a -> {
                     long idAgremiado = a.getId();
                     List<AsistenciaWebinar> obj = ControladorAsistenciaWebinar.getInstance().getByAsistencia(idAgremiado);
-                    if(!obj.isEmpty()){
+                    if (!obj.isEmpty()) {
                         listAsistenciasFiltered.put(idAgremiado, obj);
                     }
                 });
-                if(!listAsistenciasFiltered.isEmpty()){
-                    for(Map.Entry<Long,List<AsistenciaWebinar>> entrySet: listAsistenciasFiltered.entrySet()){
+                if (!listAsistenciasFiltered.isEmpty()) {
+                    for (Map.Entry<Long, List<AsistenciaWebinar>> entrySet : listAsistenciasFiltered.entrySet()) {
                         sumTotalAsis = sumTotalAsis + entrySet.getValue().size();
                         listAsistencias.addAll(entrySet.getValue());
                     }
@@ -648,26 +697,26 @@ public final class ReporteChartWebRealizado extends BasePDF {
             int agremiados = filteredList ? listAsistenciasFiltered.size() : getSortedListAgremiados("id").size();
             Paragraph p = customParagraph("Constancias enviadas a agremiados:", FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.LIGHT_GRAY,
                     Element.ALIGN_LEFT, true, 0.5f, -2.5f);
-            p.add(" "+(constancias == 0 ? "Ninguna" : String.valueOf(filteredList ? sumTotalAsis : constancias)));
+            p.add(" " + (constancias == 0 ? "Ninguna" : String.valueOf(filteredList ? sumTotalAsis : constancias)));
             cell.addElement(p);  // break point complete
             p = customParagraph("Institución(es) con más contancias recibidas:", FontFamily.HELVETICA, 10, Font.NORMAL,
                     BaseColor.LIGHT_GRAY, Element.ALIGN_LEFT, true, 0.5f, -2.5f);
-            p.add(" "+getCountConstanciasInst(listAsistencias));
+            p.add(" " + getCountConstanciasInst(listAsistencias));
             cell.setBorder(Rectangle.NO_BORDER);
             cell.addElement(p);  // break point complete
             p = customParagraph("Agremiado(s) con mayor contancias recibidas:", FontFamily.HELVETICA, 10, Font.NORMAL,
                     BaseColor.LIGHT_GRAY, Element.ALIGN_LEFT, true, 0.5f, -2.5f);
-            p.add(" "+getRankAgremiados());
+            p.add(" " + getRankAgremiados());
             cell.addElement(p);
             table.addCell(cell); // break point complete
             p = customParagraph("Institución(es) con más agremiados:", FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.LIGHT_GRAY, Element.ALIGN_RIGHT,
                     true, 0.5f, -2.5f);
-            p.add(" "+setTextRank());
+            p.add(" " + setTextRank());
             cell = new PdfPCell();
             cell.setBorder(Rectangle.NO_BORDER);
             cell.addElement(p);  // break point complete
             p = customParagraph("Agremiados registrados:", FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.LIGHT_GRAY, Element.ALIGN_RIGHT, true, 0.5f, -2.5f);
-            p.add(" "+agremiados);
+            p.add(" " + agremiados);
             cell.addElement(p);
             table.addCell(cell); //
             document.add(table);
@@ -705,8 +754,8 @@ public final class ReporteChartWebRealizado extends BasePDF {
         };
         return keyMapper;
     }
-    
-    private String getRankAgremiados(){
+
+    private String getRankAgremiados() {
         String results = "";
         Map<String, InstitutoRecord> map = new HashMap<>();
         Map<String, InstitutoRecord> mapRanked = new HashMap<>();
@@ -714,9 +763,9 @@ public final class ReporteChartWebRealizado extends BasePDF {
         int highestRecord = 0, cont = 0;
         try {
             listAsistencias.sort((a1, a2) -> {
-                if(a1.getAgremiado() < a2.getAgremiado()){
+                if (a1.getAgremiado() < a2.getAgremiado()) {
                     return -1;
-                }else if(a1.getAgremiado() > a2.getAgremiado()){
+                } else if (a1.getAgremiado() > a2.getAgremiado()) {
                     return 1;
                 }
                 return 0;
@@ -746,59 +795,64 @@ public final class ReporteChartWebRealizado extends BasePDF {
                     mapRanked.put(entrySet.getKey(), entrySet.getValue());
                 }
             }
-            results = getTextRanked(mapRanked.entrySet().stream(),highestRecord);
+            results = getTextRanked(mapRanked.entrySet().stream(), highestRecord);
         } catch (Exception ex) {
             Logger.getLogger(ReporteChartWebRealizado.class.getName()).log(Level.SEVERE, null, ex);
         }
         return results;
     }
-    
-    private PdfPTable setInfo(List<Agremiado> listAgremiados){
-        PdfPTable table = new PdfPTable(2); table.setHeaderRows(1); boolean zebra=false;
-        table.setWidthPercentage(70); table.setSpacingBefore(10); table.setHorizontalAlignment(Element.ALIGN_CENTER);
-        int cont=0,listSize = listAgremiados.size();
-        listAgremiados.sort((Agremiado a1,Agremiado a2)->{
+
+    private PdfPTable setInfo(List<Agremiado> listAgremiados) {
+        PdfPTable table = new PdfPTable(2);
+        table.setHeaderRows(1);
+        boolean zebra = false;
+        table.setWidthPercentage(70);
+        table.setSpacingBefore(10);
+        table.setHorizontalAlignment(Element.ALIGN_CENTER);
+        int cont = 0, listSize = listAgremiados.size();
+        listAgremiados.sort((Agremiado a1, Agremiado a2) -> {
             return a1.getObjPais().getNombre().compareToIgnoreCase(a2.getObjPais().getNombre());
         });
-        String tempCountry=listAgremiados.get(0).getObjPais().getNombre();
+        String tempCountry = listAgremiados.get(0).getObjPais().getNombre();
         table.addCell(buildParaCell("País", FontFamily.HELVETICA, 11, Font.NORMAL, baseColorRgbh(77, 77, 77), Element.ALIGN_CENTER, true,
                 new BaseColor(196, 219, 255)));
-        table.addCell(buildParaCell("Agremiados", FontFamily.HELVETICA, 11, Font.NORMAL, baseColorRgbh(77, 77, 77), Element.ALIGN_CENTER, true, 
+        table.addCell(buildParaCell("Agremiados", FontFamily.HELVETICA, 11, Font.NORMAL, baseColorRgbh(77, 77, 77), Element.ALIGN_CENTER, true,
                 new BaseColor(196, 219, 255)));
-        for(Agremiado a:listAgremiados){
+        for (Agremiado a : listAgremiados) {
             String loopCountry = a.getObjPais().getNombre();
-            if(loopCountry.compareToIgnoreCase(tempCountry)!=0){
-                addTableCell(table,tempCountry,cont,zebra);
+            if (loopCountry.compareToIgnoreCase(tempCountry) != 0) {
+                addTableCell(table, tempCountry, cont, zebra);
                 tempCountry = loopCountry;
-                cont = 0; zebra = !zebra;
+                cont = 0;
+                zebra = !zebra;
             }
             listSize--;
             cont++;
-            if(listSize==0){
-                addTableCell(table, tempCountry, cont,zebra);
+            if (listSize == 0) {
+                addTableCell(table, tempCountry, cont, zebra);
             }
-            
+
         }
         return table;
     }
-    
-    private void addTableCell(PdfPTable table,String country,int total,boolean zebra){
+
+    private void addTableCell(PdfPTable table, String country, int total, boolean zebra) {
         table.addCell(buildParaCell(country, FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112, 112, 112), Element.ALIGN_LEFT, zebra,
                 new BaseColor(237, 237, 237)));
-        table.addCell(buildParaCell(String.valueOf(total), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112, 112, 112),Element.ALIGN_LEFT, zebra,
+        table.addCell(buildParaCell(String.valueOf(total), FontFamily.COURIER, 11, Font.NORMAL, new BaseColor(112, 112, 112), Element.ALIGN_LEFT, zebra,
                 new BaseColor(237, 237, 237)));
     }
-    
-    private Map<String,InstitutoGeneralInfo> getInfoI() {
-        String tempValueI=""; 
+
+    private Map<String, InstitutoGeneralInfo> getInfoI() {
+        String tempValueI = "";
         List<Agremiado> listAgremiados = filteredList ? filterList : getSortedListAgremiados("institucion");
         Map<String, InstitutoGeneralInfo> mapInstitutos = new HashMap<>();
         Map<String, InstitutoGeneralInfo> sortedMap;
         InstitutoGeneralInfo obj;
-        int contRegs, mujer=0, hombre=0; 
+        int contRegs, mujer = 0, hombre = 0;
         contRegs = listAgremiados.size();
         for (Agremiado a : listAgremiados) {
-            String loopInstituto = a.getInstitucion(); 
+            String loopInstituto = a.getInstitucion();
             char genre = a.getSexo();
             if (genre == 'H') {
                 hombre = 1;
@@ -807,38 +861,39 @@ public final class ReporteChartWebRealizado extends BasePDF {
             }
             if (mapInstitutos.containsKey(loopInstituto)) {
                 obj = mapInstitutos.get(loopInstituto);
-                obj.setAgremiados(obj.getAgremiados()+1);
+                obj.setAgremiados(obj.getAgremiados() + 1);
                 obj.setHombres(obj.getHombres() + hombre);
                 obj.setMujeres(obj.getMujeres() + mujer);
                 mapInstitutos.replace(loopInstituto, obj);
             } else {
-                obj = new InstitutoGeneralInfo(1,hombre,mujer);
+                obj = new InstitutoGeneralInfo(1, hombre, mujer);
                 mapInstitutos.put(loopInstituto, obj);
-                hombre = 0; mujer = 0;
+                hombre = 0;
+                mujer = 0;
             }
             if (contRegs == 0) {
                 mapInstitutos.put(tempValueI, obj);
             }
         }
         sortedMap = new TreeMap<>(); //sortedMap.forEach((key,value)->{System.out.println(key+","+value.getAgremiados()+","+value.getHombres()+","+value.getMujeres());});
-        mapInstitutos.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEachOrdered(entry->sortedMap.put(entry.getKey(), entry.getValue()));
-        return(sortedMap);
+        mapInstitutos.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEachOrdered(entry -> sortedMap.put(entry.getKey(), entry.getValue()));
+        return (sortedMap);
     }
-    
 
     private String setTextRank() {
         String results;
         Map<String, InstitutoRecord> institutos = getRankInstitutos();
         Stream<Map.Entry<String, InstitutoRecord>> sortedStream = institutos.entrySet().stream().
                 sorted(Map.Entry.comparingByValue());
-        results = getTextRanked(sortedStream,highestAgremiadosI);
+        results = getTextRanked(sortedStream, highestAgremiadosI);
         return results;
     }
 
     public String getCountConstanciasInst(List<AsistenciaWebinar> data) {
         Map<String, InstitutoRecord> institutoMap = new HashMap<>();
         Map<String, InstitutoRecord> institutoMapRanked = new HashMap<>();
-        String highestInst = ""; InstitutoRecord obj;
+        String highestInst = "";
+        InstitutoRecord obj;
         int highestRecord = 0, cont = 0, maxEntry;
         try {
             data.sort((o1, o2) -> {
@@ -869,23 +924,24 @@ public final class ReporteChartWebRealizado extends BasePDF {
                     institutoMapRanked.put(entrySet.getKey(), entrySet.getValue());
                 }
             }
-            highestInst = getRankConstancias(institutoMapRanked,highestRecord);
+            highestInst = getRankConstancias(institutoMapRanked, highestRecord);
         } catch (Exception ex) {
             Logger.getLogger(ReporteChartWebRealizado.class.getName()).log(Level.SEVERE, null, ex);
         }
         return highestInst;
     }
 
-    private String getRankConstancias(Map<String, InstitutoRecord> map,int maxEntry) {
+    private String getRankConstancias(Map<String, InstitutoRecord> map, int maxEntry) {
         String results;
         Stream<Map.Entry<String, InstitutoRecord>> sortedStream = map.entrySet().stream().
                 sorted(Map.Entry.comparingByValue());
-        results = getTextRanked(sortedStream,maxEntry);
+        results = getTextRanked(sortedStream, maxEntry);
         return results;
     }
-    
-    private String getTextRanked(Stream<Map.Entry<String, InstitutoRecord>> sortedStream,int highestRecord){
-        String results = ""; int cont=0;
+
+    private String getTextRanked(Stream<Map.Entry<String, InstitutoRecord>> sortedStream, int highestRecord) {
+        String results = "";
+        int cont = 0;
         Map<String, InstitutoRecord> newMap = new HashMap<>();
         sortedStream.forEach(entry -> {
             newMap.put(entry.getKey(), entry.getValue());
@@ -910,7 +966,8 @@ public final class ReporteChartWebRealizado extends BasePDF {
     }
 
     private Map<String, InstitutoRecord> getRankInstitutos() {
-        String tempValueI;LocalDate oldestDate;
+        String tempValueI;
+        LocalDate oldestDate;
         List<Agremiado> listAgremiados = filteredList ? filterList : getSortedListAgremiados("institucion");
         Map<String, InstitutoRecord> mapInstitutos = new HashMap<>();
         Map<String, InstitutoRecord> mapRankInstitutos = new HashMap<>();
@@ -999,13 +1056,20 @@ public final class ReporteChartWebRealizado extends BasePDF {
             return this.oldestReg.compareTo(obj.getOldestReg());
         }
     }
-    
+
     private class InstitutoGeneralInfo {
-        int agremiados,hombres,mujeres;
-        public InstitutoGeneralInfo() {}
-        public InstitutoGeneralInfo(int a,int h,int m){
-            this.agremiados = a; this.hombres = h; this.mujeres = m;
+
+        int agremiados, hombres, mujeres;
+
+        public InstitutoGeneralInfo() {
         }
+
+        public InstitutoGeneralInfo(int a, int h, int m) {
+            this.agremiados = a;
+            this.hombres = h;
+            this.mujeres = m;
+        }
+
         public int getAgremiados() {
             return agremiados;
         }
@@ -1029,7 +1093,7 @@ public final class ReporteChartWebRealizado extends BasePDF {
         public void setMujeres(int mujeres) {
             this.mujeres = mujeres;
         }
-        
+
     }
 
 }

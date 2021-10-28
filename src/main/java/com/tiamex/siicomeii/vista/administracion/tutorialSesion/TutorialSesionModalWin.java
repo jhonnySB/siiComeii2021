@@ -95,13 +95,13 @@ public class TutorialSesionModalWin extends TemplateModalWin {
             row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
             row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
             row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(tutor);
-            row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(tutorial);
             row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(urlYoutube);
+            row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(tutorial);
             row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(usuario);
 
             contentLayout.addComponent(contenido);
             setCaption("Sesiones del tutorial (" +sys+ ")");
-            setWidth("50%");
+            setWidth("35%");
 
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());

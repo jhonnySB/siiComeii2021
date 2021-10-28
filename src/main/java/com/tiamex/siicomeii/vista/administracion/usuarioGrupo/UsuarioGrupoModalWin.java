@@ -48,7 +48,7 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
         contentLayout.addComponent(contenido);
 
         setCaption("Usuario grupo");
-        setWidth("50%");
+        //setWidth("50%");
     }
 
     @Override
@@ -79,34 +79,37 @@ public final class UsuarioGrupoModalWin extends TemplateModalWin {
             else if (matcher.find()) {
                 Element.makeNotification("Solo se permiten letras", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
                 
-            }else if(id==0){
-                if(grupoUser!=null){
-                    Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
-                }else{
-                    obj.setNombre(nombre.getValue());
-                    obj = ControladorUsuarioGrupo.getInstance().save(obj);
-                    if (obj != null) {
-                        Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                        ui.getFabricaVista().usuarioGrupoDlg.eventMostrar();
-                        close();
-                    }  
-                }
             }else{
-                if(grupoUser!=null){
-                    if(grupoUser.getId()==id){
-                        close();
-                    }else{
-                        Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                if (id == 0) {
+                    if (grupoUser != null) {
+                        Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                    } else {
+                        obj.setNombre(nombre.getValue());
+                        obj = ControladorUsuarioGrupo.getInstance().save(obj);
+                        if (obj != null) {
+                            Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                            ui.getFabricaVista().usuarioGrupoDlg.eventMostrar();
+                            close();
+                        }
                     }
-                }else{
-                    obj.setNombre(nombre.getValue());
-                    obj = ControladorUsuarioGrupo.getInstance().save(obj);
-                    if (obj != null) {
-                        Element.makeNotification("Se actualizaron los datos con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                        ui.getFabricaVista().usuarioGrupoDlg.eventMostrar();
-                        close();
-                    } 
+                } else {
+                    if (grupoUser != null) {
+                        if (grupoUser.getId() == id) {
+                            close();
+                        } else {
+                            Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        }
+                    } else {
+                        obj.setNombre(nombre.getValue());
+                        obj = ControladorUsuarioGrupo.getInstance().save(obj);
+                        if (obj != null) {
+                            Element.makeNotification("Se actualizaron los datos con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                            ui.getFabricaVista().usuarioGrupoDlg.eventMostrar();
+                            close();
+                        }
+                    }
                 }
+                ui.getFabricaVista().usuarioDlg.updateDlg();
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());

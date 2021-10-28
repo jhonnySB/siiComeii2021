@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,15 @@ import org.threeten.extra.YearWeek;
 public class regex {
 
     public static void main(String[] args) {
-
+        String inputText = "1";
+        
+        try {
+           LocalDate date = LocalDate.parse(inputText, DateTimeFormatter.ISO_DATE);
+            System.out.printf("%s%n", date);
+        } catch (DateTimeParseException exc) {
+            System.out.printf("%s is not parsable!%n", inputText);
+            //throw exc;      // Rethrow the exception.
+        }
         /*
         ZoneId zoneId = ZoneId.of("America/Mexico_City");
         YearWeek currentYearWeek = YearWeek.now(zoneId);

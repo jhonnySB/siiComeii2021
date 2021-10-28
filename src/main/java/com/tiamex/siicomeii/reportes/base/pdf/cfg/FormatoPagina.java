@@ -121,12 +121,8 @@ public class FormatoPagina extends PdfPageEventHelper {
             //document.add(fecha);
             ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_RIGHT, new Phrase(fechaFormateada ,font), 
                     (document.right()-document.left()/2+document.leftMargin()),document.top()-10, 0);
-            document.add(new Paragraph(Chunk.NEWLINE)); document.add(new Paragraph(Chunk.NEWLINE));
-            DottedLineSeparator separator = new DottedLineSeparator();
-            separator.setPercentage(59500f / 523f);
-            Chunk linebreak = new Chunk(separator);
-            //document.add(linebreak);
             
+            document.add(new Paragraph(Chunk.NEWLINE)); //document.add(new Paragraph(Chunk.NEWLINE));
         } catch (DocumentException ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

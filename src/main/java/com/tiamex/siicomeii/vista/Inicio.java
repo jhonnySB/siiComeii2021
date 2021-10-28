@@ -118,7 +118,7 @@ public class Inicio<T> extends Panel {
         List<Object> proxEvents = new ArrayList<>();
         LocalDateTime fechaActual = LocalDateTime.now(ZoneId.systemDefault()).withHour(0).withMinute(0).withSecond(0).withNano(0);
         
-        for(ProximoEvento ev:proxEventos){
+        proxEventos.forEach(ev -> {
             LocalDateTime evDate = ev.getFecha().withHour(0).withMinute(0).withSecond(0);
             if(evDate.compareTo(fechaActual)==0){
                 hoyEvents.add(ev);
@@ -127,9 +127,9 @@ public class Inicio<T> extends Panel {
                     proxEvents.add(ev);
                 }
             }
-        }
+        });
         
-        for(ProximoWebinar web:proxWebinars){
+        proxWebinars.forEach(web -> {
             LocalDateTime webDate = web.getFecha().withHour(0).withMinute(0).withSecond(0);
             if (webDate.compareTo(fechaActual) == 0) {
                 hoyEvents.add(web);
@@ -138,7 +138,7 @@ public class Inicio<T> extends Panel {
                     proxEvents.add(web);
                 }
             }
-        }
+        });
          
         
         gridLHoy.setCaptionAsHtml(true); gridLProx.setCaptionAsHtml(true);

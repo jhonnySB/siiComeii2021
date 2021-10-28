@@ -13,6 +13,7 @@ import com.tiamex.siicomeii.vista.administracion.WebinarRealizado.WebinarRealiza
 import com.vaadin.data.HasValue;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.grid.ColumnResizeMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -53,13 +54,11 @@ public abstract class TemplateDlg<T> extends Panel {
     protected int banBoton;
     protected Button tutorialsesion;
     protected Button upWebinar;
-    protected Button delete;
+    protected Button delete,tutoriales;
     protected VerticalLayout contentLayout;
     protected ResponsiveLayout content;
     protected ResponsiveRow rowBar;
-
     protected Grid<T> grid;
-
     public VerticalLayout main;
     protected ResponsiveColumn colSearchField;
     protected ResponsiveColumn colBtnSearch;
@@ -81,11 +80,12 @@ public abstract class TemplateDlg<T> extends Panel {
 
         resBusqueda = new Label();
         Element.cfgComponent(resBusqueda);
-
-        searchField = new TextField();
+        resBusqueda.setContentMode(ContentMode.HTML);
+        
+        searchField = new TextField();  searchField.setIcon(VaadinIcons.SEARCH); searchField.setCaption("Buscar");
         Element.cfgComponent(searchField);
         searchField.setId("searchFld");
-        searchField.setPlaceholder("Buscar");
+        searchField.setPlaceholder("Buscar...");
         searchField.addValueChangeListener((HasValue.ValueChangeEvent<String> event) -> {
             buttonSearchEvent();
         });
@@ -97,14 +97,18 @@ public abstract class TemplateDlg<T> extends Panel {
             buttonSearchEvent();
         });
         btnAdd = new Button("Nuevo");
+        btnAdd.setIcon(VaadinIcons.PLUS);
         Element.cfgComponent(btnAdd);
-        btnAdd.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        btnAdd.addStyleName(ValoTheme.BUTTON_PRIMARY);
         btnAdd.addClickListener((Button.ClickEvent event) -> {
             buttonAddEvent();
         });
         rowBar = content.addRow().withAlignment(Alignment.BOTTOM_LEFT);
         Element.cfgLayoutComponent(rowBar, true, false);
-        colSearchField = rowBar.addColumn().withDisplayRules(12, 6, 6, 8);
+        rowBar.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
+        rowBar.withComponents(searchField,btnAdd);
+        content.addRow().withComponents(resBusqueda);
+        /*colSearchField = rowBar.addColumn().withDisplayRules(12, 6, 6, 8);
         colSearchField.setComponent(searchField);
         //rowBar.addColumn().withDisplayRules(12, 6, 6, 8).withComponent(searchField);
         
@@ -119,7 +123,7 @@ public abstract class TemplateDlg<T> extends Panel {
         ResponsiveRow row2 = content.addRow().withAlignment(Alignment.BOTTOM_LEFT);
         Element.cfgLayoutComponent(row2, false, false);
         row2.addColumn().withDisplayRules(12, 6, 6, 8).withComponent(resBusqueda);
-        resBusqueda.setHeight("10px");
+        //resBusqueda.setHeight("10px"); */
 
         grid = new Grid<>();
         Element.cfgComponent(grid);
@@ -153,6 +157,7 @@ public abstract class TemplateDlg<T> extends Panel {
         ResponsiveLayout layout = new ResponsiveLayout();
         ResponsiveRow row = layout.addRow().withAlignment(Alignment.MIDDLE_CENTER);
         Element.cfgLayoutComponent(row, true, false);
+        row.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL, true);
 
         Button button = new Button(VaadinIcons.EDIT);
         button.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);

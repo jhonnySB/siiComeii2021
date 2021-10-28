@@ -40,7 +40,8 @@ public abstract class TemplateModalDelete extends Window{
             cancel.addClickListener((Button.ClickEvent event) -> {buttonCancelEvent();});
             cancel.setStyleName(ValoTheme.BUTTON_DANGER);
         ResponsiveRow row1 = actions.addRow().withAlignment(Alignment.MIDDLE_CENTER);
-            Element.cfgLayoutComponent(row1,true,true);
+            //Element.cfgLayoutComponent(row1,true,true);
+            row1.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
             row1.addColumn().withDisplayRules(12,6,4,4).withComponent(accept);
             row1.addColumn().withDisplayRules(12,6,4,4).withComponent(cancel);
             //row1.addColumn().withDisplayRules(12,4,3,3).withComponent(cancel);

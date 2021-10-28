@@ -38,38 +38,44 @@ public final class TutorialModalWin extends TemplateModalWin {
 
     private void init() {
         ResponsiveLayout contenido = new ResponsiveLayout();
-        Element.cfgLayoutComponent(contenido);
+        //Element.cfgLayoutComponent(contenido);
+        contenido.setResponsive(true); contenido.setCaptionAsHtml(true);
         
-        institucion = new TextField();
-        Element.cfgComponent(institucion, "Institución");
+        institucion = new TextField(); institucion.setWidthFull();
+        //Element.cfgComponent(institucion, "Institución");
+        institucion.setResponsive(true); institucion.setCaptionAsHtml(true); institucion.setCaption("<b>Institución</b>");
         institucion.setPlaceholder("Ingrese nombre de institución");
         institucion.setRequiredIndicatorVisible(true);
 
-        nombre = new TextField();
-        Element.cfgComponent(nombre, "Nombre");
+        nombre = new TextField(); nombre.setWidthFull();
+        //Element.cfgComponent(nombre, "Nombre");
+        nombre.setResponsive(true); nombre.setCaptionAsHtml(true); nombre.setCaption("<b>Nombre</b>");
         nombre.setPlaceholder("Ingrese nombre");
         nombre.setRequiredIndicatorVisible(true);
 
-        tutor = new TextField();
-        Element.cfgComponent(tutor, "Tutor");
+        tutor = new TextField(); tutor.setWidthFull();
+        //Element.cfgComponent(tutor, "Tutor");
+        tutor.setResponsive(true); tutor.setCaptionAsHtml(true); tutor.setCaption("<b>Tutor</b>");
         tutor.setPlaceholder("Ingrese nombre del tutor");
         tutor.setRequiredIndicatorVisible(true);
 
-        usuario = new TextField();
-        Element.cfgComponent(usuario, "Usuario");
+        usuario = new TextField(); usuario.setWidthFull();
+        //Element.cfgComponent(usuario, "Usuario");
+        usuario.setResponsive(true); usuario.setCaptionAsHtml(true); usuario.setCaption("<b>Usuario</b>");
         usuario.setValue(ui.getUsuario().getNombre());
         //usuario.setEnabled(false);
         usuario.setReadOnly(true);
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
-        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
+        row1.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
+        row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(tutor);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(usuario);
 
         contentLayout.addComponent(contenido);
         setCaption("Tutorial");
-        setWidth("50%");
+        setWidth("35%");
     }
 
     @Override
@@ -79,7 +85,7 @@ public final class TutorialModalWin extends TemplateModalWin {
             this.id = obj.getId();
             institucion.setValue(obj.getInstitucion());
             nombre.setValue(obj.getNombre());
-            tutor.setValue(obj.getTutor());
+                tutor.setValue(obj.getTutor());
             //usuario.setValue(String.valueOf(ui.getUsuario().getId()));
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
@@ -151,8 +157,7 @@ public final class TutorialModalWin extends TemplateModalWin {
                                 }
                             }
                 }
-                
-                
+                ui.getFabricaVista().tutorialSesionDlg.updateDlg();
             } else {
                 Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
             }

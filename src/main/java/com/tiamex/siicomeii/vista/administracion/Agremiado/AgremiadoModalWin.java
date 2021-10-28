@@ -41,8 +41,6 @@ public class AgremiadoModalWin extends TemplateModalWin {
     private TextField correo;
     private ComboBox<Pais> pais;
     private ComboBox<String> sexo;
-    private String backup = " ";
-    private int flag = 0;
 
     public AgremiadoModalWin() {
         init();
@@ -107,6 +105,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
         });
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
+        row1.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(correo);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(institucion);
@@ -124,7 +123,7 @@ public class AgremiadoModalWin extends TemplateModalWin {
         contentLayout.addComponent(contenido);
 
         setCaption("Agremiado");
-        setWidth("50%");
+        setWidth("35%");
     }
 
     @Override
@@ -137,9 +136,6 @@ public class AgremiadoModalWin extends TemplateModalWin {
             nombre.setValue(obj.getNombre());
             correo.setValue(obj.getCorreo());
 
-            backup = obj.getCorreo();
-            flag = 1;
-            
             pais.setValue(obj.getObjPais());
             sexo.setSelectedItem( obj.getSexo()=='H'?"Hombre":"Mujer" );
             //sexo.setValue(String.valueOf(obj.getSexo()));

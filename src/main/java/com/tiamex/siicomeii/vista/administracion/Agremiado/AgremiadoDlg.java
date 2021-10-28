@@ -1,9 +1,12 @@
 package com.tiamex.siicomeii.vista.administracion.Agremiado;
 
+import com.jarektoro.responsivelayout.ResponsiveColumn;
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorAgremiado;
 import com.tiamex.siicomeii.persistencia.entidad.Agremiado;
+import com.tiamex.siicomeii.persistencia.entidad.ProximoEvento;
+import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.reportes.base.pdf.ListadoAgremiadosPDF;
 import com.tiamex.siicomeii.reportes.base.pdf.ListadoWebinarsPDF;
 import com.tiamex.siicomeii.utils.Utils;
@@ -15,6 +18,7 @@ import com.vaadin.data.Result;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.SerializableComparator;
 import com.vaadin.server.SerializablePredicate;
 import com.vaadin.server.StreamResource;
 import com.vaadin.shared.ui.ContentMode;
@@ -28,6 +32,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -37,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * @author fred *
@@ -48,8 +54,8 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     List<Agremiado> filterList = new ArrayList<>();
     DateField fechaInicioF;
     DateField fechaFinF;
-    Button btnClear;
-    Button currentDate;
+    Button btnClear,currentDate,btnToday;
+    ZoneId zoneId = ZoneId.of("America/Mexico_City");
 
     public AgremiadoDlg() throws Exception {  //Constructor de la clase AgremiadoDlg
         init();
@@ -81,8 +87,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
                 } else {
                      panelChart = new agremiadosChart(filterList);
                 }
-                
-                wdw.setHeight(panelChart.getHeight() + 41, panelChart.getHeightUnits());
+                wdw.setHeightUndefined();
                 wdw.setWidth("60%");
                 wdw.setContent(panelChart);
                 ui.addWindow(wdw);
@@ -90,48 +95,108 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
                 Logger.getLogger(AgremiadoDlg.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-
+        SerializableComparator<Agremiado> comparator = (a1,a2)->{
+            int y1 = a1.getFechaReg().getYear(), y2 = a2.getFechaReg().getYear(),
+                    m1=a1.getFechaReg().getMonthValue(),m2=a2.getFechaReg().getMonthValue(),
+                    d1=a1.getFechaReg().getDayOfMonth(),d2=a2.getFechaReg().getDayOfMonth();
+            if(y1<y2)return -1;
+            if(y1>y2)return 1;
+            if(m1<m2)return -1;
+            if(m1>m2)return 1;
+            if(d1<d2)return -1;
+            if(d1>d2)return 1;
+            return 0;
+        };
         ResponsiveLayout layoutReportes = new ResponsiveLayout();
         ResponsiveRow r = layoutReportes.addRow().withAlignment(Alignment.MIDDLE_RIGHT);r.setSpacing(true);
         r.addColumn().withComponent(listadoAgremiados);
         r.addColumn().withComponent(btnChart);
         r.addColumn().withComponent(btnAdd);
-        //colSearchField.withComponent(layoutReportes);
-        //colSearchField.withDisplayRules(12, 6,6,6);
-
-        rowBar.removeComponent(colSearchField);
-        rowBar.removeComponent(colBtnSearch);
-        colBtnAdd.withDisplayRules(12, 12, 12, 12);
-        colBtnAdd.setContent(layoutReportes);
-        //rowBar.removeComponent(btnSearch);
-        //colBtnSearch.getContent().setVisible(false); colBtnSearch.withDisplayRules(0, 0, 0, 0);
-        //colBtnAdd.withDisplayRules(12, 6,6,6); btnAdd.setWidthUndefined();
+        rowBar.removeAllComponents();
+        rowBar.withComponents(searchField,btnAdd,btnChart,listadoAgremiados);
         banBoton = 2;
-
+        grid.setHeaderRowHeight(40);
         grid.addColumn(Agremiado::getNombre).setCaption("Nombre").setHidable(false);
         grid.addColumn(Agremiado::getCorreo).setCaption("Correo").setHidable(true).setHidingToggleCaption("Mostrar Correo").setHidden(true);
         grid.addColumn(Agremiado::getInstitucion).setCaption("Institución").setHidable(false);
         grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio").setHidable(true).setHidingToggleCaption("Mostrar Grado Estudio");
         grid.addColumn(Agremiado::getObjPais).setCaption("País").setHidable(true).setHidingToggleCaption("Mostrar País");
         grid.addColumn(Agremiado::getFechaReg).setCaption("Fecha registro").setHidable(true).setHidingToggleCaption("Mostrar Fecha registro")
-                .setId("colFechaReg").setMinimumWidth(355).setMaximumWidth(355);
+                .setId("colFechaReg").setMinimumWidth(480).setComparator(comparator);
         grid.addColumn(agremiadoBean -> (agremiadoBean.getSexo() == 'H' ? "Hombre" : "Mujer")).setCaption("Género")
                 .setHidable(true).setHidingToggleCaption("Mostrar Género").setHidden(true);
 
-        HeaderRow headerTitulo = grid.appendHeaderRow();
-        headerTitulo.getCell("colFechaReg").setComponent(buildFilterDate());
+        HeaderRow headerDate = grid.appendHeaderRow();
+        headerDate.getCell("colFechaReg").setComponent(buildFilterDate());
 
         ///////////////////////
         //contentLayout.addComponent(contenido);
         setCaption("<b>Agremiados</b>");
         eventMostrar();
+        enableFilters();
+    }
+    
+    private void enableFilters() {
+        if (dataProvider.getItems().isEmpty()) {
+            fechaInicioF.setEnabled(false);
+        }
     }
 
-    private DateField newDateField(String placeHolder, String description) {
-        DateField fecha = new DateField() {
+    public ResponsiveLayout buildFilterDate() {
+        ResponsiveLayout lay = new ResponsiveLayout();
+        lay.setResponsive(true);
+        lay.setSizeFull();
+        fechaInicioF = buildDateField("Fecha inicio", "Selecciona la fecha de inicio","");
+        fechaFinF = buildDateField("Fecha fin", "Selecciona la fecha final","");
+        fechaFinF.setEnabled(false);
+        Label label = new Label("-");
+        label.setResponsive(true);
+        btnClear = new Button("Limpiar");
+        btnClear.setResponsive(true);
+        btnClear.setDescription("Reiniciar las celdas de selección de fecha");
+        btnClear.setEnabled(false);
+        btnClear.addClickListener((Button.ClickListener) event -> {
+            fechaInicioF.setValue(null);
+            fechaFinF.setValue(null);
+            fechaFinF.setEnabled(false);
+            btnClear.setEnabled(false);
+            dataProvider.clearFilters();
+        });
+        btnClear.addStyleNames(ValoTheme.BUTTON_TINY,ValoTheme.BUTTON_LINK); 
+        //withComponents(fechaInicioF, label, fechaFinF, btnClear)
+        
+        btnToday= new Button("Hoy");
+        btnToday.setResponsive(true);
+        btnToday.addStyleNames(ValoTheme.BUTTON_TINY,ValoTheme.BUTTON_LINK);
+        btnToday.addClickListener((Button.ClickListener) event -> {
+            fechaInicioF.setValue(LocalDate.now(zoneId));
+        });
+        
+        ResponsiveRow row = lay.addRow().withAlignment(Alignment.MIDDLE_CENTER);
+        row.withComponents(fechaInicioF,fechaFinF,btnToday,btnClear);
+        row.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL, true); row.setSizeFull();
+
+        fechaInicioF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
+            if(event.getValue()!=null){
+                filterDate(fechaInicioF);
+                fechaFinF.setRangeStart(fechaInicioF.getValue().plusDays(1));
+                fechaFinF.setEnabled(true);
+                btnClear.setEnabled(true);
+            }
+        });
+        fechaFinF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
+            if(event.getValue()!=null){
+                dataProvider.setFilter(filter());
+                fechaInicioF.setRangeEnd(((LocalDate)event.getValue()).minusDays(1));
+            }
+        });
+        return lay;
+    }
+    
+    public DateField buildDateField(String placeHolder, String description,String caption) {
+        DateField dateField = new DateField() {
             @Override
-            protected Result<LocalDate> handleUnparsableDateString(
-                    String dateString) {
+            protected Result<LocalDate> handleUnparsableDateString(String dateString) {
                 try {
                     LocalDate parsedAtServer = LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE);
                     return Result.ok(parsedAtServer);
@@ -140,88 +205,28 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
                 }
             }
         };
-        fecha.setDefaultValue(LocalDate.now(ZoneId.systemDefault())); fecha.addStyleName(ValoTheme.DATEFIELD_TINY);
-        fecha.setPlaceholder(placeHolder); fecha.setDescription(description); fecha.setWidth("127px"); 
-        fecha.setShowISOWeekNumbers(true); fecha.setZoneId(ZoneId.of("America/Mexico_City"));
-        fecha.setResolution(DateResolution.DAY); fecha.setLocale(new Locale("es", "MX")); 
-        return fecha;
+        dateField.setResponsive(true);
+        dateField.setTextFieldEnabled(false);
+        dateField.setDefaultValue(LocalDate.now(ZoneId.systemDefault()));
+        dateField.addStyleName(ValoTheme.DATEFIELD_TINY);
+        dateField.setPlaceholder(placeHolder);
+        dateField.setDescription(description);
+        dateField.setShowISOWeekNumbers(true);
+        dateField.setZoneId(ZoneId.of("America/Mexico_City"));
+        dateField.setResolution(DateResolution.DAY);
+        dateField.setLocale(new Locale("es", "MX"));
+        return dateField;
     }
-
-    public HorizontalLayout buildFilterDate() {
-        HorizontalLayout hLayout = new HorizontalLayout();
-        hLayout.setResponsive(true);
-
-        fechaInicioF = newDateField("Fecha inicio", "Seleccionar fecha de inicio");
-        fechaFinF = newDateField("Fecha fin", "Seleccionar fecha fin");
-
-        Label label = new Label(VaadinIcons.CARET_RIGHT.getHtml()); label.setContentMode(ContentMode.HTML);
-
-        hLayout.addComponent(fechaInicioF); hLayout.setSpacing(false); hLayout.setMargin(false);
-        hLayout.addComponent(label);
-        hLayout.addComponent(fechaFinF);
-
-        btnClear = new Button();
-        btnClear.setIcon(VaadinIcons.TRASH);
-        btnClear.setDescription("Limpiar");
-        btnClear.addClickListener((Button.ClickListener) event -> {
-            fechaInicioF.setValue(null);
-            fechaFinF.setValue(null);
-            btnClear.setEnabled(false);
-            dataProvider.clearFilters();
-        });
-        btnClear.addStyleName(ValoTheme.BUTTON_TINY); //btnClear.addStyleName(ValoTheme.BUTTON_ICON_ONLY); 
-        hLayout.addComponent(btnClear);
-
-        if (dataProvider.getItems().isEmpty()) {
-            fechaInicioF.setEnabled(false);
-            fechaFinF.setEnabled(false);
-            btnClear.setEnabled(false);
-        }
-
-        //fechaInicioF.addValueChangeListener(filterDate(fechaInicioF, fechaFinF, "colFecha"));
-        fechaInicioF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
-            if (fechaInicioF.getValue() != null && fechaFinF.getValue() == null) {
-                //filterDate(fechaInicioF);
-                filterList = new ArrayList<>();
-                dataProvider.setFilter(filter(false));
-                btnClear.setEnabled(true);
-            }
-
-        });
-
-        //fechaFinF.addValueChangeListener(filterDate(fechaInicioF, fechaFinF, "colFecha"));
-        fechaFinF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
-
-            if (fechaInicioF.getValue() != null && fechaFinF.getValue() != null) {
-                btnClear.setEnabled(true);
-                filterList = new ArrayList<>();
-                dataProvider.setFilter(filter(true));
-            } else {
-                dataProvider.clearFilters();
-            }
-        });
-        return hLayout;
-    }
-
-    private SerializablePredicate<Agremiado> filter(boolean rangeFilter) {
-        SerializablePredicate<Agremiado> columnPredicate = null;
-        columnPredicate = agremiado -> {
-            boolean predicate = false;
-            LocalDate fechaInicio = fechaInicioF.getValue();
-            LocalDate fechaReg = agremiado.getFechaReg();
-            if (rangeFilter) {
-                LocalDate fechaFin = fechaFinF.getValue();
-                predicate = fechaInicio.compareTo(fechaReg) * fechaReg.compareTo(fechaFin) >= 0;
-            } else {
-                predicate = fechaInicio.compareTo(fechaReg) == 0;
-            }
-
-            if (predicate) {
-                if (!filterList.contains(agremiado)) {
-                    filterList.add(agremiado);
-                }
-            }
-            return predicate;
+    
+    private SerializablePredicate<Agremiado> filter() {
+        SerializablePredicate<Agremiado> columnPredicate;
+        columnPredicate = a -> {
+            LocalDateTime fechaInicio = fechaInicioF.getValue().atStartOfDay(ZoneId.systemDefault()).toLocalDateTime();
+            LocalDateTime fechaFin = fechaFinF.getValue().atStartOfDay(ZoneId.systemDefault()).toLocalDateTime();
+            LocalDateTime newFecha = a.getFechaReg().atTime(0, 0, 0);
+            LocalDateTime newFechaIn = fechaInicio.withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime newFechaFin = fechaFin.withHour(0).withMinute(0).withSecond(0);
+            return newFechaIn.compareTo(newFecha) * newFecha.compareTo(newFechaFin) >= 0;
         };
 
         return columnPredicate;
@@ -253,28 +258,35 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     protected void buttonSearchEvent() {
         try {
             if (!searchField.isEmpty()) {
-                resBusqueda.setHeight("35px");
-                resBusqueda.setContentMode(ContentMode.HTML);
-                String strBusqueda = searchField.getValue();
-                Collection<Agremiado> agremiados = ControladorAgremiado.getInstance().getByName(strBusqueda);
-                int listSize = agremiados.size();
-                if (listSize > 1) {
-                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron " + Integer.toString(listSize) + " coincidencias para la búsqueda '" + strBusqueda + "'" + " </span></b>");
-                } else if (listSize == 1) {
-                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró " + Integer.toString(listSize) + " coincidencia para la búsqueda '" + strBusqueda + "'" + " </span></b>");
-                } else {
-                    resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '" + strBusqueda + "'" + " </span></b>");
-                }
-                grid.setItems(agremiados);
+                String searchTxt = searchField.getValue();
+                dataProvider.setFilter(filterAllByString(searchTxt));
+                resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:14px;font-family:Open Sans\">"
+                        + "No se encontro ninguna coincidencia para la búsqueda '" + searchTxt + "'" + " </span></b>");
             } else {
                 resBusqueda.setValue(null);
-                resBusqueda.setHeight("10px");
-                grid.setItems(ControladorAgremiado.getInstance().getAll());
+                dataProvider.clearFilters();
             }
 
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
+    }
+    
+    private SerializablePredicate<Agremiado> filterAllByString(String searchTxt) {
+        SerializablePredicate<Agremiado> predicate;
+        predicate = (a) -> {
+            String nombre = a.getNombre(), inst = a.getInstitucion(),gradoE = a.getObjGradoEstudio().getNombre(),
+                    pais = a.getObjPais().getNombre();
+            Pattern pattern = Pattern.compile(Pattern.quote(searchTxt), Pattern.CASE_INSENSITIVE);
+            if (pattern.matcher(nombre).find() || pattern.matcher(inst).find() || pattern.matcher(gradoE).find() || 
+                    pattern.matcher(pais).find()) {
+                resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:14px;fotn-family:Lora;"
+                        + "letter-spacing: 1px;\">Se encontraron coincidencias para la búsqueda '" + searchTxt + "'" + " </span></b>");
+                return true;
+            }
+            return false;
+        };
+        return predicate;
     }
 
     @Override

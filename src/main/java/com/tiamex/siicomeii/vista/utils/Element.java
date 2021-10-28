@@ -134,7 +134,7 @@ public class Element{
         component.setWidth("100%");
         component.setResponsive(true);
         component.setCaptionAsHtml(true);
-        component.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL,spacing);
+        //component.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL,spacing);
         component.setVerticalSpacing(ResponsiveRow.SpacingSize.SMALL,spacing);
         
         if(margin){

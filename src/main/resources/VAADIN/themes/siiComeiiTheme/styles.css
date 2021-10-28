@@ -15412,6 +15412,10 @@ div.v-layout.v-horizontal.v-widget {
 	background-color: #15f107;
 }
 
+.siiComeiiTheme .grid-shadowbox {
+	box-shadow: rgba(166, 166, 166, 0.35) 0px 5px 15px;
+}
+
 .siiComeiiTheme .v-filterselect-item-websR {
 	font-family: "Open Sans", sans-serif;
 	font-size: 15px;
@@ -15575,4 +15579,47 @@ div.v-layout.v-horizontal.v-widget {
 	overflow: visible;
 	visibility: visible;
 	top: 0px !important;
+}
+
+.siiComeiiTheme .colMargin {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.siiComeiiTheme .v-panel-caption-captionColor {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 12px;
+	line-height: 36px;
+	border-bottom: none;
+	margin-bottom: 1px;
+	background-color: #3b5998;
+	background-image: -webkit-linear-gradient(top, #3b5998 2%, #3b5998 98%);
+	background-image: linear, to bottom, #3b5998 2%, #3b5998 98%;
+	color: #eceff4;
+	font-weight: 400;
+	font-size: 14px;
+	-webkit-box-shadow: inset 0 1px 0 #3b5998, inset 0 -1px 0 #3b5998, 0 0 0 1px #3b5998;
+	box-shadow: inset 0 1px 0 #3b5998, inset 0 -1px 0 #3b5998, 0 0 0 1px #3b5998;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.siiComeiiTheme .v-panel-caption-blue {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 12px;
+	line-height: 36px;
+	border-bottom: none;
+	margin-bottom: 1px;
+	background-color: #197de1;
+	background-image: -webkit-linear-gradient(top, #197de1 2%, #197de1 98%);
+	background-image: linear, to bottom, #197de1 2%, #197de1 98%;
+	color: #eceff4;
+	font-weight: 400;
+	font-size: 14px;
+	-webkit-box-shadow: inset 0 1px 0 #197de1, inset 0 -1px 0 #197de1, 0 0 0 1px #197de1;
+	box-shadow: inset 0 1px 0 #197de1, inset 0 -1px 0 #197de1, 0 0 0 1px #197de1;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05);
 }

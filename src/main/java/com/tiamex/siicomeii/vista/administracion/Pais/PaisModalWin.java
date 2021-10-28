@@ -50,7 +50,7 @@ public class PaisModalWin extends TemplateModalWin {
         contentLayout.addComponent(contenido);
 
         setCaption("País");
-        setWidth("50%");
+        //setWidth("50%");
     }
 
     @Override
@@ -122,6 +122,7 @@ public class PaisModalWin extends TemplateModalWin {
                     } 
                 }
             }
+            ui.getFabricaVista().agremiadoDlg.updateDlg();
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

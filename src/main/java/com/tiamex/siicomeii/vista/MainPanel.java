@@ -4,6 +4,7 @@ import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.Main;
 import com.tiamex.siicomeii.SiiComeiiUI;
+import com.tiamex.siicomeii.vista.administracion.GradoEstudio.GradoEstudioDlg;
 import com.tiamex.siicomeii.vista.reportes.ChartExportDemo;
 import com.tiamex.siicomeii.vista.reportes.agremiadosChart;
 //import com.tiamex.siicomeii.vista.utils.ChartExportDemo;
@@ -18,6 +19,7 @@ import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.MenuBar;
@@ -30,6 +32,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.batik.gvt.flow.MarginInfo;
 
 /**
  * @author fred *
@@ -154,22 +157,24 @@ public class MainPanel extends Panel {
         });
 
         MenuBar.MenuItem administracion = menuPrincipal.addItem("Administración", VaadinIcons.TOOLBOX, null);
-        MenuBar.MenuItem catalogos = administracion.addItem("Catálogos", VaadinIcons.CALC_BOOK, null);
-        MenuBar.MenuItem gradoEstudio = catalogos.addItem("Grado de estudios", VaadinIcons.ACADEMY_CAP, comando -> {
+        MenuBar.MenuItem Nuevo = administracion.addItem("Catálogos", VaadinIcons.CALC_BOOK, c->{
             try {
-                setContenidoPrincipal(ui.getFabricaVista().getGradoEstudioDlg());
+                Panel p = new Panel(); p.setSizeFull(); p.setResponsive(true); p.setCaption("Catalogos");
+                GridLayout grid = new GridLayout();
+                FabricaVista viewFactory = ui.getFabricaVista();
+                grid.setColumns(3);
+                grid.setSizeFull();
+                grid.setSpacing(true);
+                grid.addComponents(viewFactory.getGradoEstudioDlg(),viewFactory.getUsuarioGrupoDlg(),viewFactory.getPaisDlg());
+                p.setContent(grid);
+                setContenidoPrincipal(p);
             } catch (Exception ex) {
+                ex.printStackTrace();
                 Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        MenuBar.MenuItem usuarioGrupo = catalogos.addItem("Grupo de usuario", VaadinIcons.GROUP, comando -> {
-            try {
-                setContenidoPrincipal(ui.getFabricaVista().getUsuarioGrupoDlg());
-            } catch (Exception ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
-        MenuBar.MenuItem usuario = catalogos.addItem("Usuarios", VaadinIcons.USERS, comando -> {
+        
+        MenuBar.MenuItem usuario = administracion.addItem("Usuarios", VaadinIcons.USERS, comando -> {
             try {
                 setContenidoPrincipal(ui.getFabricaVista().getUsuarioDlg());
             } catch (Exception ex) {
@@ -178,13 +183,7 @@ public class MainPanel extends Panel {
             }
 
         });
-        MenuBar.MenuItem pais = catalogos.addItem("Paises", VaadinIcons.GLOBE, comando -> {
-            try {
-                setContenidoPrincipal(ui.getFabricaVista().getPaisDlg());
-            } catch (Exception ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
+        
 
         MenuBar.MenuItem proximosWebinar = menuPrincipal.addItem("Próximos Webinars", VaadinIcons.CALENDAR_USER, comando -> {
             try {
@@ -226,32 +225,6 @@ public class MainPanel extends Panel {
             }
         });
         
-        MenuBar.MenuItem reportes = menuPrincipal.addItem("Reportes", VaadinIcons.FILE_PRESENTATION, null);
-        MenuBar.MenuItem agremiadoR = reportes.addItem("Agremiados", VaadinIcons.USERS, comando -> {
-            try {
-                setContenidoPrincipal(new agremiadosChart());
-            } catch (Exception ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
-        
-        
-        MenuBar.MenuItem proximoWebinarR = reportes.addItem("Próximos Webinars", VaadinIcons.CALENDAR_USER, comando -> {
-            try {
-                setContenidoPrincipal(ui.getFabricaVista().getGradoEstudioDlg());
-            } catch (Exception ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
-
-        MenuBar.MenuItem webinarRealizadoR = reportes.addItem("Webinars Realizados", VaadinIcons.DIPLOMA, comando -> {
-            try {
-                setContenidoPrincipal(ui.getFabricaVista().getGradoEstudioDlg());
-            } catch (Exception ex) {
-                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
-
         return menuPrincipal;
     }
 

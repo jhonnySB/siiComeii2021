@@ -8,11 +8,14 @@ import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalWin;
 import com.vaadin.data.Binder;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,11 +47,10 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
 
         ResponsiveRow row1 = contenido.addRow().withAlignment(Alignment.TOP_CENTER);
         row1.addColumn().withDisplayRules(12, 12, 12, 12).withComponent(nombre);
-
         contentLayout.addComponent(contenido);
 
         setCaption("Grado de estudios");
-        setWidth("50%");
+        //setWidth("50%");
     }
 
     @Override
@@ -65,7 +67,7 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
  @Override
     protected void buttonAcceptEvent() {
         try {
-            String regex = "[^A-z|ñ|\\p{L}| ]";
+            String regex = "[^A-z|ñ|\\p{L}|.| ]";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(nombre.getValue());
             GradoEstudio obj = new GradoEstudio();
@@ -74,7 +76,9 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
             GradoEstudio grado = (GradoEstudio)ControladorGradoEstudio.getInstance().getByNames(cadena);
             
             if (!validarCampos()) {
-                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Notification n =Element.makeNotification("Debe proporcionar un nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER);
+                n.setStyleName("bar");
+                n.show(Page.getCurrent());
             } 
             else if (matcher.find()) {
                 Element.makeNotification("Solo se permiten letras", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
@@ -108,6 +112,7 @@ public class GradoEstudioDlgModalWin extends TemplateModalWin {
                     } 
                 }
             }
+            ui.getFabricaVista().agremiadoDlg.updateDlg();
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }

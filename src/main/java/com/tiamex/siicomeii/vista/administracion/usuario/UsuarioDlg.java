@@ -1,8 +1,10 @@
 package com.tiamex.siicomeii.vista.administracion.usuario;
 
+import com.jarektoro.responsivelayout.ResponsiveColumn;
 import com.jarektoro.responsivelayout.ResponsiveLayout;
 import com.jarektoro.responsivelayout.ResponsiveRow;
 import com.tiamex.siicomeii.controlador.ControladorUsuario;
+import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.Usuario;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.Element;
@@ -14,6 +16,8 @@ import com.vaadin.data.Binder;
 import com.vaadin.data.ReadOnlyHasValue;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.converter.StringToIntegerConverter;
+import com.vaadin.data.provider.DataProvider;
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.data.validator.RegexpValidator;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ErrorMessage;
@@ -70,12 +74,16 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
     Label statusLabel;
     PopupButton popupBtn;
     UploadReceiverSql receiver;
+    ListDataProvider<Usuario> dataProvider = 
+            DataProvider.ofCollection(ControladorUsuario.getInstance().getAll());
 
     public UsuarioDlg() throws Exception {
         init();
     }
 
     private void init() throws Exception {
+        btnAdd.setCaption("Nuevo registro");
+        searchField.setPlaceholder("Buscar por nombre,correo,grupo..");
         grid.addComponentColumn(this::buildActiveTag).setCaption("Estado");
         grid.addColumn(Usuario::getNombre).setCaption("Nombre");
         grid.addColumn(Usuario::getCorreo).setCaption("Correo");
@@ -90,15 +98,16 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
     private void createDownloadSql() {
         sqlButton = new Button();
         sqlButton.setResponsive(true);
-        sqlButton.setCaption("Descargar SQL");
+        sqlButton.setCaption("Respaldar BD"); sqlButton.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         sqlButton.setDescription("Descargar respaldo de la base de datos");
         sqlButton.setIcon(VaadinIcons.FILE_TEXT_O);
         sqlButton.addClickListener(event -> {
             downlaodSQL();
         });
 
-        modalRestoreDb = createBtn("", VaadinIcons.ROTATE_LEFT, "");
-        modalRestoreDb.setDescription("Restaurar base de datos"); modalRestoreDb.setSizeFull();
+        modalRestoreDb = createBtn("Restaurar BD", VaadinIcons.ROTATE_LEFT, "");
+        modalRestoreDb.setSizeUndefined(); modalRestoreDb.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        modalRestoreDb.setDescription("Restaurar base de datos");
         modalRestoreDb.addClickListener((ClickListener) listener -> {
             openModanRestorewdw();
         });
@@ -132,56 +141,27 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
         cancelBtn.addClickListener((e) -> {
             popupBtn.setPopupVisible(false);
         });
-        AutocompleteOffExtension.setAutocompleteOff(userLbl);
-        AutocompleteOffExtension.setAutocompleteOff(passwordFld);
 
-        ResponsiveLayout mainLayout = new ResponsiveLayout();
-        mainLayout.setResponsive(true);
-        mainLayout.setWidth(250, Unit.PIXELS);
-        mainLayout.setCaption("Restaurar base de datos");
-        mainLayout.setSpacing();
-        mainLayout.withDefaultRules(12, 12, 12, 12);
-        Panel popPanel = new Panel();
-        popPanel.setResponsive(true);
-        /*
-        row.setMargin(ResponsiveRow.MarginSize.SMALL, ResponsiveLayout.DisplaySize.LG);
-        row.addColumn().withComponent(userLbl).withGrow(true); 
-        row.setSpacing(false);
-        row = mainLayout.addRow(); //row.addStyleName("custom-row2");
-        row.setMargin(ResponsiveRow.MarginSize.SMALL, ResponsiveLayout.DisplaySize.LG);
-        row.addColumn().withComponent(passwordFld).withGrow(true); 
-        row.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
-        row = mainLayout.addRow(); */
-        ResponsiveRow row = mainLayout.addRow();
-        row.addStyleName("custom-row");
-        row.addColumn().withComponent(fileUploader).withDisplayRules(12, 12, 6, 6);
-        row.addColumn().withComponent(fileInfoLbl).withDisplayRules(12, 12, 6, 6);
-        row.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
-        row = mainLayout.addRow();
-        row.setMargin(false);
-        row.addColumn().withComponent(statusLabel).withDisplayRules(12, 12, 12, 12);
-        row = mainLayout.addRow();
-        row.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
-        row.addColumn().withComponent(restoreDb).withDisplayRules(12, 12, 6, 6);
-        row.addColumn().withComponent(cancelBtn).withDisplayRules(12, 12, 6, 6);
-        row.setMargin(ResponsiveRow.MarginSize.SMALL, ResponsiveLayout.DisplaySize.LG);
-        row.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
-        popupBtn.setContent(mainLayout);
-
-        btnAdd.setIcon(VaadinIcons.PLUS);
+        //btnAdd.setIcon(VaadinIcons.PLUS);
         ResponsiveLayout layout = new ResponsiveLayout();
-        ResponsiveRow r = layout.addRow().withAlignment(Alignment.MIDDLE_RIGHT);
+        ResponsiveRow r = layout.addRow().withAlignment(Alignment.TOP_RIGHT);
         r.setSpacing(true);
-        r.addColumn().withComponent(sqlButton);
         r.addColumn().withComponent(modalRestoreDb);
+        r.addColumn().withComponent(sqlButton);
         r.addColumn().withComponent(btnAdd);
         //colSearchField.withComponent(layoutReportes);
         //colSearchField.withDisplayRules(12, 6,6,6);
-
-        rowBar.removeComponent(colSearchField);
-        rowBar.removeComponent(colBtnSearch);
-        colBtnAdd.withDisplayRules(12, 12, 12, 12);
-        colBtnAdd.setContent(layout);
+        
+        //rowBar.removeComponent(colBtnSearch);
+        rowBar.removeAllComponents();
+        rowBar.setSpacing(ResponsiveRow.SpacingSize.SMALL, true); 
+        searchField.setWidth(100,Unit.PERCENTAGE);
+        rowBar.withComponents(searchField,btnAdd,sqlButton,modalRestoreDb);
+        //rowBar.removeComponent(colSearchField);
+        //searchField.setWidth(50, Unit.PERCENTAGE);
+        //colSearchField.withDisplayRules(12, 12, 6, 6).setAlignment(ResponsiveColumn.ColumnComponentAlignment.LEFT);
+        //colBtnAdd.withDisplayRules(12, 12, 6, 6);
+        //colBtnAdd.setContent(layout);
     }
 
     private void openModanRestorewdw() {
@@ -336,13 +316,13 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
     private Button createBtn(String caption, VaadinIcons icon, String... styleNames) {
         Button btn = new Button();
         btn.setResponsive(true);
-        btn.setCaption(caption);
-        if (icon != null) {
+        if(caption!=null)
+            btn.setCaption(caption);
+        if (icon != null)
             btn.setIcon(icon);
-        }
-        btn.setSizeFull();
-        //btn.setCaptionAsHtml(true);
-        btn.addStyleNames(styleNames);
+        btn.setCaptionAsHtml(true);
+        if(styleNames.length>0)
+            btn.addStyleNames(styleNames);
         return btn;
     }
 
@@ -382,6 +362,7 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
         ResponsiveLayout layout = new ResponsiveLayout();
         ResponsiveRow row = layout.addRow().withAlignment(Alignment.MIDDLE_CENTER);
         Element.cfgLayoutComponent(row, true, false);
+        row.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL, true);
         Label lblActivo = new Label();
 
         if (obj.getActivo()) {
@@ -406,35 +387,53 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
 
     @Override
     protected void eventMostrar() {
-        grid.setItems(ControladorUsuario.getInstance().getAll());
+        dataProvider = DataProvider.ofCollection(ControladorUsuario.getInstance().getAll());
+        grid.setDataProvider(dataProvider);
     }
 
     @Override
     protected void buttonSearchEvent() {
         try {
             if (!searchField.isEmpty()) {
-                resBusqueda.setHeight("35px");
-                String strBusqueda = searchField.getValue();
-                Collection<Usuario> usuarios = ControladorUsuario.getInstance().getByName(strBusqueda);
-                int userSize = usuarios.size();
-                if (userSize > 1) {
+                String searchTxt = searchField.getValue();
+                //Collection<Usuario> usuarios = ControladorUsuario.getInstance().getByName(strBusqueda);
+                dataProvider.setFilter(filterAllByString(searchTxt));
+                resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:14px;font-family:Lora"
+                        + "letter-spacing:1px\">No se encontro ninguna coincidencia para la búsqueda '" + searchTxt + "'" + " </span></b>");
+                
+                /*if (userSize > 1) {
                     resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron " + Integer.toString(userSize) + " coincidencias para la búsqueda '" + strBusqueda + "'" + " </span></b>");
                 } else if (userSize == 1) {
                     resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró " + Integer.toString(userSize) + " coincidencia para la búsqueda '" + strBusqueda + "'" + " </span></b>");
                 } else {
                     resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '" + strBusqueda + "'" + " </span></b>");
                 }
-                grid.setItems(usuarios);
+                grid.setItems(usuarios);*/
             } else {
                 resBusqueda.setValue(null);
-                resBusqueda.setHeight("10px");
-                grid.setItems(ControladorUsuario.getInstance().getAll());
+                dataProvider.clearFilters();
             }
 
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
+    
+    private SerializablePredicate<Usuario> filterAllByString(String searchTxt){
+        SerializablePredicate<Usuario> predicate;
+        predicate = (webinar)->{
+            String name = webinar.getNombre(),correo = webinar.getCorreo(),userGroup = webinar.getObjUsuarioGrupo().getNombre();
+            Pattern pattern = Pattern.compile(Pattern.quote(searchTxt), Pattern.CASE_INSENSITIVE);
+            if(pattern.matcher(name).find() || pattern.matcher(correo).find() || pattern.matcher(userGroup).find()){
+                resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:14px;fotn-family:Lora;"
+                        + "letter-spacing: 1px;\">Se encontraron coincidencias para la búsqueda '" + searchTxt + "'" + " </span></b>");
+                return true;
+            }
+            return false;
+        };
+        return predicate;
+    }
+    
 
     @Override
     protected void eventDeleteButtonGrid(Usuario obj) {

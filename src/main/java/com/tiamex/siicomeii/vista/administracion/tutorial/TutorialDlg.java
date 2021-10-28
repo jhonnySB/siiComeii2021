@@ -1,26 +1,32 @@
 package com.tiamex.siicomeii.vista.administracion.tutorial;
 
 import com.tiamex.siicomeii.controlador.ControladorTutorial;
+import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.Tutorial;
 import com.tiamex.siicomeii.utils.Utils;
 import com.tiamex.siicomeii.vista.utils.TemplateDlg;
+import com.vaadin.data.provider.DataProvider;
+import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.server.SerializablePredicate;
 import com.vaadin.shared.ui.ContentMode;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /** @author fred **/
 public class TutorialDlg extends TemplateDlg<Tutorial>{
 
     public static String opt;
-
+    ListDataProvider<Tutorial> dataProvider;
     public TutorialDlg() throws Exception{
         init();
     }
 
     private void init() {
         banBoton = 3;
+        searchField.setPlaceholder("Buscar por nombre,tutor,instituto");
         grid.addColumn(Tutorial::getNombre).setCaption("Nombre").setHidable(false);
         grid.addColumn(Tutorial::getTutor).setCaption("Tutor").setHidable(true).setHidingToggleCaption("Mostrar Tutor");
         grid.addColumn(Tutorial::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución");
@@ -32,36 +38,41 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
     
     @Override
     protected void eventMostrar(){ 
-        grid.setItems(ControladorTutorial.getInstance().getAll());  
-        
+        dataProvider = DataProvider.ofCollection(ControladorTutorial.getInstance().getAll());
+        grid.setDataProvider(dataProvider);
     }
 
     @Override
     protected void buttonSearchEvent(){
         try{
             if(!searchField.isEmpty()){
-                resBusqueda.setHeight("35px");
-                resBusqueda.setContentMode(ContentMode.HTML);
-                String strBusqueda = searchField.getValue();
-                Collection<Tutorial> tutorials = ControladorTutorial.getInstance().getByName(strBusqueda);
-                int tutorialSize = tutorials.size();
-                if(tutorialSize>1){
-                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;font-family:Open Sans;\">Se encontraron "+Integer.toString(tutorialSize)+" coincidencias para la búsqueda '"+strBusqueda+"'"+" </span></b>");
-                }else if(tutorialSize==1){
-                    resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:16px;fotn-family:Open Sans;\">Se encontró "+Integer.toString(tutorialSize)+" coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>");
-                }else{
-                     resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">No se encontro ninguna coincidencia para la búsqueda '"+strBusqueda+"'"+" </span></b>"); 
-                }
-                grid.setItems(tutorials);
+                String searchTxt = searchField.getValue();
+                dataProvider.setFilter(filterAllByString(searchTxt));
+                resBusqueda.setValue("<b><span style=\"color:red;display:inline-block;font-size:16px;font-family:Open Sans\">"
+                        + "No se encontro ninguna coincidencia para la búsqueda '"+searchTxt+"'"+" </span></b>"); 
             }else{
                 resBusqueda.setValue(null);
-                resBusqueda.setHeight("10px");
-                grid.setItems(ControladorTutorial.getInstance().getAll());
+                dataProvider.clearFilters();
             }
             
         }catch (Exception ex){
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
+    }
+    
+    private SerializablePredicate<Tutorial> filterAllByString(String searchTxt) {
+        SerializablePredicate<Tutorial> predicate;
+        predicate = (tuto) -> {
+            String name = tuto.getNombre(), tutor = tuto.getTutor(), inst = tuto.getInstitucion();
+            Pattern pattern = Pattern.compile(Pattern.quote(searchTxt), Pattern.CASE_INSENSITIVE);
+            if (pattern.matcher(name).find() || pattern.matcher(tutor).find() || pattern.matcher(inst).find()) {
+                resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:14px;fotn-family:Lora;"
+                        + "letter-spacing: 1px;\">Se encontraron coincidencias para la búsqueda '" + searchTxt + "'" + " </span></b>");
+                return true;
+            }
+            return false;
+        };
+        return predicate;
     }
     
            @Override
@@ -100,9 +111,6 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
     @Override
     protected void eventTutorialSesiones(Tutorial obj) {
         try {
-            //TutorialSesionDlg obj2 = new TutorialSesionDlg(obj.getId());
-            
-            //obj2.setTutorial(obj.getId());
             opt = obj.getNombre();
             ui.getFabricaVista().getMainPanel().setContenidoPrincipal(ui.getFabricaVista().getTutorialsesionDlg(obj.getId()));
         } catch (IOException ex) {

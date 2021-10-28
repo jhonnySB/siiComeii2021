@@ -103,6 +103,8 @@ import java.util.function.Predicate;
 import org.threeten.extra.YearWeek;
 import com.google.common.collect.Lists;
 import com.google.common.base.Functions;
+import com.vaadin.ui.HorizontalLayout;
+
 /**
  *
  * @author jhon
@@ -125,8 +127,8 @@ public class webinarRealizadoChart<T> extends Panel {
     protected Button tutorialsesion;
     protected Button upWebinar;
     protected Button delete;
-    protected VerticalLayout contentLayout;
-    protected ResponsiveLayout content;
+    protected VerticalLayout contentModalLayout;
+    protected ResponsiveLayout contentModal;
     protected ResponsiveLayout contentChart;
     protected ResponsiveRow row1;
     TextField fileName;
@@ -144,21 +146,22 @@ public class webinarRealizadoChart<T> extends Panel {
     NativeSelect<String> selectBy, selectGraph;
     MenuBar menuDownload;
     // webinar
-    ComboBox<String> comboBox,comboYearSel;
+    ComboBox<String> comboBox, comboYearSel;
     NativeSelect<Integer> selectYear;
-    List<WebinarRealizado> listaWebR = ControladorWebinarRealizado.getInstance().getAllSorted("nombre"),listaComboBox,copyListWebR;
+    List<WebinarRealizado> listaWebR = ControladorWebinarRealizado.getInstance().getAllSorted("nombre"), listaComboBox, copyListWebR;
     List<ProximoWebinar> listaProxWeb = ControladorProximoWebinar.getInstance().getAll();
     List<Agremiado> listaAgremiados = ControladorAgremiado.getInstance().getAll();
     List<AsistenciaWebinar> listAsistencia = ControladorAsistenciaWebinar.getInstance().getAll();
     List<List<WebinarRealizado>> orderedByYearList;
-    Map<String,Integer> mapInstitutoWeb = new HashMap<>();
+    Map<String, Integer> mapInstitutoWeb = new HashMap<>();
     final LocalDate currentDate = LocalDate.now(ZoneId.of("America/Mexico_City"));
     final Locale locale = Locale.forLanguageTag("es-MX");
     List<Integer> listYears;
     Chart generalChart;
     int highestRecord;
     Panel scrollPanelChart;
-    
+    Button btnDownload;
+
     public VerticalLayout getMain() {
         return main;
     }
@@ -174,21 +177,6 @@ public class webinarRealizadoChart<T> extends Panel {
 
     private void initDlg() throws Exception {
         ui = Element.getUI();
-        content = new ResponsiveLayout();
-        content.setSizeFull();
-        content.setSpacing();
-
-        ResponsiveRow r1 = content.addRow();
-        List<Integer> scales = Arrays.asList(1, 2);
-        RadioButtonGroup radioBtn = new RadioButtonGroup("", scales);
-        radioBtn.setCaption("<span style=\"font-size:14px\">Escala del gráfico");
-        radioBtn.setCaptionAsHtml(true);
-
-        ResponsiveLayout rLayoutGraph = new ResponsiveLayout();
-        rLayoutGraph.setResponsive(true);
-        ResponsiveRow rowGraph = rLayoutGraph.addRow();
-        rowGraph.setResponsive(true);
-
         selectGraph = new NativeSelect<>("Tipo de gráfico:", Arrays.asList("Columna", "Pastel"));
         selectGraph.setEmptySelectionAllowed(false);
         selectGraph.setResponsive(true);
@@ -362,49 +350,55 @@ public class webinarRealizadoChart<T> extends Panel {
             }
         });
         //getSvgStrings();
-        
-        
+
         /*btnFullReport = createExportButton(VaadinIcons.FILE_TEXT_O.getHtml(), currentDate.toString() + ".pdf", createPdfStreamSource(true),
                 "Descargar reporte de todos los datos registrados");*/
-        btnFullReport = new Button(); btnFullReport.setResponsive(true); 
+        btnFullReport = new Button();
+        btnFullReport.setResponsive(true);
         btnFullReport.setDescription("Descargar reporte de todos los datos registrados");
-        btnFullReport.setIcon(VaadinIcons.FILE_TEXT_O); btnFullReport.addStyleName(ValoTheme.BUTTON_SMALL);
-        btnFullReport.addClickListener((ClickListener) listener->{
-            if(listaWebR.isEmpty() && listAsistencia.isEmpty()){
+        btnFullReport.setIcon(VaadinIcons.FILE_TEXT_O);
+        btnFullReport.addClickListener((ClickListener) listener -> {
+            if (listaWebR.isEmpty() && listAsistencia.isEmpty()) {
                 Notification.show("", "Sin registros", Notification.Type.ERROR_MESSAGE);
-            }else{
-                ui.addWindow(new ShowPDFDlg(new StreamResource(createPdfStreamSource(true,0),
+            } else {
+                ui.addWindow(new ShowPDFDlg(new StreamResource(createPdfStreamSource(true, 0),
                         currentDate.format(DateTimeFormatter.ISO_DATE))));
             }
         });
-        
+
         /*btnReportChart = createExportButton(VaadinIcons.BAR_CHART_H.getHtml(), currentDate.toString() + ".pdf", createPdfStreamSource(false),
                 "Descargar reporte de los datos filtrados en la tabla");
         btnReportChart.addClickListener((ClickListener) listener -> {
         }); */
-        
-        comboBox = new ComboBox<>("Buscar institución:", getInstitutos());
-        comboBox.setResponsive(true); comboBox.setPlaceholder("Ingrese nombre");
-        comboBox.setTextInputAllowed(true); comboBox.setPageLength(10);
-        comboBox.setWidth(90F, Unit.PERCENTAGE);  comboBox.addStyleName("searchbox");
+        comboBox = new ComboBox<>("<b>Buscar institución:</b>", getInstitutos());
+        comboBox.setResponsive(true);
+        comboBox.setPlaceholder("Ingrese nombre");
+        comboBox.setTextInputAllowed(true);
+        comboBox.setPageLength(10);
+        //comboBox.setWidth(90F, Unit.PERCENTAGE);
+        comboBox.setWidthFull();
+        comboBox.addStyleName("searchbox");
         comboBox.setCaptionAsHtml(true);
         comboBox.setEmptySelectionAllowed(true);
         comboBox.setEmptySelectionCaption("Todos los registros");
-        comboBox.setStyleGenerator(str->{
-            if(mapInstitutoWeb.get(str)>0)
+        comboBox.setStyleGenerator(str -> {
+            if (mapInstitutoWeb.get(str) > 0) {
                 return "websR";
+            }
             return "noWebsR";
-        }); 
-        comboBox.setItemCaptionGenerator(str->{
-            int total = mapInstitutoWeb.get(str);
-            if(total==0)
-                return str+" - Ninguno.";
-            if(total==1)
-                return str+" - "+total+" realizado.";
-            return str+" - "+total+" realizados.";
         });
-        comboBox.addSelectionListener((SingleSelectionEvent<String> event)->{
-            if(event.getSelectedItem().isPresent()){
+        comboBox.setItemCaptionGenerator(str -> {
+            int total = mapInstitutoWeb.get(str);
+            if (total == 0) {
+                return str + " - Ninguno.";
+            }
+            if (total == 1) {
+                return str + " - " + total + " realizado.";
+            }
+            return str + " - " + total + " realizados.";
+        });
+        comboBox.addSelectionListener((SingleSelectionEvent<String> event) -> {
+            if (event.getSelectedItem().isPresent()) {
                 String selectedItem = event.getValue();
                 listaComboBox = ControladorWebinarRealizado.getInstance().getByInstituto(selectedItem);
                 scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados 2021",
@@ -416,59 +410,73 @@ public class webinarRealizadoChart<T> extends Panel {
                     selectYear.clear();
                     selectYear.setEnabled(false);
                 }
-            }else{
+            } else {
                 scrollPanelChart.setContent(generalChart);
                 selectYear.setEnabled(true);
                 selectYear.setSelectedItem(2021);
             }
         });
-        selectYear = new NativeSelect<>("Año:",getYears()); selectYear.setEmptySelectionAllowed(false);
-        selectYear.setWidth(90F, Unit.PERCENTAGE); selectYear.setEmptySelectionAllowed(true);
+        selectYear = new NativeSelect<>("<b>Año:</b>", getYears());
+        selectYear.setEmptySelectionAllowed(false);
+        selectYear.setCaptionAsHtml(true);
+        selectYear.setWidthFull();
+        //selectYear.setWidth(90F, Unit.PERCENTAGE);
+        selectYear.setEmptySelectionAllowed(true);
         selectYear.setEmptySelectionCaption("Seleccionar año");
-        selectYear.setItemCaptionGenerator(year->{
+        selectYear.setItemCaptionGenerator(year -> {
             return String.valueOf(year);
         });
         selectYear.setEnabled(false);
-        selectYear.addSelectionListener((SingleSelectionListener) listener->{
-            if(listener.isUserOriginated()){
+        selectYear.addSelectionListener((SingleSelectionListener) listener -> {
+            if (listener.isUserOriginated()) {
                 String year = "";
                 if (listener.getSelectedItem().isPresent()) {
                     year = String.valueOf(listener.getSelectedItem().get());
                 }
                 scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados " + year,
-                            "Webinars realizados en todo el año", year.isEmpty() ? 0 : Integer.valueOf(year)));
+                        "Webinars realizados en todo el año", year.isEmpty() ? 0 : Integer.valueOf(year)));
             }
-            
+
         });
-        
+
         ResponsiveLayout downloadLayout = new ResponsiveLayout();
         String htmlIcon = VaadinIcons.DOWNLOAD.getHtml();
-        downloadLayout.setCaption("<span style=\"font-size:12px\">Opciones de descarga " + htmlIcon + "</span>");
+        downloadLayout.setCaption("<b><span style=\"font-size:12px\">Opciones de descarga " + htmlIcon + "</span></b>");
         downloadLayout.setDescription("Se muestran algunas opciones para descargar el gráfico y el reporte en PDF");
         downloadLayout.setCaptionAsHtml(true);
+        downloadLayout.setSizeFull();
 
+        btnFullReport.addStyleNames(ValoTheme.BUTTON_FRIENDLY);
+        ResponsiveRow rr = downloadLayout.addRow();
+        rr.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
+        rr.setSizeFull();
+        rr.addColumn().withComponent(btnFullReport).withDisplayRules(4, 4, 3, 3);
         createMenuDownload();
-        ResponsiveRow rr = downloadLayout.addRow(); rr.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
-        rr.addColumn().withComponent(btnFullReport).withDisplayRules(12, 12, 7, 7);
-        rr.addColumn().withComponent(comboYearSel).withDisplayRules(12, 12, 5, 5);
-        
+        HorizontalLayout hl = new HorizontalLayout();
+        hl.setResponsive(true); hl.setSpacing(false); hl.setMargin(false);
+        hl.setSizeFull();
+        hl.addComponent(comboYearSel); hl.addComponent(btnDownload);
+        rr.addColumn().withComponent(hl).withDisplayRules(8, 8, 9, 9);
+        //rr.addColumn().withComponent(comboYearSel).withDisplayRules(5, 5, 5, 5);
+        //rr.addColumn().withComponent(btnDownload).withDisplayRules(3, 3, 3, 3);
 
-        Panel infoPanel = new Panel(); infoPanel.addStyleName("captionPanelNoPadding");
-        infoPanel.setCaption(
-                "<span style=\"padding:0;\">Información General y descargas " + VaadinIcons.INFO_CIRCLE.getHtml() + "</span>");
+        Panel infoPanel = new Panel(); //infoPanel.addStyleName("captionPanelNoPadding");
+        infoPanel.addStyleNames("blue");
+        //<span style=\"padding:0;\">Información general y descargas </span>
+        infoPanel.setCaption("Información general y descargas");
         infoPanel.setCaptionAsHtml(true);
         infoPanel.setResponsive(true);
-        infoPanel.setWidth(90f, Unit.PERCENTAGE);
-        infoPanel.setHeight("315px");
+        //infoPanel.setWidth(90f, Unit.PERCENTAGE);
+        infoPanel.setHeightUndefined();
         ResponsiveLayout layoutInfoP = new ResponsiveLayout();
         layoutInfoP.setResponsive(true);
         layoutInfoP.setHeightUndefined();
         ResponsiveRow rowInfoP = layoutInfoP.addRow().withAlignment(Alignment.TOP_LEFT);
-        layoutInfoP.setWidth(90, Unit.PERCENTAGE);
         rowInfoP.setMargin(ResponsiveRow.MarginSize.SMALL, ResponsiveLayout.DisplaySize.LG);
         rowInfoP.addColumn().withComponent(downloadLayout);
         Label lblInfo;
         lblInfo = new Label();
+        lblInfo.setWidthFull();
         lblInfo.setCaption("<br><b>Webinars realizados:</b>");
         lblInfo.setCaptionAsHtml(true);
         lblInfo.setContentMode(ContentMode.HTML);
@@ -484,8 +492,7 @@ public class webinarRealizadoChart<T> extends Panel {
         lblInfo.setResponsive(true);
         lblInfo.setCaption("<br>");
         lblInfo.setCaptionAsHtml(true);
-        rowInfoP.addColumn().withComponent(lblInfo);
-
+        
         lblInfo = new Label();
         lblInfo.setCaption("<b>Constancias:</b>");
         lblInfo.setCaptionAsHtml(true);
@@ -501,32 +508,50 @@ public class webinarRealizadoChart<T> extends Panel {
         ResponsiveRow rowChart = chartOptionsLayout.addRow();
         rowChart.setSpacing(true); 
         
-        ResponsiveLayout layoutComboSelect = new ResponsiveLayout(); layoutComboSelect.setResponsive(true);
-        ResponsiveRow rComboSelect = layoutComboSelect.addRow(); rComboSelect.setResponsive(true);
-        rComboSelect.addColumn().withComponent(comboBox).withDisplayRules(12,12,12,12); 
+        contentModal = new ResponsiveLayout();
+        contentModal.setSizeFull();
+        contentModal.setSpacing();
+
+        ResponsiveRow rowModal = contentModal.addRow();
+        rowModal.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
+        rowModal.setMargin(ResponsiveRow.MarginSize.NORMAL, ResponsiveLayout.DisplaySize.XS);
+        rowModal.setMargin(ResponsiveRow.MarginSize.NORMAL, ResponsiveLayout.DisplaySize.SM);
+        rowModal.setMargin(ResponsiveRow.MarginSize.NORMAL, ResponsiveLayout.DisplaySize.MD);
+        rowModal.setMargin(ResponsiveRow.MarginSize.NORMAL, ResponsiveLayout.DisplaySize.LG);
+       
+        ResponsiveLayout rLayLateral = new ResponsiveLayout();
+        rLayLateral.setResponsive(true);
+        rLayLateral.setSpacing();
+        ResponsiveRow rowLat = rLayLateral.addRow();
+        rowLat.setResponsive(true); rowLat.setSpacing(ResponsiveRow.SpacingSize.SMALL, true);
+        rowLat.addStyleName("");
+        
+        ResponsiveLayout layoutComboSelect = new ResponsiveLayout();
+        layoutComboSelect.setResponsive(true);
+        ResponsiveRow rComboSelect = layoutComboSelect.addRow();
+        rComboSelect.setResponsive(true);
+        rComboSelect.addColumn().withComponent(comboBox).withDisplayRules(12, 12, 12, 12);
         rComboSelect.addColumn().withComponent(selectYear).withDisplayRules(12, 12, 12, 12);
         rowChart.addColumn().withComponent(layoutComboSelect);
         rowChart.addColumn().withComponent(infoPanel);
+        rowLat.addColumn().withComponent(chartOptionsLayout);
 
-        rowGraph.addColumn().withComponent(chartOptionsLayout);
-
-        //rowGraph.addColumn().withComponent(downloadLayout);
-        ResponsiveRow rowDownload = rLayoutGraph.addRow().withAlignment(Alignment.BOTTOM_CENTER);
-        //rowDownload.addColumn().withComponent(downloadLayout);
-
-        //vLayout.addComponent(downloadLayout);
-        r1.addColumn().withComponent(rLayoutGraph).withDisplayRules(12, 12, 3, 3);
-        r1.setMargin(true);
+        rowModal.addColumn().withComponent(rLayLateral).withDisplayRules(12, 12, 3, 3);
 
         contentChart = new ResponsiveLayout();
         contentChart.setSizeFull();
-        scrollPanelChart = new Panel(); int currentYear = currentDate.getYear();
+        scrollPanelChart = new Panel();
+        scrollPanelChart.setCaption("Vista del gráfico");
+        scrollPanelChart.setResponsive(true);
+        scrollPanelChart.addStyleName("captionColor");
+        int currentYear = currentDate.getYear();
         generalChart = getAgremiadoChartColumn(listaWebR, "Webinars realizados " + currentYear,
                 "Webinars realizados en todo el año", currentYear);
         scrollPanelChart.setContent(generalChart);
         contentChart.addComponent(scrollPanelChart);
 
-        r1.addColumn().withComponent(contentChart, ResponsiveColumn.ColumnComponentAlignment.CENTER).withDisplayRules(12, 12, 9, 9);
+        rowModal.addColumn().withComponent(contentChart, ResponsiveColumn.ColumnComponentAlignment.CENTER).withDisplayRules(12, 12, 9, 9);
+        
         Lang lang = new Lang();
         lang.setNoData("No hay datos que mostrar.");
         lang.setPrintChart("Imprimir gráfico");
@@ -541,52 +566,67 @@ public class webinarRealizadoChart<T> extends Panel {
         ChartOptions.get().setTheme(new VaadinTheme());
 
         this.setCaption("Estadísitcas de Agremiados");
-        this.setWidthFull(); this.setHeightUndefined();
-        this.setContent(content);
+        this.setWidthFull();
+        this.setHeightUndefined();
+        this.setContent(contentModal);
         this.setCaptionAsHtml(true);
     }
-    
-    private void createMenuDownload(){
+
+    private void createMenuDownload() {
         Collection<String> items = new ArrayList<>();
         listaWebR.stream().map(web -> String.valueOf(web.getFecha().getYear())).filter(year -> (items.isEmpty() || !items.contains(year))).
                 forEachOrdered(year -> {
-            items.add(year);
-        });
-        comboYearSel = new ComboBox(); comboYearSel.setResponsive(true); comboYearSel.setWidth(100, Unit.PERCENTAGE);
-        comboYearSel.setDescription("Descargar reporte de los webinars deñ año seleccionado"); 
+                    items.add(year);
+                });
+        comboYearSel = new ComboBox();
+        comboYearSel.setWidthFull();
+        comboYearSel.setResponsive(true);
+        comboYearSel.setDescription("Descargar reporte de los webinars del año seleccionado");
         comboYearSel.setItems(Lists.transform(getYears(), Functions.toStringFunction()));
-        comboYearSel.setPlaceholder("Año"); comboYearSel.addStyleName(ValoTheme.COMBOBOX_SMALL);
-        comboYearSel.setEmptySelectionAllowed(false); comboYearSel.setPageLength(7);
-        comboYearSel.addSelectionListener((SingleSelectionListener) listener->{
-            String  item = String.valueOf(listener.getSelectedItem().get());
+        comboYearSel.setPlaceholder("Año...");
+        //comboYearSel.addStyleName(ValoTheme.COMBOBOX_TINY);
+        comboYearSel.setEmptySelectionAllowed(false);
+        comboYearSel.setPageLength(7);
+        comboYearSel.setTextInputAllowed(false);
+        comboYearSel.addSelectionListener((SingleSelectionListener) listener -> {
+            btnDownload.setEnabled(true);
+        });
+        btnDownload = new Button();
+        btnDownload.setEnabled(false);
+        btnDownload.setResponsive(true);
+        btnDownload.setIcon(VaadinIcons.DOWNLOAD_ALT);
+        btnDownload.addStyleNames(ValoTheme.BUTTON_FRIENDLY);
+        btnDownload.addClickListener((ClickListener) listener->{
+            String item = comboYearSel.getValue();
             int year = Integer.valueOf(item);
-            ui.addWindow(new ShowPDFDlg(new StreamResource(createPdfStreamSource(false,year),
+            ui.addWindow(new ShowPDFDlg(new StreamResource(createPdfStreamSource(false, year),
                     currentDate.format(DateTimeFormatter.ISO_DATE))));
         });
+
     }
-    
-    private List<Integer> getYears(){
+
+    private List<Integer> getYears() {
         List<Integer> list = new ArrayList<>();
-        int currentYear,oldestYear,index = 0; 
+        int currentYear, oldestYear, index = 0;
         currentYear = oldestYear = currentDate.getYear();
-        for(WebinarRealizado web:listaWebR){
-            if(web.getFecha().getYear()<oldestYear){
+        for (WebinarRealizado web : listaWebR) {
+            if (web.getFecha().getYear() < oldestYear) {
                 oldestYear = web.getFecha().getYear();
             }
         }
         list.add(oldestYear);
-        if(oldestYear!=currentYear){
-            for(;oldestYear<currentYear;oldestYear+=1){
-                list.add(list.get(index)+1); index++;
+        if (oldestYear != currentYear) {
+            for (; oldestYear < currentYear; oldestYear += 1) {
+                list.add(list.get(index) + 1);
+                index++;
             }
         }
         return list;
     }
-   
-    
-    private Collection<String> getInstitutos(){
+
+    private Collection<String> getInstitutos() {
         Collection<String> newList = new ArrayList<>();
-        listaAgremiados.forEach(agremiado->{
+        listaAgremiados.forEach(agremiado -> {
             String i = agremiado.getInstitucion();
             if (newList.isEmpty() || !newList.stream().
                     filter(obj -> obj.equalsIgnoreCase(i)).findFirst().isPresent()) {
@@ -602,15 +642,15 @@ public class webinarRealizadoChart<T> extends Panel {
                 newList.add(i);
             }
         });
-        listaWebR.forEach(webRealizado->{
+        listaWebR.forEach(webRealizado -> {
             String webR = webRealizado.getInstitucion();
-            if(mapInstitutoWeb.containsKey(webR)){
-                mapInstitutoWeb.replace(webR, mapInstitutoWeb.get(webR)+1);
+            if (mapInstitutoWeb.containsKey(webR)) {
+                mapInstitutoWeb.replace(webR, mapInstitutoWeb.get(webR) + 1);
             }
         });
         return newList.stream().sorted().collect(Collectors.toCollection(ArrayList::new));
     }
-    
+
     public String getCountConstanciasInst(List<AsistenciaWebinar> data) {
         Map<String, InstitutoRecord> institutoMap = new HashMap<>();
         Map<String, InstitutoRecord> institutoMapRanked = new HashMap<>();
@@ -642,8 +682,8 @@ public class webinarRealizadoChart<T> extends Panel {
                     institutoMap.put(loopInstituto, obj);
                 }
             }
-            institutoMap.entrySet().stream().filter((Map.Entry<String, InstitutoRecord> entrySet) -> 
-                    {
+            institutoMap.entrySet().stream().filter((Map.Entry<String, InstitutoRecord> entrySet)
+                    -> {
                 return entrySet.getValue().getTotal() == highestRecord;
             }).forEachOrdered(entrySet -> {
                 institutoMapRanked.put(entrySet.getKey(), entrySet.getValue());
@@ -670,13 +710,13 @@ public class webinarRealizadoChart<T> extends Panel {
             newMap.put(entry.getKey(), entry.getValue());
         });
         for (Map.Entry<String, InstitutoRecord> entrySet : newMap.entrySet()) {
-            if(results.isEmpty()){
+            if (results.isEmpty()) {
                 results = "- " + entrySet.getKey();
-            }else{
-                results = results + "<br>"+"- "+entrySet.getKey();
+            } else {
+                results = results + "<br>" + "- " + entrySet.getKey();
             }
         }
-        results = results+".";
+        results = results + ".";
         return results;
     }
 
@@ -696,7 +736,7 @@ public class webinarRealizadoChart<T> extends Panel {
             }
             return date;
         }).forEachOrdered(_item -> {
-            obj.setTotal(obj.getTotal()+1);
+            obj.setTotal(obj.getTotal() + 1);
         });
         return obj;
     }
@@ -715,14 +755,18 @@ public class webinarRealizadoChart<T> extends Panel {
 
     private void setLayoutContentChart(Component component) {
         contentChart.removeAllComponents();
-        contentChart.addComponent(component);
+        Panel p = new Panel();
+        p.setResponsive(true);
+        p.addStyleName("captionColor");
+        p.setCaption("Vista del gráfico");
+        p.setContent(component);
+        contentChart.addComponent(p);
     }
 
-
-    private StreamResource.StreamSource createPdfStreamSource(boolean fullReport,int year) {
+    private StreamResource.StreamSource createPdfStreamSource(boolean fullReport, int year) {
         StreamResource.StreamSource ss
                 = () -> {
-                    File result = doExportPDF(fullReport,year);
+                    File result = doExportPDF(fullReport, year);
                     if (result != null) {
                         try {
                             return new FileInputStream(result);
@@ -735,35 +779,47 @@ public class webinarRealizadoChart<T> extends Panel {
         return ss;
     }
 
-    private File doExportPDF(boolean fullReport,int yearSelected) {
+    private File doExportPDF(boolean fullReport, int yearSelected) {
         File file = null;
         ReporteChartWebRealizado reporte = new ReporteChartWebRealizado();
         try {
             if (fullReport) {
-                file = reporte.writePdf("Webinar_realizados_completo", getSvgStrings(0),listYears,orderedByYearList);
+                file = reporte.writePdf("Webinar_realizados_completo", getSvgStrings(0), listYears, orderedByYearList);
             } else {
-                file = reporte.writePdf("webRealizados", getSvgStrings(yearSelected),yearSelected,orderedByYearList,listYears);
+                file = reporte.writePdf("webRealizados", getSvgStrings(yearSelected), yearSelected, orderedByYearList, listYears);
             }
         } catch (Exception ex) {
             Logger.getLogger(webinarRealizadoChart.class.getName()).log(Level.SEVERE, null, ex);
         }
         return file;
     }
-    
-    private List<String> getSvgStrings(int yearSel){
-        List<String> list = new ArrayList<>(); int month=0;int countYears = 0; 
-        listYears = new ArrayList<>();copyListWebR = new ArrayList<>(listaWebR);
-        List<WebinarRealizado> yearList;orderedByYearList = new ArrayList<>();
-        copyListWebR.sort((WebinarRealizado w1,WebinarRealizado w2)->{
-            int y1=w1.getFecha().getYear(), y2 = w2.getFecha().getYear(),
-                    m1 = w1.getFecha().getMonthValue(),m2=w2.getFecha().getMonthValue();
-            if(y2<y1)return -1;
-            if(y2>y1)return 1;
-            if(m1<m2)return -1;
-            if(m1>m2)return 1;
+
+    private List<String> getSvgStrings(int yearSel) {
+        List<String> list = new ArrayList<>();
+        int month = 0;
+        int countYears = 0;
+        listYears = new ArrayList<>();
+        copyListWebR = new ArrayList<>(listaWebR);
+        List<WebinarRealizado> yearList;
+        orderedByYearList = new ArrayList<>();
+        copyListWebR.sort((WebinarRealizado w1, WebinarRealizado w2) -> {
+            int y1 = w1.getFecha().getYear(), y2 = w2.getFecha().getYear(),
+                    m1 = w1.getFecha().getMonthValue(), m2 = w2.getFecha().getMonthValue();
+            if (y2 < y1) {
+                return -1;
+            }
+            if (y2 > y1) {
+                return 1;
+            }
+            if (m1 < m2) {
+                return -1;
+            }
+            if (m1 > m2) {
+                return 1;
+            }
             return 0;
         });
-        if(yearSel==0){
+        if (yearSel == 0) {
             countYears = copyListWebR.stream().map(web -> web.getFecha().getYear()).
                     filter(year -> (listYears.isEmpty() || !listYears.contains(year))).map((Integer year) -> {
                 listYears.add(year);
@@ -778,23 +834,23 @@ public class webinarRealizadoChart<T> extends Panel {
                 orderedByYearList.add(yearList);
                 list.add(buildChartPieSvg(ChartType.PIE, "Webinars Realizados " + yearToCheck,
                         "Webinars realizados durante el año por las instituciones", yearList));
-            }  
-        }else{
-            copyListWebR.removeIf((Predicate<WebinarRealizado>) web->{
-                return web.getFecha().getYear()!= yearSel;
+            }
+        } else {
+            copyListWebR.removeIf((Predicate<WebinarRealizado>) web -> {
+                return web.getFecha().getYear() != yearSel;
             });
-            for(WebinarRealizado web:copyListWebR){
+            for (WebinarRealizado web : copyListWebR) {
                 int m = web.getFecha().getMonthValue();
-                if(month==0 || month!=m){
+                if (month == 0 || month != m) {
                     listYears.add(m);
                     yearList = new ArrayList<>(copyListWebR);
                     final int monthToCheck = m;
-                    yearList.removeIf((Predicate<WebinarRealizado>) w->{
-                        return w.getFecha().getMonthValue()!=monthToCheck;
+                    yearList.removeIf((Predicate<WebinarRealizado>) w -> {
+                        return w.getFecha().getMonthValue() != monthToCheck;
                     });
                     orderedByYearList.add(yearList);
-                    list.add(buildChartPieSvg(ChartType.PIE, "Webinars Realizados de " + 
-                            Month.of(m).getDisplayName(TextStyle.FULL, locale).toUpperCase(),
+                    list.add(buildChartPieSvg(ChartType.PIE, "Webinars Realizados de "
+                            + Month.of(m).getDisplayName(TextStyle.FULL, locale).toUpperCase(),
                             "Webinars realizados durante el mes por las instituciones", yearList));
                     month = m;
                 }
@@ -822,13 +878,13 @@ public class webinarRealizadoChart<T> extends Panel {
         return sourceList;
     }
 
-    private String buildChartPieSvg(ChartType charType, String titleChart, String subTitleChart,List<WebinarRealizado> data) {
+    private String buildChartPieSvg(ChartType charType, String titleChart, String subTitleChart, List<WebinarRealizado> data) {
         Configuration config = createChart(charType, titleChart, subTitleChart, false).getConfiguration();
         plotOptPie(config, true, true, LABEL_FORMATTER, 0);
         fillChartDataPie(config, data, titleChart);
         return SVGGenerator.getInstance().generate(config);
     }
-    
+
     // Configuration config,List<Agremiado> data,String seriesName,boolean drillDownData
     /*private String buildChart(ChartType charType, String titleChart, String subTitleChart, boolean exporting, List<Agremiado> data,
             String filterBy) {
@@ -837,7 +893,6 @@ public class webinarRealizadoChart<T> extends Panel {
         fillChartDataPie(config, data, titleChart, false, filterBy);
         return SVGGenerator.getInstance().generate(config);
     } */
-
     private Chart createChart(ChartType chartType, String titleChart, String subTitleChart, boolean exporting) {
         Chart chart = new Chart(chartType);
         chart.setWidth(1000, Unit.PIXELS);
@@ -865,10 +920,11 @@ public class webinarRealizadoChart<T> extends Panel {
         x.setType(axisTypeX);
         x.setCrosshair(new Crosshair());
         x.setTitle("Mes");
-        x.setCategories("Enero","Febero","Marzo","Abril","Mayo","junio","Julio",
-                "Agosto","Septiembre","Octubre","Nomviembre","Diciembre");
+        x.setCategories("Enero", "Febero", "Marzo", "Abril", "Mayo", "junio", "Julio",
+                "Agosto", "Septiembre", "Octubre", "Nomviembre", "Diciembre");
         Labels labels = new Labels();
-        labels.setRotation(-45); labels.setAlign(HorizontalAlign.RIGHT);
+        labels.setRotation(-45);
+        labels.setAlign(HorizontalAlign.RIGHT);
         x.setLabels(labels);
         config.addxAxis(x);
 
@@ -896,16 +952,16 @@ public class webinarRealizadoChart<T> extends Panel {
     }
 
     // Configuration config, AxisType axisTypeX, String titleAxisX, String titleAxisY, boolean dtLblEnable
-    private Chart getAgremiadoChartColumn(List<WebinarRealizado> data,String title, String subTitle,int filteredYear) {
+    private Chart getAgremiadoChartColumn(List<WebinarRealizado> data, String title, String subTitle, int filteredYear) {
         Chart chart = createChart(ChartType.COLUMN, title, subTitle, true);
         Configuration config = chart.getConfiguration();
         plotOptColumn(config, AxisType.CATEGORY, true);
         config.getLegend().setEnabled(false);
-        fillChartColumn(data, config,filteredYear);
+        fillChartColumn(data, config, filteredYear);
         return chart;
     }
 
-    private boolean yearIsPresent(List<WebinarRealizado> data,int year){
+    private boolean yearIsPresent(List<WebinarRealizado> data, int year) {
         boolean currentYearWebs = false;
         for (WebinarRealizado web : data) {
             if (web.getFecha().getYear() == year) {
@@ -915,12 +971,12 @@ public class webinarRealizadoChart<T> extends Panel {
         }
         return currentYearWebs;
     }
-    
-    private void fillChartColumn(List<WebinarRealizado> data, Configuration config,int filteredYear) {
+
+    private void fillChartColumn(List<WebinarRealizado> data, Configuration config, int filteredYear) {
         try {
-            int[] values = new int[]{0,0,0,0,0,0,0,0,0,0,0,0};
+            int[] values = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             if (!data.isEmpty()) {
-                if(yearIsPresent(data,filteredYear)){
+                if (yearIsPresent(data, filteredYear)) {
                     List<WebinarRealizado> copyData = new ArrayList<>(data);
                     copyData.removeIf((WebinarRealizado webinar) -> {
                         return webinar.getFecha().getYear() != filteredYear;
@@ -997,10 +1053,10 @@ public class webinarRealizadoChart<T> extends Panel {
     private void fillChartDataPie(Configuration config, List<WebinarRealizado> data, String seriesName) {
         DataSeries series = new DataSeries();
         series.setName(seriesName);
-        data.sort((WebinarRealizado w1,WebinarRealizado w2)->{
+        data.sort((WebinarRealizado w1, WebinarRealizado w2) -> {
             return w1.getInstitucion().compareToIgnoreCase(w2.getInstitucion());
         });
-        if(!data.isEmpty()){
+        if (!data.isEmpty()) {
             Iterator<WebinarRealizado> it = data.iterator();
             String i = data.get(0).getInstitucion();
             int cont = 0;
@@ -1017,7 +1073,7 @@ public class webinarRealizadoChart<T> extends Panel {
                 }
             }
         }
-        
+
         config.addSeries(series);
 
     }
@@ -1038,7 +1094,6 @@ public class webinarRealizadoChart<T> extends Panel {
                 break;
         }
     }*/
-
     private void dataPiePaises(Configuration config, DataSeries series, List<Agremiado> data) {
         try {
             int cont = 0, maxReg = 0;
@@ -1195,7 +1250,6 @@ public class webinarRealizadoChart<T> extends Panel {
             setLayoutContentChart(getAgremiadoChartPie(data, "instituciones", "Agremiados registrados por institución", true));
         });
     }*/
-
     private void setDrillDownCallBackPie(Chart chart, List<int[]> totalGenero, List<String> instituciones) {
         chart.setDrilldownCallback((DrilldownEvent event) -> {
             DataSeries drillDownSeries = new DataSeries("Género");
@@ -1303,7 +1357,7 @@ public class webinarRealizadoChart<T> extends Panel {
     }
 }
 
-    /*   callback function
+/*   callback function
     private Function<Agremiado,Object> callback(){
         Function<Agremiado,Object> call = null;
         call = agremiado ->{

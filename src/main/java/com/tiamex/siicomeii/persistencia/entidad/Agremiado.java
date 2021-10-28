@@ -154,7 +154,7 @@ public class Agremiado implements Serializable {
 
     @Basic(optional = false)
     @Column(name = "urlIcon")
-    private boolean urlIcon = false;
+    private boolean urlIcon;
 
     public boolean getUrlIcon() {
         return urlIcon;
