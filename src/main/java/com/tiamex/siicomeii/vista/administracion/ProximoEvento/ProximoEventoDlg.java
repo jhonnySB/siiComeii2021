@@ -47,7 +47,7 @@ import org.vaadin.hene.popupbutton.PopupButton;
 public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
     ListDataProvider<ProximoEvento> dataProvider = DataProvider.ofCollection(ControladorProximoEvento.getInstance().getAll());
     List<ProximoEvento> filterList=null;
-    TextField filtroTitulo;
+    public TextField filtroTitulo;
     DateField fechaInicioF;
     DateField fechaFinF;
     Button btnClear,btnToday;
@@ -69,28 +69,28 @@ public class ProximoEventoDlg extends TemplateDlg<ProximoEvento>{
             if(d1>d2)return 1;
             return 0;
         };
+        banBoton = 5;
         grid.setHeaderRowHeight(40);
         grid.setResponsive(true);
         rowBar.removeAllComponents(); rowBar.addColumn().withComponent(btnAdd);
-        grid.addColumn(ProximoEvento::getTitulo).setCaption("<b>Título</b>").setHidable(false).setId("colTitulo");
+        int minWidth = 200;
+        grid.addColumn(ProximoEvento::getTitulo).setCaption("<b>Título</b>").setHidable(false).setId("colTitulo").setMinimumWidth(minWidth);
         grid.addColumn(ProximoEvento::getFechaFrm).setCaption("Fecha").setHidable(true).setHidingToggleCaption("Mostrar Fecha").
-                setId("colFecha").setMinimumWidth(480).setComparator(comparator).setWidthUndefined();
-        grid.addComponentColumn(proxEvento -> {
-            String desc = proxEvento.getDescripcion();
-            Label lblDes = new Label();
-            lblDes.setContentMode(ContentMode.HTML);
-            lblDes.setValue("<span title=\""+proxEvento.getDescripcion()+"\" style=\"display:inline-block;white-space:normal;\">"+desc+"</span>");
-            return lblDes;
-        }).setMaximumWidth(300).setCaption("Descripción").setHidable(true).setHidingToggleCaption("Mostrar Descripción");
+                setId("colFecha").setMinimumWidth(480).setComparator(comparator);
+        grid.addColumn(ProximoEvento::getDescripcion).setMinimumWidth(300).setMaximumWidth(300).setCaption("Descripción").setHidable(true).
+                setHidingToggleCaption("Mostrar Descripción").setDescriptionGenerator(proxEvento-> 
+                        "<b>Descripción completa:</b> <br>"+proxEvento.getDescripcion(),ContentMode.HTML);
         grid.addComponentColumn((ProximoEvento web) -> {
             if (web.getImagen() != null) {
                 return createPopupImageBtn(web.getImagen(), web.getTitulo());
             }
             return new Label("Sin imagen");
-        }).setCaption("Imagen").setHidable(true).setHidden(false).setHidingToggleCaption("Mostrar imagen").clearExpandRatio();
-        grid.addColumn(ProximoEvento::getObjUsuario).setCaption("Usuario").setHidable(true).setHidingToggleCaption("Mostrar Usuario").setHidden(true);
+        }).setCaption("Imagen").setHidable(true).setHidden(false).setMinimumWidth(minWidth).
+                setHidingToggleCaption("Mostrar imagen").clearExpandRatio();
+        grid.addColumn(ProximoEvento::getObjUsuario).setCaption("Usuario").setHidable(true).
+                setHidingToggleCaption("Mostrar Usuario").setHidden(true);
         setCaption("<b>Próximos eventos</b>"); 
-         
+        
         HeaderRow headerTitulo = grid.appendHeaderRow(); 
         headerTitulo.getCell("colTitulo").setComponent(buildFilterTitulo());
         headerTitulo.getCell("colFecha").setComponent(buildFilterDate());

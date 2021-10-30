@@ -27,6 +27,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import java.util.Arrays;
 
 /** @author cerimice */
 public class Element{
@@ -93,6 +94,24 @@ public class Element{
             example.setPosition(position);
             example.setHtmlContentAllowed(true);
             example.setDelayMsec(2000);
+        return example;
+    }
+    
+    public static Notification buildNotification(String caption,String description, String styleNames){
+        Notification example = new Notification(caption, description);
+        example.setPosition(Position.TOP_CENTER);
+            example.setHtmlContentAllowed(true);
+            example.setDelayMsec(2000);
+            example.setStyleName(styleNames);
+        return example;
+    }
+    
+    public static Notification buildSucessNotification(){
+        Notification example = new Notification("Éxito", "La operación se realizo con éxito");
+        example.setPosition(Position.TOP_CENTER);
+            example.setHtmlContentAllowed(true);
+            example.setDelayMsec(2000);
+            example.setStyleName("bar success closable");
         return example;
     }
     

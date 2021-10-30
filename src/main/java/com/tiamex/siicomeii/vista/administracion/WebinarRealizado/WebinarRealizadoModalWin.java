@@ -196,21 +196,20 @@ public final class WebinarRealizadoModalWin extends TemplateModalWin implements 
 
                 obj = ControladorWebinarRealizado.getInstance().save(obj);
                 if (obj != null) {
-                    if (id != 0) {
+                    Element.buildSucessNotification().show(Page.getCurrent());
+                    /*if (id != 0) {
                         Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                     } else {
                         Element.makeNotification("Registro agregado a Webinars Realizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
-                    }
+                    }*/
                     ui.getFabricaVista().getWebinarRealizadoDlg().updateDlg();
                     close();
-                } else {
-                    Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                 }
-
                 ui.getFabricaVista().getProximoWebinarDlg().updateDlg();
 
             } else {
-                Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.buildNotification("Aviso", "Faltan campos por completar", "bar warning closable").
+                                            show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());

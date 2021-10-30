@@ -105,23 +105,22 @@ public final class TutorialModalWin extends TemplateModalWin {
                 obj.setUsuario(ui.getUsuario().getId());
                 
                 if(regexTutor()){
-                   Element.makeNotification("Solo se permiten letras en el nombre del tutor", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                   Element.buildNotification("Error", "No se permiten números y caracteres especiales en el nombre", "bar error closable").
+                            show(Page.getCurrent());
                 }else{
                     Tutorial tutorial = (Tutorial)ControladorTutorial.getInstance().getByNames(nombre.getValue());
                     if(id==0){ // nuevo registro (botón agregar)
                                 
                                 if (tutorial != null) { // nuevo registro con entrada de correo duplicada
-                                    
-                                    Element.makeNotification("Ya existe un tutorial con el mismo nombre: '"+tutorial.getNombre()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    Element.buildNotification("Aviso", "Ya existe un registro con el mismo nombre", "bar warning closable").
+                                            show(Page.getCurrent());
                                 }else{ // nuevo registro con nuevo correo
                                     
                                         obj = ControladorTutorial.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getTutorialDlg().eventMostrar();
                                             close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                         }
                                 }
                             }else{ // editando un registro
@@ -131,15 +130,14 @@ public final class TutorialModalWin extends TemplateModalWin {
                                     if(compareTutorial(tutorial)){ // sin cambios
                                         close();
                                     }else if(tutorial.getId()!=id){
-                                        Element.makeNotification("Ya existe un tutorial con el mismo nombre: '"+tutorial.getNombre()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                        Element.buildNotification("Aviso", "Ya existe un registro con el mismo nombre", "bar warning closable").
+                                            show(Page.getCurrent());
                                     }else{
                                         obj = ControladorTutorial.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getTutorialDlg().eventMostrar();
                                             close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                         }
                                     }
                                     
@@ -147,19 +145,17 @@ public final class TutorialModalWin extends TemplateModalWin {
                                     
                                         obj = ControladorTutorial.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getTutorialDlg().eventMostrar();
                                             close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                         }
-                                    
                                 }
                             }
                 }
                 ui.getFabricaVista().tutorialSesionDlg.updateDlg();
             } else {
-                Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.buildNotification("Aviso", "Faltan campos por completar", "bar warning closable").
+                                            show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());

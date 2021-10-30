@@ -179,8 +179,8 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                 obj.setPassword(password.getValue());
                 obj.setUsuarioGrupo(usuarioGrupo.getValue().getId());
                 if (regexName()) {
-                    Element.makeNotification("Solo se permiten letras en el nombre", Notification.Type.WARNING_MESSAGE, 
-                            Position.TOP_CENTER).show(UI.getCurrent().getPage());
+                    Element.buildNotification("Error", "No se permiten números y caracteres especiales en el nombre", "bar error closable").
+                            show(Page.getCurrent());
                     nombre.focus();
                 } else {
                     if (ContarCaracteres(password.getValue()) >= 8 && ContarCaracteres(password.getValue()) <= 10) {
@@ -189,25 +189,20 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                             if (id == 0) { // nuevo registro (botón agregar)
 
                                 if (usuario != null) { // nuevo registro con entrada de correo duplicada
-
-                                    Element.makeNotification("Ya existe un usuario con el mismo correo", Notification.Type.WARNING_MESSAGE, 
-                                            Position.TOP_CENTER).show(Page.getCurrent());
+                                    Element.buildNotification("Aviso", "Ya existe un registro con el mismo correo", "bar warning closable").
+                                            show(Page.getCurrent());
                                 } else { // nuevo registro con nuevo correo
                                     SiiComeiiMailer mailer = new SiiComeiiMailer();
                                     if (mailer.enviarBienvenida(obj)) {
                                         obj = ControladorUsuario.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, 
-                                                    Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getUsuarioDlg().eventMostrar();
                                             close();
-                                        } else {
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, 
-                                                    Position.TOP_CENTER).show(ui.getPage());
                                         }
                                     } else {
-                                        Element.makeNotification("El correo no existe", Notification.Type.WARNING_MESSAGE, 
-                                                Position.TOP_CENTER).show(Page.getCurrent());
+                                        Element.buildNotification("Error", "Verifíque que el correo sea válido y exista", "bar error closable").
+                                                show(Page.getCurrent());
                                     }
                                 }
                             } else { // editando un registro
@@ -217,18 +212,14 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                                     if (compareUsers(usuario)) { // el mismo registro
                                         close();
                                     } else if (usuario.getId() != id) {
-                                        Element.makeNotification("Ya existe un usuario con el mismo correo", Notification.Type.WARNING_MESSAGE, 
-                                                Position.TOP_CENTER).show(Page.getCurrent());
+                                        Element.buildNotification("Aviso", "Ya existe un registro con el mismo correo", "bar warning closable").
+                                            show(Page.getCurrent());
                                     } else {
                                         obj = ControladorUsuario.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, 
-                                                    Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getUsuarioDlg().eventMostrar();
                                             close();
-                                        } else {
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, 
-                                                    Position.TOP_CENTER).show(ui.getPage());
                                         }
                                     }
 
@@ -237,27 +228,24 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                                     if (mailer.enviarBienvenida(obj)) {
                                         obj = ControladorUsuario.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, 
-                                                    Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getUsuarioDlg().eventMostrar();
                                             close();
-                                        } else {
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, 
-                                                    Position.TOP_CENTER).show(ui.getPage());
                                         }
                                     } else {
-                                        Element.makeNotification("El correo no existe", Notification.Type.WARNING_MESSAGE, 
-                                                Position.TOP_CENTER).show(Page.getCurrent());
+                                        Element.buildNotification("Error", "Verifíque que el correo sea válido y exista", "bar error closable").
+                                                show(Page.getCurrent());
                                     }
                                 }
                             }
                         } else {
-                            Element.makeNotification("Las contraseñas no coinciden", Notification.Type.WARNING_MESSAGE, 
-                                    Position.TOP_CENTER).show(Page.getCurrent());
+                            Element.buildNotification("Aviso", "Las contraseñas deben coincidir", "bar warning closable").
+                                            show(Page.getCurrent());
+                            rePassword.focus();
                         }
                     } else {
-                        Element.makeNotification("La contraseña no cumple con un minimo de 8 caracteres y un máximo de 10", 
-                                Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(UI.getCurrent().getPage());
+                        Element.buildNotification("Aviso", "La longitud de la contraseña debe ser entre 8 y 10 caracteres", "bar warning closable").
+                                            show(Page.getCurrent());
                     }
                 }
                 ui.getFabricaVista().usuarioDlg.updateDlg();
@@ -267,8 +255,9 @@ public class UsuarioDlgModalWin extends TemplateModalWin {
                     error.setErrorLevel(ErrorLevel.ERROR);
                     usuarioGrupo.setComponentError(error);
                 }
-                Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE, 
-                        Position.TOP_CENTER).show(UI.getCurrent().getPage());
+                
+                 Element.buildNotification("Aviso", "Faltan campos por completar", "bar warning closable").
+                                            show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());

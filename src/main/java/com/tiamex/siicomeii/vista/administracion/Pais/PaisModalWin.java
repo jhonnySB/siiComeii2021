@@ -88,19 +88,19 @@ public class PaisModalWin extends TemplateModalWin {
             Pais pais = (Pais)ControladorPais.getInstance().getByNames(cadena);
             
             if (!validarCampos()) {
-                Element.makeNotification("Debe proporcionar un nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.buildNotification("Error", "Debe proporcionar un nombre", "bar error closable").show(Page.getCurrent());
             } 
             else if (matcher.find()) {
-                Element.makeNotification("Solo se permiten letras", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.buildNotification("Error", "No se permiten números y caracteres especiales", "bar error closable").show(Page.getCurrent());
                 
             }else if(id==0){
                 if(pais!=null){
-                    Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                    Element.buildNotification("Aviso", "Ya existe un registro con el mismo nombre", "bar warning closable").show(Page.getCurrent());
                 }else{
                     obj.setNombre(nombre.getValue());
                     obj = ControladorPais.getInstance().save(obj);
                     if (obj != null) {
-                        Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        Element.buildSucessNotification().show(Page.getCurrent());
                         ui.getFabricaVista().paisDlg.eventMostrar();
                         close();
                     }  
@@ -110,13 +110,13 @@ public class PaisModalWin extends TemplateModalWin {
                     if(pais.getId()==id){
                         close();
                     }else{
-                        Element.makeNotification("Ya existe un registro con el mismo nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                        Element.buildNotification("Aviso", "Ya existe un registro con el mismo nombre", "bar warning closable").show(Page.getCurrent());
                     }
                 }else{
                     obj.setNombre(nombre.getValue());
                     obj = ControladorPais.getInstance().save(obj);
                     if (obj != null) {
-                        Element.makeNotification("Se actualizaron los datos con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                        Element.buildSucessNotification().show(Page.getCurrent());
                         ui.getFabricaVista().paisDlg.eventMostrar();
                         close();
                     } 

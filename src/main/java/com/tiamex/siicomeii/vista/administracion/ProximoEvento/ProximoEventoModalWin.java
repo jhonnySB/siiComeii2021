@@ -170,31 +170,27 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
                 obj.setUsuario(ui.getUsuario().getId());
                 boolean newFile = receiver.newFileReceived();
                 if (regexName()) {
-                    Element.makeNotification("Solo se permiten letras en el título", Notification.Type.WARNING_MESSAGE, 
-                            Position.TOP_CENTER).show(Page.getCurrent());
+                    Element.buildNotification("Error", "No se permiten números y caracteres especiales en el título", "bar error closable").
+                            show(Page.getCurrent());
                 } else {
                     ProximoEvento evento = (ProximoEvento) ControladorProximoEvento.getInstance().getByTitulos(titulo.getValue());
                     if (id == 0) { // nuevo registro (botón agregar)
                         if(newFile){
                             obj.setImagen(receiver.getContentByte());
                             if (evento != null) { // nuevo registro con entrada de correo duplicada
-                                Element.makeNotification("Ya existe un evento con el mismo título: '" + evento.getTitulo() + "'",
-                                        Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                Element.buildNotification("Aviso", "Ya existe un registro con el mismo título", "bar warning closable").
+                                            show(Page.getCurrent());
                             } else { // nuevo registro con nuevo correo
                                 obj = ControladorProximoEvento.getInstance().save(obj);
                                 if (obj != null) {
-                                    Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE,
-                                            Position.TOP_CENTER).show(ui.getPage());
+                                    Element.buildSucessNotification().show(Page.getCurrent());
                                     ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
                                     close();
-                                } else {
-                                    Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE,
-                                            Position.TOP_CENTER).show(ui.getPage());
-                                }
+                                } 
                             }
                         }else{
-                            Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE,
-                                    Position.TOP_CENTER).show(Page.getCurrent());
+                            Element.buildNotification("Aviso", "Faltan campos por completar", "bar warning closable").
+                                            show(Page.getCurrent());
                             lblError.setValue("<span style=\"color:red\">Seleccione una imagen</span>");
                         }  
                     } else { // editando un registro
@@ -204,42 +200,32 @@ public class ProximoEventoModalWin extends TemplateModalWin implements Upload.Re
                             obj.setImagen(oldEv.getImagen());
                         if (evento != null) { // mismo reg
                             if (evento.getId() != id) {
-                                Element.makeNotification("Ya existe un evento con el mismo título: '" + evento.getTitulo() + "'", 
-                                        Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                Element.buildNotification("Aviso", "Ya existe un registro con el mismo título", "bar warning closable").
+                                            show(Page.getCurrent());
                             } else {
                                 obj = ControladorProximoEvento.getInstance().save(obj);
                                 if (obj != null) {
-                                    Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, 
-                                            Position.TOP_CENTER).show(ui.getPage());
+                                    Element.buildSucessNotification().show(Page.getCurrent());
                                     ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
                                     close();
-                                } else {
-                                    Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, 
-                                            Position.TOP_CENTER).show(ui.getPage());
                                 }
                             }
 
                         } else {
                             obj = ControladorProximoEvento.getInstance().save(obj);
                             if (obj != null) {
-                                Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, 
-                                        Position.TOP_CENTER).show(ui.getPage());
+                                Element.buildSucessNotification().show(Page.getCurrent());
                                 ui.getFabricaVista().getProximoEventoDlg().eventMostrar();
                                 close();
-                            } else {
-                                Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, 
-                                        Position.TOP_CENTER).show(ui.getPage());
                             }
-
                         }
                     }
                     ui.getFabricaVista().getProximoEventoDlg().fechaFinF.setEnabled(true);
                     ui.getFabricaVista().getProximoEventoDlg().fechaInicioF.setEnabled(true);
                 }
             } else {
-                Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE, 
-                        Position.TOP_CENTER).show(Page.getCurrent());
-                
+                Element.buildNotification("Aviso", "Faltan campos por completar", "bar warning closable").
+                                            show(Page.getCurrent());
             }
         } catch (Exception ex) {
             ex.printStackTrace();

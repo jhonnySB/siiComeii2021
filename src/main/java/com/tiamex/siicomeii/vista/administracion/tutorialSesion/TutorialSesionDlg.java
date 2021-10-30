@@ -68,12 +68,16 @@ public class TutorialSesionDlg extends TemplateDlg<TutorialSesion>{
         });
         rowBar.addComponent(tutoriales);
         searchField.setPlaceholder("Buscar...");
-        grid.addColumn(TutorialSesion::getNombre).setCaption("Nombre").setHidable(true).setHidingToggleCaption("Mostrar Nombre");
-        grid.addColumn(TutorialSesion::getTutor).setCaption("Tutor").setHidable(true).setHidingToggleCaption("Mostrar Tutor");
-        grid.addColumn(TutorialSesion::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución");
+        int minWidth = 200;
+        grid.addColumn(TutorialSesion::getNombre).setCaption("Nombre").setHidable(true).setHidingToggleCaption("Mostrar Nombre")
+                .setMinimumWidth(minWidth);
+        grid.addColumn(TutorialSesion::getTutor).setCaption("Tutor").setHidable(true).setHidingToggleCaption("Mostrar Tutor")
+                .setMinimumWidth(minWidth);
+        grid.addColumn(TutorialSesion::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución")
+                .setMinimumWidth(minWidth);
         //grid.addColumn(TutorialSesion::getUrlYoutube).setCaption("URL de youtube").setHidable(true).setHidingToggleCaption("Mostrar URL");
-        grid.addComponentColumn(this::buildUrlCmpt).setCaption("Enlace de video").setHidable(true).
-                setHidingToggleCaption("Mostrar enlace").setWidthUndefined().setResizable(false).clearExpandRatio();
+        grid.addComponentColumn(this::buildUrlCmpt).setCaption("Enlace de video").setHidable(true).setHidingToggleCaption("Mostrar enlace").
+                setWidthUndefined().setResizable(false).clearExpandRatio().setMinimumWidth(150);
         eventMostrar();
     }
     

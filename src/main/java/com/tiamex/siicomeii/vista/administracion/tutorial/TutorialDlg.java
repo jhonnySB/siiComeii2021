@@ -26,11 +26,14 @@ public class TutorialDlg extends TemplateDlg<Tutorial>{
 
     private void init() {
         banBoton = 3;
+        int minWidth = 200;
         searchField.setPlaceholder("Buscar por nombre,tutor,instituto");
-        grid.addColumn(Tutorial::getNombre).setCaption("Nombre").setHidable(false);
-        grid.addColumn(Tutorial::getTutor).setCaption("Tutor").setHidable(true).setHidingToggleCaption("Mostrar Tutor");
-        grid.addColumn(Tutorial::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución");
-        grid.addColumn(Tutorial::getObjUsuario).setCaption("Usuario").setHidable(true).setHidingToggleCaption("Mostrar Usuario").setHidden(true);
+        grid.addColumn(Tutorial::getNombre).setCaption("Nombre").setHidable(false).setMinimumWidth(minWidth);
+        grid.addColumn(Tutorial::getTutor).setCaption("Tutor").setHidable(true).setHidingToggleCaption("Mostrar Tutor").setMinimumWidth(minWidth);
+        grid.addColumn(Tutorial::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución")
+                .setMinimumWidth(minWidth);
+        grid.addColumn(Tutorial::getObjUsuario).setCaption("Usuario").setHidable(true).setHidingToggleCaption("Mostrar Usuario").setHidden(true)
+                .setMinimumWidth(minWidth);
 
         setCaption("<b>Tutoriales</b>");
         eventMostrar();

@@ -84,10 +84,10 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
     private void init() throws Exception {
         btnAdd.setCaption("Nuevo registro");
         searchField.setPlaceholder("Buscar por nombre,correo,grupo..");
-        grid.addComponentColumn(this::buildActiveTag).setCaption("Estado");
-        grid.addColumn(Usuario::getNombre).setCaption("Nombre");
-        grid.addColumn(Usuario::getCorreo).setCaption("Correo");
-        grid.addColumn(Usuario::getObjUsuarioGrupo).setCaption("Grupo de usuario");
+        grid.addComponentColumn(this::buildActiveTag).setCaption("Estado").setMinimumWidth(250);
+        grid.addColumn(Usuario::getNombre).setCaption("Nombre").setMinimumWidth(200);
+        grid.addColumn(Usuario::getCorreo).setCaption("Correo").setMinimumWidth(200);
+        grid.addColumn(Usuario::getObjUsuarioGrupo).setCaption("Grupo de usuario").setMinimumWidth(150);
 
         createDownloadSql();
 
@@ -486,11 +486,13 @@ public class UsuarioDlg extends TemplateDlg<Usuario> {
                     fos.write(buffer, 0, leido);//Buffer de caracteres, Desplazamiento de partida para empezar a escribir caracteres, Número de caracteres para escribir
                     leido = is.read(buffer);
                 }
-                Element.makeNotification("SQL de Base de datos guardado", Notification.Type.TRAY_NOTIFICATION, Position.TOP_CENTER).show(ui.getPage());
+                Element.buildSucessNotification().show(Page.getCurrent());
+                //Element.makeNotification("SQL de Base de datos guardado", Notification.Type.TRAY_NOTIFICATION, Position.TOP_CENTER).show(ui.getPage());
                 //Cierra respaldo
             } //Creamos una variable de tipo byte para el buffer
         } catch (IOException e) {
-            Element.makeNotification("Error al descargar archivo SQL", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+            Element.buildNotification("Error", "Ocurrió un error al realizar la operación", "bar error closable").show(Page.getCurrent());
+            //Element.makeNotification("Error al descargar archivo SQL", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
         }
     }
 

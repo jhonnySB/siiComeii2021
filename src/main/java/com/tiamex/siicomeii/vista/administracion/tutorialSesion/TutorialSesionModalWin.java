@@ -138,17 +138,19 @@ public class TutorialSesionModalWin extends TemplateModalWin {
                 obj.setUsuario(ui.getUsuario().getId());
                 
                 if(regexName()){
-                    Element.makeNotification("El nombre del tutor solo puede contener letras", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                    Element.buildNotification("Error", "No se permiten números y caracteres especiales en el nombre", "bar error closable").
+                            show(Page.getCurrent());
                 }else{
                     TutorialSesion tutorialSesion = (TutorialSesion)ControladorTutorialSesion.getInstance().getByNameLinked(idTutorialLinked,nombre.getValue());
                     
                     if(id==0){
                         if(tutorialSesion!=null){
-                            Element.makeNotification("Ya existe una sesión con el mismo nombre: '"+tutorialSesion.getNombre()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                            Element.buildNotification("Aviso", "Ya existe un registro con el mismo nombre", "bar warning closable").
+                                            show(Page.getCurrent());
                         }else{
                             obj = ControladorTutorialSesion.getInstance().save(obj);
                             if (obj != null) {
-                                Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                Element.buildSucessNotification().show(Page.getCurrent());
                                 ui.getFabricaVista().getTutorialsesionDlg(idTutorialLinked).eventMostrar();
                                 close();
                             }
@@ -159,15 +161,14 @@ public class TutorialSesionModalWin extends TemplateModalWin {
                                     if(compareTutorial(tutorialSesion)){ // sin cambios
                                         close();
                                     }else if(tutorialSesion.getId()!=id){
-                                        Element.makeNotification("Ya existe una sesión con el mismo nombre: '"+tutorialSesion.getNombre()+"'", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                        Element.buildNotification("Aviso", "Ya existe un registro con el mismo correo", "bar warning closable").
+                                            show(Page.getCurrent());
                                     }else{
                                         obj = ControladorTutorialSesion.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getTutorialsesionDlg(idTutorialLinked).eventMostrar();
                                             close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                         }
                                     }
                                     
@@ -175,20 +176,18 @@ public class TutorialSesionModalWin extends TemplateModalWin {
                                     
                                         obj = ControladorTutorialSesion.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getTutorialsesionDlg(idTutorialLinked).eventMostrar();
                                             close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                         }
-                                    
                                 }
                     }
                     
                     
                 } 
             } else {
-                Element.makeNotification("Faltan campos por completar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.buildNotification("Aviso", "Faltan campos por completar", "bar warning closable").
+                                            show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());

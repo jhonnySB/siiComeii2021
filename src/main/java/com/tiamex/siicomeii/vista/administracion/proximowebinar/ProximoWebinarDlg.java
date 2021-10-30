@@ -29,6 +29,7 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.components.grid.HeaderRow;
 import com.vaadin.ui.themes.ValoTheme;
@@ -64,12 +65,13 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
     Button btnClear, btnToday;
     ZoneId zoneId = ZoneId.of("America/Mexico_City");
     List<ProximoWebinar> filterList = null;
-
+    public TextField cpySearchFld;
     public ProximoWebinarDlg() throws Exception {
         init();
     }
 
     private void init() {
+        cpySearchFld = searchField;
         banBoton = 4;
         grid.setHeaderRowHeight(40);
         searchField.setPlaceholder("Buscar por título,ponente,instituto");
@@ -97,17 +99,26 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
             }
             return 0;
         };
-        grid.addColumn(ProximoWebinar::getTitulo).setCaption("Titulo").setHidable(false);
-        grid.addColumn(ProximoWebinar::getPonente).setCaption("Ponente").setHidable(true).setHidingToggleCaption("Mostrar Ponente");
-        grid.addColumn(ProximoWebinar::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución");
-        grid.addComponentColumn(this::buildFechaForm).setCaption("Fecha").setMinimumWidth(490).setHidable(true).setHidingToggleCaption("Mostrar Fecha").
-                setResizable(true).setComparator(comparator).setId("dateCol");
+        int minWidth = 200;
+        
+        grid.addColumn(ProximoWebinar::getTitulo).setCaption("Titulo").setHidable(false).setMinimumWidth(minWidth);
+        grid.addColumn(ProximoWebinar::getPonente).setCaption("Ponente").setHidable(true).setHidingToggleCaption("Mostrar Ponente").
+                setMinimumWidth(minWidth);
+        grid.addColumn(ProximoWebinar::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución")
+                .setMinimumWidth(150);
+        grid.addComponentColumn(this::buildFechaForm).setCaption("Fecha").setMinimumWidth(525).setHidable(true).setHidingToggleCaption("Mostrar Fecha")
+                .setComparator(comparator).setId("dateCol");
         grid.addComponentColumn((ProximoWebinar web) -> {
+            ResponsiveLayout lay = new ResponsiveLayout(); lay.setResponsive(true);
+            lay.setSizeFull(); lay.setSpacing();
             if (web.getImagen() != null) {
-                return createPopupImageBtn(web.getImagen(), web.getTitulo());
-            }
-            return new Label("Sin imagen");
-        }).setCaption("Imagen").setHidable(true).setHidden(false).setHidingToggleCaption("Mostrar imagen");
+                lay.addRow().withAlignment(Alignment.MIDDLE_CENTER).
+                        withComponents(createPopupImageBtn(web.getImagen(), web.getTitulo()));
+            }else
+                lay.addRow().withAlignment(Alignment.MIDDLE_CENTER).withComponents(new Label("Sin imagen"));
+            return lay;
+        }).setCaption("Imagen").setHidable(true).setHidden(false).setHidingToggleCaption("Mostrar imagen").setResizable(false)
+                .setMinimumWidth(150);
         setCaption("<b>Próximos webinars</b>");
 
         HeaderRow filterHeader = grid.appendHeaderRow();
@@ -151,8 +162,9 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
         });
 
         ResponsiveRow row = lay.addRow().withAlignment(Alignment.MIDDLE_CENTER);
-        row.withComponents(fechaInicioF,fechaFinF,btnToday,btnClear);
-        row.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL, true); row.setSizeFull();
+        row.withComponents(fechaInicioF, fechaFinF, btnToday, btnClear);
+        row.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL, true);
+        row.setSizeFull();
 
         fechaInicioF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
             if (event.getValue() != null) {
@@ -238,7 +250,7 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
         img.setWidth(250, Unit.PIXELS);
         img.setHeight(250, Unit.PIXELS);
         img.setResponsive(true);
-        img.setAlternateText("No se pudo cargar la imagen");
+        img.setAlternateText("Cargando imagen...");
         Button closeBtn = new Button();
         closeBtn.setIcon(VaadinIcons.CLOSE_SMALL);
         closeBtn.addStyleName(ValoTheme.BUTTON_TINY);
@@ -255,7 +267,10 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
     private ResponsiveLayout buildFechaForm(ProximoWebinar webinar) {
         ResponsiveLayout layout = new ResponsiveLayout();
         ResponsiveRow row = layout.addRow().withAlignment(Alignment.MIDDLE_LEFT);
-        Element.cfgLayoutComponent(row, true, false);
+        //Element.cfgLayoutComponent(row, true, false);
+        row.setWidth("100%");
+        row.setResponsive(true);
+        row.setCaptionAsHtml(true);
         row.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL, true);
         proxWeb = webinar;
         buildDatesLabels();
@@ -268,7 +283,7 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
 
     public void buildDatesLabels() {
 
-        boolean antiguo = false;
+        int antiguo = -1;
 
         lblFecha = new Label();
         lblTime = new Label();
@@ -284,12 +299,12 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
         lblTime.setContentMode(ContentMode.HTML);
         lblEstado.setContentMode(ContentMode.HTML);
 
-        long diasTotales = ChronoUnit.DAYS.between(LocalDate.now(), proxWeb.getFecha().toLocalDate()); //System.out.println("diasTotales: "+diasTotales);
-        int signedDias = Long.signum(diasTotales); //System.out.println("signedDias: "+signedDias);
-        int unsignedDias = (int) Math.abs(diasTotales); //System.out.println("unsignedDias: "+unsignedDias);
-
+        long diasTotales = ChronoUnit.DAYS.between(LocalDate.now(ZoneId.of("America/Mexico_City")), proxWeb.getFecha().toLocalDate());
+        int signedDias = Long.signum(diasTotales);
+        int unsignedDias = (int) Math.abs(diasTotales);
+        
         if (signedDias < 0) { // fecha antigua (<0)
-            antiguo = true;
+            antiguo = 1;
             if (unsignedDias < 7) { // dias menor a una semana
                 switch (unsignedDias) {
                     case 1:
@@ -418,25 +433,33 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
             }
 
         } else { // fecha actual ==0
-            antiguo = true;
+            antiguo = 0;
             lblTime.setValue("<span style=\"background-color:#28a745;padding:3px 6px;color:white;border-radius:0px;font-size:13px\">Hoy.</span>");
         }
 
-        if (antiguo == true) {
+        if (antiguo==1) {
             WebinarRealizado webR = (WebinarRealizado) ControladorWebinarRealizado.getInstance().getByNames(proxWeb.getTitulo());
             if (webR != null) {
+                delete.setEnabled(false);
+                btnEdit.setEnabled(false);
+                upWebinar.setEnabled(false);
                 upWebinar.setDescription("Ver detalles del webinar realizado");
                 lblEstado.setValue("<span style=\"display:inline-block;border-radius:100px;background-color:rgba(0, 204, 40, 0.4);"
                         + "color:white;font-style:normal;height:16px;width:16px;padding:0px 2px 7px 5px\">✔</span>");
                 lblEstado.setDescription("Archivado en webinars realizados");
             } else {
+                upWebinar.setEnabled(false);
                 lblEstado.setValue("<span style=\"display:inline-block;border-radius:100px;background-color:rgba(255, 40, 40, 0.4);"
                         + "color:white;font-style:normal;height:23px;width:23px;padding:0px 0px 0px 0px;text-align:center;font-family:Lora;\">i</span>");
                 lblEstado.setDescription("No se ha archivado en webinars realizados");
             }
         } else {
-            upWebinar.setEnabled(antiguo);
-            upWebinar.setDescription("El webinar está próximo o en progreso...");
+            if(antiguo==-1){
+                upWebinar.setEnabled(false);
+                upWebinar.setDescription("El webinar está próximo o en progreso...");
+            }else
+                upWebinar.setEnabled(true);
+            
         }
     }
 

@@ -54,7 +54,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
     List<Agremiado> filterList = new ArrayList<>();
     DateField fechaInicioF;
     DateField fechaFinF;
-    Button btnClear,currentDate,btnToday;
+    Button btnClear, currentDate, btnToday;
     ZoneId zoneId = ZoneId.of("America/Mexico_City");
 
     public AgremiadoDlg() throws Exception {  //Constructor de la clase AgremiadoDlg
@@ -80,12 +80,17 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
                 Window wdw = new Window();
                 agremiadosChart panelChart;
                 wdw.setCaption(VaadinIcons.BAR_CHART.getHtml());
-                wdw.setCaptionAsHtml(true); wdw.setModal(true);
-                wdw.center();wdw.setClosable(true);wdw.setDraggable(true);wdw.setResponsive(true);wdw.setResizable(true);
+                wdw.setCaptionAsHtml(true);
+                wdw.setModal(true);
+                wdw.center();
+                wdw.setClosable(true);
+                wdw.setDraggable(true);
+                wdw.setResponsive(true);
+                wdw.setResizable(true);
                 if (filterList.isEmpty()) {
-                     panelChart = new agremiadosChart();
+                    panelChart = new agremiadosChart();
                 } else {
-                     panelChart = new agremiadosChart(filterList);
+                    panelChart = new agremiadosChart(filterList);
                 }
                 wdw.setHeightUndefined();
                 wdw.setWidth("60%");
@@ -95,32 +100,50 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
                 Logger.getLogger(AgremiadoDlg.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        SerializableComparator<Agremiado> comparator = (a1,a2)->{
+        SerializableComparator<Agremiado> comparator = (a1, a2) -> {
             int y1 = a1.getFechaReg().getYear(), y2 = a2.getFechaReg().getYear(),
-                    m1=a1.getFechaReg().getMonthValue(),m2=a2.getFechaReg().getMonthValue(),
-                    d1=a1.getFechaReg().getDayOfMonth(),d2=a2.getFechaReg().getDayOfMonth();
-            if(y1<y2)return -1;
-            if(y1>y2)return 1;
-            if(m1<m2)return -1;
-            if(m1>m2)return 1;
-            if(d1<d2)return -1;
-            if(d1>d2)return 1;
+                    m1 = a1.getFechaReg().getMonthValue(), m2 = a2.getFechaReg().getMonthValue(),
+                    d1 = a1.getFechaReg().getDayOfMonth(), d2 = a2.getFechaReg().getDayOfMonth();
+            if (y1 < y2) {
+                return -1;
+            }
+            if (y1 > y2) {
+                return 1;
+            }
+            if (m1 < m2) {
+                return -1;
+            }
+            if (m1 > m2) {
+                return 1;
+            }
+            if (d1 < d2) {
+                return -1;
+            }
+            if (d1 > d2) {
+                return 1;
+            }
             return 0;
         };
         ResponsiveLayout layoutReportes = new ResponsiveLayout();
-        ResponsiveRow r = layoutReportes.addRow().withAlignment(Alignment.MIDDLE_RIGHT);r.setSpacing(true);
+        ResponsiveRow r = layoutReportes.addRow().withAlignment(Alignment.MIDDLE_RIGHT);
+        r.setSpacing(true);
         r.addColumn().withComponent(listadoAgremiados);
         r.addColumn().withComponent(btnChart);
         r.addColumn().withComponent(btnAdd);
         rowBar.removeAllComponents();
-        rowBar.withComponents(searchField,btnAdd,btnChart,listadoAgremiados);
+        rowBar.withComponents(searchField, btnAdd, btnChart, listadoAgremiados);
         banBoton = 2;
         grid.setHeaderRowHeight(40);
-        grid.addColumn(Agremiado::getNombre).setCaption("Nombre").setHidable(false);
-        grid.addColumn(Agremiado::getCorreo).setCaption("Correo").setHidable(true).setHidingToggleCaption("Mostrar Correo").setHidden(true);
-        grid.addColumn(Agremiado::getInstitucion).setCaption("Institución").setHidable(false);
-        grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio").setHidable(true).setHidingToggleCaption("Mostrar Grado Estudio");
-        grid.addColumn(Agremiado::getObjPais).setCaption("País").setHidable(true).setHidingToggleCaption("Mostrar País");
+        int minWidth = 200;
+        grid.addColumn(Agremiado::getNombre).setCaption("Nombre").setHidable(false).setMinimumWidth(minWidth);
+        grid.addColumn(Agremiado::getCorreo).setCaption("Correo").setHidable(true).setHidingToggleCaption("Mostrar Correo").setHidden(true)
+                .setMinimumWidth(minWidth);
+        grid.addColumn(Agremiado::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar instituto")
+                .setMinimumWidth(150);
+        grid.addColumn(Agremiado::getObjGradoEstudio).setCaption("Grado estudio").setHidable(true).setHidingToggleCaption("Mostrar Grado Estudio")
+                .setMinimumWidth(150);
+        grid.addColumn(Agremiado::getObjPais).setCaption("País").setHidable(true).setHidingToggleCaption("Mostrar País")
+                .setMinimumWidth(150);
         grid.addColumn(Agremiado::getFechaReg).setCaption("Fecha registro").setHidable(true).setHidingToggleCaption("Mostrar Fecha registro")
                 .setId("colFechaReg").setMinimumWidth(480).setComparator(comparator);
         grid.addColumn(agremiadoBean -> (agremiadoBean.getSexo() == 'H' ? "Hombre" : "Mujer")).setCaption("Género")
@@ -135,7 +158,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         eventMostrar();
         enableFilters();
     }
-    
+
     private void enableFilters() {
         if (dataProvider.getItems().isEmpty()) {
             fechaInicioF.setEnabled(false);
@@ -146,8 +169,8 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         ResponsiveLayout lay = new ResponsiveLayout();
         lay.setResponsive(true);
         lay.setSizeFull();
-        fechaInicioF = buildDateField("Fecha inicio", "Selecciona la fecha de inicio","");
-        fechaFinF = buildDateField("Fecha fin", "Selecciona la fecha final","");
+        fechaInicioF = buildDateField("Fecha inicio", "Selecciona la fecha de inicio", "");
+        fechaFinF = buildDateField("Fecha fin", "Selecciona la fecha final", "");
         fechaFinF.setEnabled(false);
         Label label = new Label("-");
         label.setResponsive(true);
@@ -162,22 +185,23 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
             btnClear.setEnabled(false);
             dataProvider.clearFilters();
         });
-        btnClear.addStyleNames(ValoTheme.BUTTON_TINY,ValoTheme.BUTTON_LINK); 
+        btnClear.addStyleNames(ValoTheme.BUTTON_TINY, ValoTheme.BUTTON_LINK);
         //withComponents(fechaInicioF, label, fechaFinF, btnClear)
-        
-        btnToday= new Button("Hoy");
+
+        btnToday = new Button("Hoy");
         btnToday.setResponsive(true);
-        btnToday.addStyleNames(ValoTheme.BUTTON_TINY,ValoTheme.BUTTON_LINK);
+        btnToday.addStyleNames(ValoTheme.BUTTON_TINY, ValoTheme.BUTTON_LINK);
         btnToday.addClickListener((Button.ClickListener) event -> {
             fechaInicioF.setValue(LocalDate.now(zoneId));
         });
-        
+
         ResponsiveRow row = lay.addRow().withAlignment(Alignment.MIDDLE_CENTER);
-        row.withComponents(fechaInicioF,fechaFinF,btnToday,btnClear);
-        row.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL, true); row.setSizeFull();
+        row.withComponents(fechaInicioF, fechaFinF, btnToday, btnClear);
+        row.setHorizontalSpacing(ResponsiveRow.SpacingSize.SMALL, true);
+        row.setSizeFull();
 
         fechaInicioF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
-            if(event.getValue()!=null){
+            if (event.getValue() != null) {
                 filterDate(fechaInicioF);
                 fechaFinF.setRangeStart(fechaInicioF.getValue().plusDays(1));
                 fechaFinF.setEnabled(true);
@@ -185,15 +209,15 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
             }
         });
         fechaFinF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
-            if(event.getValue()!=null){
+            if (event.getValue() != null) {
                 dataProvider.setFilter(filter());
-                fechaInicioF.setRangeEnd(((LocalDate)event.getValue()).minusDays(1));
+                fechaInicioF.setRangeEnd(((LocalDate) event.getValue()).minusDays(1));
             }
         });
         return lay;
     }
-    
-    public DateField buildDateField(String placeHolder, String description,String caption) {
+
+    public DateField buildDateField(String placeHolder, String description, String caption) {
         DateField dateField = new DateField() {
             @Override
             protected Result<LocalDate> handleUnparsableDateString(String dateString) {
@@ -217,7 +241,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
         dateField.setLocale(new Locale("es", "MX"));
         return dateField;
     }
-    
+
     private SerializablePredicate<Agremiado> filter() {
         SerializablePredicate<Agremiado> columnPredicate;
         columnPredicate = a -> {
@@ -271,15 +295,15 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());
         }
     }
-    
+
     private SerializablePredicate<Agremiado> filterAllByString(String searchTxt) {
         SerializablePredicate<Agremiado> predicate;
         predicate = (a) -> {
-            String nombre = a.getNombre(), inst = a.getInstitucion(),gradoE = a.getObjGradoEstudio().getNombre(),
+            String nombre = a.getNombre(), inst = a.getInstitucion(), gradoE = a.getObjGradoEstudio().getNombre(),
                     pais = a.getObjPais().getNombre();
             Pattern pattern = Pattern.compile(Pattern.quote(searchTxt), Pattern.CASE_INSENSITIVE);
-            if (pattern.matcher(nombre).find() || pattern.matcher(inst).find() || pattern.matcher(gradoE).find() || 
-                    pattern.matcher(pais).find()) {
+            if (pattern.matcher(nombre).find() || pattern.matcher(inst).find() || pattern.matcher(gradoE).find()
+                    || pattern.matcher(pais).find()) {
                 resBusqueda.setValue("<b><span style=\"color:#28a745;display:inline-block;font-size:14px;fotn-family:Lora;"
                         + "letter-spacing: 1px;\">Se encontraron coincidencias para la búsqueda '" + searchTxt + "'" + " </span></b>");
                 return true;

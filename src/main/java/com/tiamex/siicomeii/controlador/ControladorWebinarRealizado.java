@@ -1,7 +1,11 @@
 package com.tiamex.siicomeii.controlador;
 
+import com.tiamex.siicomeii.persistencia.SingletonPU;
 import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
 import com.tiamex.siicomeii.persistencia.servicio.ServicioWebinarRealizado;
+import com.tiamex.siicomeii.utils.Utils;
+import java.util.logging.Logger;
+import javax.persistence.Query;
 
 /** @author cerimice **/
 public class ControladorWebinarRealizado extends GenericController<ServicioWebinarRealizado,WebinarRealizado,Long>{

@@ -208,9 +208,9 @@ public final class AsistenciaWebinarModalWin extends TemplateModalWin {
             return r;
         });
 
-        cmboxAgremiados.setPlaceholder("Seleccionar correo de agremiado");
+        cmboxAgremiados.setPlaceholder("Buscar correo/nombre de agremiado");
         cmboxAgremiados.setEmptySelectionAllowed(false);
-        cmboxAgremiados.setSizeFull();
+        cmboxAgremiados.setWidthFull();
         cmboxAgremiados.setTextInputAllowed(true);
         cmboxAgremiados.setPageLength(5);
 

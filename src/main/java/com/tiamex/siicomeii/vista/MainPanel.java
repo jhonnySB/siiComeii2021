@@ -150,7 +150,6 @@ public class MainPanel extends Panel {
         MenuBar.MenuItem homeTab = menuPrincipal.addItem("Inicio", VaadinIcons.HOME, comando -> {
             try {
                 setContenidoPrincipal(new Inicio());
-                //setContenidoPrincipal(new ChartExportDemo());
             } catch (Exception ex) {
                 Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
             }

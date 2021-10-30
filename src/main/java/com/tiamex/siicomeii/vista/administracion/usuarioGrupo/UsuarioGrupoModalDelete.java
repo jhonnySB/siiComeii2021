@@ -6,6 +6,7 @@ import com.tiamex.siicomeii.controlador.ControladorPais;
 import com.tiamex.siicomeii.controlador.ControladorUsuarioGrupo;
 import com.tiamex.siicomeii.vista.utils.Element;
 import com.tiamex.siicomeii.vista.utils.TemplateModalDelete;
+import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -56,11 +57,11 @@ public class UsuarioGrupoModalDelete extends TemplateModalDelete {
     protected void buttonAcceptEvent(){
         try {
             if(ControladorUsuarioGrupo.getInstance().delete(idGrupo)>0){
-                Element.makeNotification("Eliminado con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                Element.buildSucessNotification().show(Page.getCurrent());
                 ui.getFabricaVista().usuarioGrupoDlg.eventMostrar();
                 close();
             }else{
-                Element.makeNotification("No se pudo eliminar el registro", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(ui.getPage());        
+                Element.buildNotification("Aviso", "No se pudo eliminar el registro", "bar warning closable").show(Page.getCurrent());
                 accept.setDisableOnClick(true);
             }
         } catch (Exception ex) {

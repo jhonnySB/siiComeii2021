@@ -91,7 +91,6 @@ public final class ListadoAgremiadosPDF extends BasePDF {
 
                 document.add(elementsPDF.getParagraph("Total agremiados registrados: " + ControladorAgremiado.getInstance().getAll().size(),
                          format.getFontSubtitleBold(), Element.ALIGN_RIGHT));
-                document.newPage();
             }else{
                 contenido = new Format(42);
                 document.add(elementsPDF.getParagraph("SIN REGISTROS", contenido.getFontSubtitleBold(), Element.ALIGN_CENTER));

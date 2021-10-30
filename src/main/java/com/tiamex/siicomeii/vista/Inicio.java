@@ -13,7 +13,9 @@ import com.tiamex.siicomeii.controlador.ControladorWebinarRealizado;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoEvento;
 import com.tiamex.siicomeii.persistencia.entidad.ProximoWebinar;
 import com.tiamex.siicomeii.persistencia.entidad.WebinarRealizado;
+import com.tiamex.siicomeii.vista.administracion.ProximoEvento.ProximoEventoDlg;
 import com.tiamex.siicomeii.vista.administracion.WebinarRealizado.WebinarRealizadoModalWin;
+import com.tiamex.siicomeii.vista.administracion.proximowebinar.ProximoWebinarDlg;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
@@ -23,6 +25,7 @@ import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.grid.ColumnResizeMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.Grid;
@@ -63,8 +66,7 @@ public class Inicio<T> extends Panel {
     protected VerticalLayout contentLayout;
     protected ResponsiveLayout content;
     protected ResponsiveRow row1;
-    protected GridLayout gridLHoy;
-    protected GridLayout gridLProx;
+    protected GridLayout gridLHoy, gridLProx, gridOldWeb;
 
     protected Grid<T> grid;
 
@@ -76,33 +78,39 @@ public class Inicio<T> extends Panel {
 
     public Inicio() throws Exception {
         initDlg();
-        
+
     }
-    
+
     private void initDlg() throws Exception {
         ui = Element.getUI();
         content = new ResponsiveLayout();
         content.setSpacing();
         content.setResponsive(true);
-        
+
         contentLayout = new VerticalLayout();
         contentLayout.setSpacing(true);
-        contentLayout.setSizeUndefined(); contentLayout.setWidthFull();
-        contentLayout.setResponsive(true); 
-        
-        
+        contentLayout.setSizeUndefined();
+        contentLayout.setWidthFull();
+        contentLayout.setResponsive(true);
+
         VerticalLayout vLayout = new VerticalLayout(); // agregar los eventos en vertical (hoy/proximos(mañana,etc))
-        vLayout.setSizeFull();vLayout.setResponsive(true);vLayout.setSpacing(true); vLayout.setMargin(true);
-        
-        HorizontalLayout hLayoutHoy = new HorizontalLayout(); 
+        vLayout.setSizeFull();
+        vLayout.setResponsive(true);
+        vLayout.setSpacing(true);
+        vLayout.setMargin(true);
+
+        HorizontalLayout hLayoutHoy = new HorizontalLayout();
         hLayoutHoy.addStyleName("outlined");
-        hLayoutHoy.setWidthFull();  
-        HorizontalLayout hLayoutProx = new HorizontalLayout(); 
+        hLayoutHoy.setWidthFull();
+        HorizontalLayout hLayoutProx = new HorizontalLayout();
         hLayoutProx.addStyleName("outlined");
         hLayoutProx.setSizeFull();
-        
-        
-        gridLHoy = new GridLayout();  
+
+        gridOldWeb = new GridLayout();
+        gridOldWeb.setColumns(5);
+        gridOldWeb.setSizeFull();
+        gridOldWeb.setSpacing(true);
+        gridLHoy = new GridLayout();
         gridLHoy.setColumns(5);
         gridLHoy.setSizeFull();
         gridLHoy.setSpacing(true);
@@ -110,94 +118,144 @@ public class Inicio<T> extends Panel {
         gridLProx.setColumns(5);
         gridLProx.setSizeFull();
         gridLProx.setSpacing(true);
-        
-        
-        List<ProximoEvento> proxEventos = ControladorProximoEvento.getInstance().getAllSorted("titulo") ;
-        List<ProximoWebinar> proxWebinars =ControladorProximoWebinar.getInstance().getAllSorted("titulo") ;
-        List<Object> hoyEvents = new ArrayList<>() ;
+
+        List<ProximoEvento> proxEventos = ControladorProximoEvento.getInstance().getAllSorted("titulo");
+        List<ProximoWebinar> proxWebinars = ControladorProximoWebinar.getInstance().getAllSorted("titulo");
+        List<Object> hoyEvents = new ArrayList<>();
         List<Object> proxEvents = new ArrayList<>();
+        List<Object> oldEvents = new ArrayList<>();
         LocalDateTime fechaActual = LocalDateTime.now(ZoneId.systemDefault()).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        
+
         proxEventos.forEach(ev -> {
             LocalDateTime evDate = ev.getFecha().withHour(0).withMinute(0).withSecond(0);
-            if(evDate.compareTo(fechaActual)==0){
+            if (evDate.isEqual(fechaActual)) {
                 hoyEvents.add(ev);
-            }else{
-                if(evDate.isAfter(fechaActual)){
+            } else {
+                if (evDate.isAfter(fechaActual)) {
                     proxEvents.add(ev);
                 }
             }
         });
-        
+
         proxWebinars.forEach(web -> {
             LocalDateTime webDate = web.getFecha().withHour(0).withMinute(0).withSecond(0);
-            if (webDate.compareTo(fechaActual) == 0) {
+            if (webDate.isEqual(fechaActual)) {
                 hoyEvents.add(web);
-            }else{
-                if(webDate.isAfter(fechaActual)){
+            } else {
+                if (webDate.isAfter(fechaActual)) {
                     proxEvents.add(web);
+                } else {
+                    WebinarRealizado wr = (WebinarRealizado) ControladorWebinarRealizado.getInstance().
+                            getByNameWebinarRealizado(web.getTitulo());
+                    if (wr == null) {
+                        oldEvents.add(web);
+                    }
                 }
+
             }
         });
-         
-        
-        gridLHoy.setCaptionAsHtml(true); gridLProx.setCaptionAsHtml(true);
-        if(hoyEvents.size()>0){
-            gridLHoy.setCaption("<span style=\"color:#007bff;font-weight:bold;font-size:22px;\"> Hoy ("+hoyEvents.size()+")</span>");
-        }else{
+
+        gridLHoy.setCaptionAsHtml(true);
+        gridLProx.setCaptionAsHtml(true);
+        gridOldWeb.setCaptionAsHtml(true);
+        if (hoyEvents.size() > 0) {
+            gridLHoy.setCaption("<span style=\"color:#007bff;font-weight:bold;font-size:22px;\"> Hoy (" + hoyEvents.size() + ")</span>");
+        } else {
             gridLHoy.setCaption("<span style=\"color:#007bff;font-weight:bold;font-size:22px;\"> Hoy (Ninguno) </span>");
         }
-        
-        if(proxEvents.size()>0){
-            gridLProx.setCaption("<span style=\"color:#007bff;font-weight:bold;font-size:22px;\"> Próximos ("+proxEvents.size()+")</span>");
-        }else{
+
+        if (proxEvents.size() > 0) {
+            gridLProx.setCaption("<span style=\"color:#007bff;font-weight:bold;font-size:22px;\"> Próximos (" + proxEvents.size() + ")</span>");
+        } else {
             gridLProx.setCaption("<span style=\"color:#007bff;font-weight:bold;font-size:22px;\"> Próximos (Ninguno)</span>");
         }
-        createBoxes(hoyEvents,gridLHoy);
-        createBoxes(proxEvents,gridLProx);
-        
-        gridLHoy.setSpacing(true); gridLProx.setSpacing(true);
+
+        if (oldEvents.size() > 0) {
+            gridOldWeb.setCaption("<span style=\"color:#dc3545;font-weight:bold;font-size:22px;\"> Webinars antiguos no realizados (" + oldEvents.size() + ")</span>");
+            createBoxes(oldEvents, gridOldWeb);
+            gridOldWeb.setSpacing(true);
+            contentLayout.addComponent(gridOldWeb);
+        }
+
+        createBoxes(hoyEvents, gridLHoy);
+        createBoxes(proxEvents, gridLProx);
+
+        gridLHoy.setSpacing(true);
+        gridLProx.setSpacing(true);
 
         contentLayout.addComponent(gridLHoy);
         contentLayout.addComponent(gridLProx);
-        
+
         this.setSizeFull();
-        this.setCaption("Inicio: Eventos próximos"); //filtrar mediante un native button por proximos webinars y proximos eventos
-        this.setCaptionAsHtml(true); 
+        this.setCaption("Inicio: Eventos pasados y próximos"); //filtrar mediante un native button por proximos webinars y proximos eventos
+        this.setCaptionAsHtml(true);
         this.setContent(contentLayout);
-       
+
     }
-    
-    private void createBoxes(List<Object> events, GridLayout grid) throws IOException{
+
+    private void createBoxes(List<Object> events, GridLayout grid) throws IOException {
         Label lblTitle;
         Label lblFecha;
         CustomLayout box;
         try {
             for (Object obj : events) {
                 box = new CustomLayout(new FileInputStream(new File(Main.getBaseDir() + "/inicio.html")));
-                box.setCaptionAsHtml(true);
+                box.setCaptionAsHtml(true); box.addStyleNames("customGridBox");
+                box.setSizeFull();
                 lblTitle = new Label();
                 lblFecha = new Label();
                 lblTitle.setWidthFull();
                 lblFecha.setWidthFull();
+                Button btnGo = new Button();
+                btnGo.addStyleNames(ValoTheme.BUTTON_FRIENDLY,ValoTheme.BUTTON_SMALL);
+                btnGo.setCaption("Ver");
+                btnGo.setResponsive(true);
                 if (obj instanceof ProximoEvento) {
                     ProximoEvento proxEv = (ProximoEvento) obj;
+                    String value = proxEv.getTitulo();
                     box.setIcon(VaadinIcons.CALENDAR_CLOCK);
                     box.setCaption("<b>Proximo Evento</b>");
                     box.setDescription("<span>Descripción: " + proxEv.getDescripcion() + "</span>", ContentMode.HTML);
                     lblTitle.setValue(proxEv.getTitulo());
                     lblFecha.setValue(proxEv.getFechaFrm());
-                } else {
+                    btnGo.addClickListener((ClickListener) (Button.ClickEvent listener) -> {
+                        FabricaVista fb = ui.getFabricaVista();
+                        try {
+                            ProximoEventoDlg proxEvDlg = fb.getProximoEventoDlg();
+                            fb.getMainPanel().setContenidoPrincipal(proxEvDlg);
+                            proxEvDlg.filtroTitulo.setValue(value);
+                        } catch (IOException ex) {
+                            Logger.getLogger(Inicio.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            Logger.getLogger(Inicio.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    });
+                } else if (obj instanceof ProximoWebinar) {
                     ProximoWebinar proxWeb = (ProximoWebinar) obj;
+                    String value = proxWeb.getTitulo();
                     box.setIcon(VaadinIcons.CALENDAR_USER);
                     box.setCaption("<b>Proximo Webinar</b>");
                     box.setDescription("<span>Ponente: " + proxWeb.getPonente() + "</span><br>"
                             + "<span>Institución: " + proxWeb.getInstitucion() + "</span>", ContentMode.HTML);
                     lblTitle.setValue(proxWeb.getTitulo());
                     lblFecha.setValue(proxWeb.getFechaFrm());
+                    btnGo.addClickListener((ClickListener) (Button.ClickEvent listener) -> {
+                        FabricaVista fb = ui.getFabricaVista();
+                        try {
+                            ProximoWebinarDlg proxWebDlg = fb.getProximoWebinarDlg();
+                            fb.getMainPanel().setContenidoPrincipal(proxWebDlg);
+                            proxWebDlg.cpySearchFld.setValue(value);
+                        } catch (IOException ex) {
+                            Logger.getLogger(Inicio.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            Logger.getLogger(Inicio.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    });
+                    
                 }
                 box.addComponent(lblTitle, "titulo");
                 box.addComponent(lblFecha, "fecha");
+                box.addComponent(btnGo, "btnGo");
                 grid.addComponent(box);
             }
         } catch (FileNotFoundException ex) {

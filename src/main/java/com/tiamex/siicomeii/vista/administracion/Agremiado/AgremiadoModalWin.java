@@ -165,28 +165,29 @@ public class AgremiadoModalWin extends TemplateModalWin {
                 obj.setGradoEstudios(gradoEstudio.getValue().getId());
                 
                 if(regexName()){
-                    Element.makeNotification("Solo se permiten letras en el nombre", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(UI.getCurrent().getPage());
+                    Element.buildNotification("Error", "No se permiten números y caracteres especiales en el nombre", "bar error closable").
+                            show(Page.getCurrent());
                     nombre.focus();
                 }else{
                     Agremiado agremiado = ControladorAgremiado.getInstance().getByEmail(correo.getValue());
                     if(id==0){ // nuevo registro (botón agregar)
                                 
                                 if (agremiado != null) { // nuevo registro con entrada de correo duplicada
-                                    Element.makeNotification("Ya existe un agremiado con el mismo correo", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                    Element.buildNotification("Aviso", "Ya existe un registro con el mismo correo", "bar warning closable").
+                                            show(Page.getCurrent());
                                 }else{ // nuevo registro con nuevo correo
                                     SiiComeiiMailer mailer = new SiiComeiiMailer();
                                     if (mailer.enviarBienvenida(obj)) {
                                         obj = ControladorAgremiado.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos guardados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getAgremiadoDlg().eventMostrar();
                                             ui.getFabricaVista().getAgremiadoDlg().updateDateFilters(true, true);
                                             close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                         }
                                     }else {
-                                        Element.makeNotification("El correo no existe", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                        Element.buildNotification("Error", "Verifíque que el correo sea válido y exista", "bar error closable").
+                                                show(Page.getCurrent());
                                     }
                                 }
                             }else{ // editando un registro
@@ -196,16 +197,15 @@ public class AgremiadoModalWin extends TemplateModalWin {
                                     if(compareAgremiados(agremiado)){ // el mismo registro
                                         close();
                                     }else if(agremiado.getId()!=id){
-                                        Element.makeNotification("Ya existe un agremiado con el mismo correo", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                        Element.buildNotification("Aviso", "Ya existe un registro con el mismo correo", "bar warning closable").
+                                            show(Page.getCurrent());
                                     }else{
                                         obj = ControladorAgremiado.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getAgremiadoDlg().eventMostrar();
                                             ui.getFabricaVista().getAgremiadoDlg().updateDateFilters(true, true);
                                             close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                         }
                                     }
                                     
@@ -214,15 +214,14 @@ public class AgremiadoModalWin extends TemplateModalWin {
                                     if (mailer.enviarBienvenida(obj)) {
                                         obj = ControladorAgremiado.getInstance().save(obj);
                                         if (obj != null) {
-                                            Element.makeNotification("Datos actualizados con éxito", Notification.Type.HUMANIZED_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
+                                            Element.buildSucessNotification().show(Page.getCurrent());
                                             ui.getFabricaVista().getAgremiadoDlg().eventMostrar();
                                             ui.getFabricaVista().getAgremiadoDlg().updateDateFilters(true, true);
                                             close();
-                                        }else{
-                                            Element.makeNotification("Ocurrió un error en el servidor", Notification.Type.ERROR_MESSAGE, Position.TOP_CENTER).show(ui.getPage());
                                         }
                                     }else {
-                                        Element.makeNotification("El correo no existe", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                                        Element.buildNotification("Error", "Verifíque que el correo sea válido y exista", "bar error closable").
+                                                show(Page.getCurrent());
                                     }
                                 }
                             }
@@ -230,7 +229,8 @@ public class AgremiadoModalWin extends TemplateModalWin {
 
             } else {
                 validateComboBox();
-                Element.makeNotification("Faltan campos por llenar", Notification.Type.WARNING_MESSAGE, Position.TOP_CENTER).show(Page.getCurrent());
+                Element.buildNotification("Aviso", "Faltan campos por completar", "bar warning closable").
+                                            show(Page.getCurrent());
             }
         } catch (Exception ex) {
             Logger.getLogger(this.getClass().getName()).log(Utils.nivelLoggin(), ex.getMessage());

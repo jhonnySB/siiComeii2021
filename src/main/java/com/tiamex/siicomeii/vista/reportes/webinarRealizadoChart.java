@@ -155,6 +155,7 @@ public class webinarRealizadoChart<T> extends Panel {
     List<List<WebinarRealizado>> orderedByYearList;
     Map<String, Integer> mapInstitutoWeb = new HashMap<>();
     final LocalDate currentDate = LocalDate.now(ZoneId.of("America/Mexico_City"));
+    int currentYear = currentDate.getYear();
     final Locale locale = Locale.forLanguageTag("es-MX");
     List<Integer> listYears;
     Chart generalChart;
@@ -397,15 +398,16 @@ public class webinarRealizadoChart<T> extends Panel {
             }
             return str + " - " + total + " realizados.";
         });
+        
         comboBox.addSelectionListener((SingleSelectionEvent<String> event) -> {
             if (event.getSelectedItem().isPresent()) {
                 String selectedItem = event.getValue();
                 listaComboBox = ControladorWebinarRealizado.getInstance().getByInstituto(selectedItem);
-                scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados 2021",
-                        "Webinars realizados en todo el año", 2021));
+                scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados "+currentYear,
+                        "Webinars realizados en todo el año", currentYear));
                 if (mapInstitutoWeb.get(selectedItem) > 0) {
                     selectYear.setEnabled(true);
-                    selectYear.setSelectedItem(2021);
+                    selectYear.setSelectedItem(currentYear);
                 } else {
                     selectYear.clear();
                     selectYear.setEnabled(false);
@@ -413,7 +415,7 @@ public class webinarRealizadoChart<T> extends Panel {
             } else {
                 scrollPanelChart.setContent(generalChart);
                 selectYear.setEnabled(true);
-                selectYear.setSelectedItem(2021);
+                selectYear.setSelectedItem(currentYear);
             }
         });
         selectYear = new NativeSelect<>("<b>Año:</b>", getYears());
@@ -426,15 +428,20 @@ public class webinarRealizadoChart<T> extends Panel {
         selectYear.setItemCaptionGenerator(year -> {
             return String.valueOf(year);
         });
-        selectYear.setEnabled(false);
+        selectYear.setSelectedItem(currentYear);
         selectYear.addSelectionListener((SingleSelectionListener) listener -> {
             if (listener.isUserOriginated()) {
-                String year = "";
+                String year;
                 if (listener.getSelectedItem().isPresent()) {
                     year = String.valueOf(listener.getSelectedItem().get());
-                }
-                scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados " + year,
-                        "Webinars realizados en todo el año", year.isEmpty() ? 0 : Integer.valueOf(year)));
+                    if(comboYearSel.getSelectedItem().isPresent()){
+                        scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados " + year,
+                                "Webinars realizados en todo el año", year.isEmpty() ? 0 : Integer.valueOf(year)));
+                    }else
+                        scrollPanelChart.setContent(getAgremiadoChartColumn(listaWebR, "Webinars realizados "+currentYear,""
+                                + "Webinars realizados en todo el año "+currentYear, currentYear));
+                }else
+                    scrollPanelChart.setContent(getAgremiadoChartColumn(new ArrayList<>(), "","", currentYear));
             }
 
         });
@@ -544,7 +551,6 @@ public class webinarRealizadoChart<T> extends Panel {
         scrollPanelChart.setCaption("Vista del gráfico");
         scrollPanelChart.setResponsive(true);
         scrollPanelChart.addStyleName("captionColor");
-        int currentYear = currentDate.getYear();
         generalChart = getAgremiadoChartColumn(listaWebR, "Webinars realizados " + currentYear,
                 "Webinars realizados en todo el año", currentYear);
         scrollPanelChart.setContent(generalChart);
