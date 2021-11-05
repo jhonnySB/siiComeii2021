@@ -7,7 +7,6 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.ExceptionConverter;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -21,12 +20,8 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.draw.DottedLineSeparator;
-import static com.lowagie.text.ElementTags.FONT;
 import com.tiamex.siicomeii.Main;
 import com.tiamex.siicomeii.utils.Utils;
-import com.vaadin.server.FileResource;
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -64,7 +59,9 @@ public class FormatoPagina extends PdfPageEventHelper {
         total.setRole(PdfName.ARTIFACT); // new Font(BaseFont.createFont("C:\Users\jhon\Downloads\Compressed\Montserrat", BaseFont.IDENTITY_H, BaseFont.EMBEDDED), 10);
         try {
             //font = new Font(FontFamily.HELVETICA);
-            font = new Font(BaseFont.createFont("C:\\Users\\jhon\\Downloads\\Compressed\\Montserrat\\Montserrat-ExtraLight.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED), 9);
+            //Main.getBaseDir()+"/mylayout.html"
+            font = new Font(BaseFont.createFont(Main.getBaseDir()+"/fonts/Montserrat-ExtraLight.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED), 9);
+            //font = new Font(BaseFont.createFont("C:\\Users\\jhon\\Downloads\\Compressed\\Montserrat\\Montserrat-ExtraLight.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED), 9);
         } catch (DocumentException | IOException ex) {
             Logger.getLogger(FormatoPagina.class.getName()).log(Level.SEVERE, null, ex);
         }
