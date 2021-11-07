@@ -112,17 +112,19 @@ public class WebinarRealizadoDlg extends TemplateDlg<WebinarRealizado> {
         rowBar.withComponents(searchField, btnCharts);
         grid.setHeaderRowHeight(40);
         int minWidth = 200;
-        grid.addColumn(WebinarRealizado::getNombre).setCaption("Nombre").setHidable(false).setMinimumWidth(minWidth);
+        int maxWidth = 300;
+        grid.addColumn(WebinarRealizado::getNombre).setCaption("Nombre").setHidable(false).setMinimumWidth(minWidth).setMaximumWidth(maxWidth)
+                .setDescriptionGenerator(web->web.getNombre());
         grid.addColumn(WebinarRealizado::getPonente).setCaption("Ponente").setHidable(true).setHidingToggleCaption("Mostrar Ponente")
-                .setMinimumWidth(minWidth);
+                .setMinimumWidth(minWidth).setMaximumWidth(maxWidth).setDescriptionGenerator(web->web.getPonente());
         grid.addColumn(WebinarRealizado::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución")
-                .setMinimumWidth(150);
+                .setMinimumWidth(150).setMaximumWidth(maxWidth).setDescriptionGenerator(web->web.getInstitucion());
         grid.addColumn(WebinarRealizado::getFechaFrm).setCaption("Fecha").setHidable(true).setHidingToggleCaption("Mostrar Fecha").setId("colDate")
                 .setMinimumWidth(480).setComparator(comparator);
         grid.addColumn(WebinarRealizado::getPresentacion).setCaption("Presentación").setHidable(true).
                 setHidingToggleCaption("Mostrar Presentación").setHidden(true);
         grid.addComponentColumn(this::buildUrlCmpt).setCaption("Enlace video").setHidable(true).setHidingToggleCaption("Mostrar enlace")
-                .setMinimumWidth(150);
+                .setMinimumWidth(150).setMaximumWidth(150);
         grid.addColumn(webinar -> String.valueOf(webinar.getAsistentes())).setCaption("Asistentes").setHidable(true).setHidden(true).
                 setHidingToggleCaption("Mostrar Asistentes");
 

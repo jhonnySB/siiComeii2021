@@ -114,7 +114,9 @@ public abstract class TemplateDlg<T> extends Panel {
 
         grid = new Grid<>();
         grid.setHeightByRows(10);
-        Element.cfgComponent(grid);
+        //Element.cfgComponent(grid);
+        grid.setWidthFull();
+        grid.setResponsive(true); grid.setCaptionAsHtml(true);
         //grid.setHeight(Element.windowHeightPx(100) + "px");
         grid.setColumnResizeMode(ColumnResizeMode.ANIMATED);
         grid.setSelectionMode(SelectionMode.SINGLE);
@@ -167,7 +169,7 @@ public abstract class TemplateDlg<T> extends Panel {
         switch (banBoton) {
             case 1: //botones webinar realizado
                 grid.getColumn("botones").setMinimumWidth(180).setMaximumWidth(180).
-                        setEditable(false).clearExpandRatio();
+                        setEditable(false);
                 buttonListado = new Button(VaadinIcons.FILE_TEXT_O);
                 buttonListado.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
                 buttonListado.addClickListener(e -> eventListaAsistentes(obj));
@@ -198,7 +200,7 @@ public abstract class TemplateDlg<T> extends Panel {
                 break;
             case 2: //botones agremiado para listado de webinar asistidos
                 grid.getColumn("botones").setMinimumWidth(240).setMaximumWidth(240).
-                        setEditable(false).clearExpandRatio();
+                        setEditable(false);
                 buttonConstancias = new Button(VaadinIcons.LIST);
                 buttonConstancias.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
                 row.addColumn().withComponent(buttonConstancias);
@@ -206,7 +208,7 @@ public abstract class TemplateDlg<T> extends Panel {
                 break;
             case 3:
                 grid.getColumn("botones").setMinimumWidth(310).setMaximumWidth(310).
-                        setEditable(false).clearExpandRatio().setCaption("Acción");
+                        setEditable(false).setCaption("Acción");
                 tutorialsesion = new Button(VaadinIcons.ACADEMY_CAP);
                 tutorialsesion.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
                 tutorialsesion.addClickListener(e -> eventTutorialSesiones(obj));
@@ -215,8 +217,8 @@ public abstract class TemplateDlg<T> extends Panel {
                 row.addColumn().withComponent(tutorialsesion);
                 break;
             case 4: //proximos webinars
-                grid.getColumn("botones").setMinimumWidth(240).setMaximumWidth(240).
-                        setEditable(false).clearExpandRatio().setCaption("Acción");
+                grid.getColumn("botones").setMinimumWidth(180).setMaximumWidth(180).
+                        setEditable(false).setCaption("Acción");
                 upWebinar = new Button(VaadinIcons.ARCHIVE);
                 upWebinar.addStyleNames(ValoTheme.BUTTON_TINY+" "+ValoTheme.BUTTON_FRIENDLY);
                 upWebinar.addClickListener(e -> this.eventWebinarRealizado(obj));

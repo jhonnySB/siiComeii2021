@@ -149,21 +149,18 @@ public final class ReporteChartAgremiado extends BasePDF {
     private void writePdfContent() throws DocumentException, IOException {
         writeGeneralInfo();
         document.add(BR);
+        if (writer.getVerticalPosition(true) < 100) {
+            document.newPage();
+        }
         createDetailedSection();
         document.add(BR);
         if (writer.getVerticalPosition(true) < 100) {
             document.newPage();
         }
         createConstanciasSection();
-        /*Image scaledImg = createSvgImg(svgStrMain);
-        int indentation = 0;
-        float scaler = ((document.getPageSize().getWidth() - document.leftMargin() - document.rightMargin() - indentation)
-                / scaledImg.getWidth()) * 100;
-        scaledImg.scalePercent(scaler); */
-        //document.add(scaledImg);
     }
 
-    private Image createSvgImg(String svgStrChart) {
+    private Image createSvgImg(String svgStrChart,float fixedWidth) {
         ImgTemplate imgTemp = null;
         try {
             File tempFile = File.createTempFile("tempChartExport", ".svg");
@@ -174,7 +171,7 @@ public final class ReporteChartAgremiado extends BasePDF {
             SVGDocument svgDoc = new SAXSVGDocumentFactory(null).createSVGDocument(null, new FileReader(tempFile.getAbsolutePath()));
             float svgWidth = Float.parseFloat(svgDoc.getDocumentElement().getAttribute("width").replaceAll("[^0-9.,]", ""));
             float svgHeight = Float.parseFloat(svgDoc.getDocumentElement().getAttribute("height").replaceAll("[^0-9.,]", ""));
-            PdfTemplate svgTempl = PdfTemplate.createTemplate(writer, svgWidth, svgHeight);
+            PdfTemplate svgTempl = PdfTemplate.createTemplate(writer, fixedWidth!= 0 ? fixedWidth : svgWidth, svgHeight);
             Graphics2D g2d = svgTempl.createGraphics(svgTempl.getWidth(), svgTempl.getHeight());
             GraphicsNode chartGfx = (new GVTBuilder()).build(new BridgeContext(new UserAgentAdapter()), svgDoc);
             chartGfx.paint(g2d);
@@ -197,9 +194,9 @@ public final class ReporteChartAgremiado extends BasePDF {
             table.addCell(createImageCell(svgStrGenre));
             table.addCell(createImageCell(svgStrCountries));
             document.add(table);
-            Image chartInstitutos = createSvgImg(svgStrInst);
-            chartInstitutos.scaleAbsolute(table.getTotalWidth() / 2, table.getTotalHeight());
-            chartInstitutos.setAlignment(Rectangle.ALIGN_CENTER);
+            Image chartInstitutos = createSvgImg(svgStrInst,700);
+            //chartInstitutos.scaleAbsolute(table.getTotalWidth() / 1.5F, table.getTotalHeight() * 1.5F);
+            chartInstitutos.scaleToFit(700, 400);
             document.add(chartInstitutos);
         } catch (DocumentException | IOException ex) {
             Logger.getLogger(ReporteChartAgremiado.class.getName()).log(Level.SEVERE, null, ex);
@@ -397,26 +394,37 @@ public final class ReporteChartAgremiado extends BasePDF {
             Paragraph p = customParagraph("Constancias enviadas a agremiados:", FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.LIGHT_GRAY,
                     Element.ALIGN_BASELINE, true, 0.5f, -2.5f);
             p.add(" " + (constancias == 0 ? "Ninguna" : String.valueOf(filteredList ? sumTotalAsis : constancias)));
+            p.setIndentationRight(10);
+            p.setAlignment(Element.ALIGN_JUSTIFIED);
             cell.addElement(p);  // 
             p = customParagraph("Institución(es) con mayor contancias recibidas: ", FontFamily.HELVETICA, 10, Font.NORMAL,
                     BaseColor.LIGHT_GRAY, Element.ALIGN_BASELINE, true, 0.5f, -2.5f);
             p.add(" " + getCountConstanciasInst(listAsistencias));
             cell.setBorder(Rectangle.NO_BORDER);
+            p.setIndentationRight(10);
+            p.setAlignment(Element.ALIGN_JUSTIFIED);
             cell.addElement(p);  // 
             p = customParagraph("Agremiado(s) con mayor contancias recibidas:", FontFamily.HELVETICA, 10, Font.NORMAL,
                     BaseColor.LIGHT_GRAY, Element.ALIGN_BASELINE, true, 0.5f, -2.5f);
             p.add(" " + getRankAgremiados());
+            p.setIndentationRight(10);
+            p.setAlignment(Element.ALIGN_JUSTIFIED);
             cell.addElement(p);
             table.addCell(cell); // 
+            
             p = customParagraph("Institución(es) con mayor agremiados:", FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.LIGHT_GRAY, Element.ALIGN_RIGHT,
                     true, 0.5f, -2.5f);
             p.add(" " + setTextRank());
             cell = new PdfPCell();
             cell.setBorder(Rectangle.NO_BORDER);
+            p.setIndentationLeft(10);
+            p.setAlignment(Element.ALIGN_JUSTIFIED);
             cell.addElement(p);  // 
             p = customParagraph("Agremiados registrados:", FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.LIGHT_GRAY, Element.ALIGN_RIGHT, 
                     true, 0.5f, -2.5f);
             p.add(" " + agremiados);
+            p.setAlignment(Element.ALIGN_JUSTIFIED);
+            p.setIndentationLeft(10);
             cell.addElement(p);
             table.addCell(cell); //
             document.add(table);
@@ -442,7 +450,8 @@ public final class ReporteChartAgremiado extends BasePDF {
     }
 
     public PdfPCell createImageCell(String svgChart) throws DocumentException, IOException {
-        Image scaledImg = createSvgImg(svgChart);
+        Image scaledImg = createSvgImg(svgChart,0);
+        scaledImg.scaleToFit(600, 400);
         PdfPCell cell = new PdfPCell(scaledImg, true);
         cell.setBorder(Rectangle.NO_BORDER);
         return cell;
@@ -594,7 +603,7 @@ public final class ReporteChartAgremiado extends BasePDF {
         Map<String, InstitutoRecord> institutoMapRanked = new HashMap<>();
         String highestInst = "";
         InstitutoRecord obj;
-        int highestRecord = 0, cont = 0, maxEntry;
+        int highestRecord = 0, cont = 0;
         try {
             data.sort((o1, o2) -> {
                 return o1.getObjAgremiado().getInstitucion().compareToIgnoreCase(o2.getObjAgremiado().getInstitucion());
@@ -614,7 +623,7 @@ public final class ReporteChartAgremiado extends BasePDF {
                     }
                     institutoMap.replace(loopInstituto, obj);
                 } else {
-                    cont = 0;
+                    cont = 1;
                     obj = new InstitutoRecord(1, loopDate);
                     institutoMap.put(loopInstituto, obj);
                 }
@@ -641,7 +650,6 @@ public final class ReporteChartAgremiado extends BasePDF {
 
     private String getTextRanked(Stream<Map.Entry<String, InstitutoRecord>> sortedStream, int highestRecord) {
         String results = "";
-        int cont = 0;
         Map<String, InstitutoRecord> newMap = new HashMap<>();
         sortedStream.forEach(entry -> {
             newMap.put(entry.getKey(), entry.getValue());
@@ -650,17 +658,15 @@ public final class ReporteChartAgremiado extends BasePDF {
             if (results.compareTo("") == 0) {
                 results = entrySet.getKey();
             } else {
-                if (cont < 3) {
+                
                     results = results + "," + entrySet.getKey();
-                }
+                
             }
-            cont++;
+            
         }
-        if (cont > 3) {
-            results = results + "," + (cont - 3) + " más...";
-        } else {
+        
             results = results + ".";
-        }
+        
         results = results + "(" + highestRecord + ")";
         return results;
     }

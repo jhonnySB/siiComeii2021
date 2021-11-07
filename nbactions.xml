@@ -10,9 +10,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
+                <exec.args>-classpath %classpath com.tiamex.siicomeii.Main ${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>/home/bell/NetBeansProjects/FINAL/siiComeii2021</exec.workingdir>
+                <exec.workingdir>C:\Users\jhon\Documents\NetBeansProjects\up_v2\siicomeii</exec.workingdir>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.appArgs>clean vaadin:update-widgetset vaadin:compile -classpath %classpath com.tiamex.siicomeii.Main</exec.appArgs>
                 <exec.mainClass>com.tiamex.siicomeii.Main</exec.mainClass>
@@ -28,10 +28,10 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath com.tiamex.siicomeii.Main ${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>/home/bell/NetBeansProjects/FINAL/siiComeii2021</exec.workingdir>
+                <exec.workingdir>C:\Users\jhon\Documents\NetBeansProjects\up_v2\siicomeii</exec.workingdir>
                 <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.appArgs>clean vaadin:update-widgetset vaadin:compile -classpath %classpath com.tiamex.siicomeii.Main</exec.appArgs>
                 <exec.mainClass>com.tiamex.siicomeii.Main</exec.mainClass>
@@ -47,9 +47,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
+                <exec.args>-classpath %classpath com.tiamex.siicomeii.Main ${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>/home/bell/NetBeansProjects/FINAL/siiComeii2021</exec.workingdir>
+                <exec.workingdir>C:\Users\jhon\Documents\NetBeansProjects\up_v2\siicomeii</exec.workingdir>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.appArgs>clean vaadin:update-widgetset vaadin:compile -classpath %classpath com.tiamex.siicomeii.Main</exec.appArgs>
                 <exec.mainClass>com.tiamex.siicomeii.Main</exec.mainClass>

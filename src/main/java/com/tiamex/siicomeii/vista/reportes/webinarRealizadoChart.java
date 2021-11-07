@@ -103,6 +103,7 @@ import java.util.function.Predicate;
 import org.threeten.extra.YearWeek;
 import com.google.common.collect.Lists;
 import com.google.common.base.Functions;
+import com.vaadin.addon.charts.model.style.Style;
 import com.vaadin.ui.HorizontalLayout;
 
 /**
@@ -398,11 +399,13 @@ public class webinarRealizadoChart<T> extends Panel {
             }
             return str + " - " + total + " realizados.";
         });
-        
         comboBox.addSelectionListener((SingleSelectionEvent<String> event) -> {
+            
             if (event.getSelectedItem().isPresent()) {
                 String selectedItem = event.getValue();
+                
                 listaComboBox = ControladorWebinarRealizado.getInstance().getByInstituto(selectedItem);
+                
                 scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados "+currentYear,
                         "Webinars realizados en todo el año", currentYear));
                 if (mapInstitutoWeb.get(selectedItem) > 0) {
@@ -413,8 +416,8 @@ public class webinarRealizadoChart<T> extends Panel {
                     selectYear.setEnabled(false);
                 }
             } else {
+                
                 scrollPanelChart.setContent(generalChart);
-                selectYear.setEnabled(true);
                 selectYear.setSelectedItem(currentYear);
             }
         });
@@ -430,16 +433,20 @@ public class webinarRealizadoChart<T> extends Panel {
         });
         selectYear.setSelectedItem(currentYear);
         selectYear.addSelectionListener((SingleSelectionListener) listener -> {
+            
             if (listener.isUserOriginated()) {
                 String year;
                 if (listener.getSelectedItem().isPresent()) {
                     year = String.valueOf(listener.getSelectedItem().get());
-                    if(comboYearSel.getSelectedItem().isPresent()){
+               
+                    if(comboBox.getSelectedItem().isPresent()){
                         scrollPanelChart.setContent(getAgremiadoChartColumn(listaComboBox, "Webinars realizados " + year,
                                 "Webinars realizados en todo el año", year.isEmpty() ? 0 : Integer.valueOf(year)));
-                    }else
-                        scrollPanelChart.setContent(getAgremiadoChartColumn(listaWebR, "Webinars realizados "+currentYear,""
-                                + "Webinars realizados en todo el año "+currentYear, currentYear));
+                    }else{
+                       
+                        scrollPanelChart.setContent(getAgremiadoChartColumn(listaWebR, "Webinars realizados "+year,""
+                                + "Webinars realizados en todo el año "+year, Integer.parseInt(year)));
+                    }
                 }else
                     scrollPanelChart.setContent(getAgremiadoChartColumn(new ArrayList<>(), "","", currentYear));
             }
@@ -683,7 +690,7 @@ public class webinarRealizadoChart<T> extends Panel {
                     }
                     institutoMap.replace(loopInstituto, obj);
                 } else {
-                    cont = 0;
+                    cont = 1;
                     obj = new InstitutoRecord(1, loopDate);
                     institutoMap.put(loopInstituto, obj);
                 }
@@ -886,19 +893,13 @@ public class webinarRealizadoChart<T> extends Panel {
 
     private String buildChartPieSvg(ChartType charType, String titleChart, String subTitleChart, List<WebinarRealizado> data) {
         Configuration config = createChart(charType, titleChart, subTitleChart, false).getConfiguration();
+        config.getLegend().setEnabled(false);
         plotOptPie(config, true, true, LABEL_FORMATTER, 0);
         fillChartDataPie(config, data, titleChart);
         return SVGGenerator.getInstance().generate(config);
     }
 
-    // Configuration config,List<Agremiado> data,String seriesName,boolean drillDownData
-    /*private String buildChart(ChartType charType, String titleChart, String subTitleChart, boolean exporting, List<Agremiado> data,
-            String filterBy) {
-        Configuration config = createChart(charType, titleChart, subTitleChart, exporting);
-        plotOptPie(config, true, true, LABEL_FORMATTER, 0);
-        fillChartDataPie(config, data, titleChart, false, filterBy);
-        return SVGGenerator.getInstance().generate(config);
-    } */
+
     private Chart createChart(ChartType chartType, String titleChart, String subTitleChart, boolean exporting) {
         Chart chart = new Chart(chartType);
         chart.setWidth(1000, Unit.PIXELS);
@@ -915,6 +916,9 @@ public class webinarRealizadoChart<T> extends Panel {
         plotOpt.setShowInLegend(showInLegend);
         DataLabels dataLabels = new DataLabels();
         dataLabels.setEnabled(dtLblEnable);
+        Style style = new Style();
+        style.setFontSize("8");
+        dataLabels.setStyle(style);
         dataLabels.setFormatter(dtLblFormatter);
         dataLabels.setConnectorPadding(conectorPadding);
         plotOpt.setDataLabels(dataLabels);

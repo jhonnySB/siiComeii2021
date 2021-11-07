@@ -166,7 +166,7 @@ public final class ReporteChartWebRealizado extends BasePDF {
                     document.add(customParagraph(Month.of(listMonths.get(i)).getDisplayName(TextStyle.FULL, locale).toUpperCase(),
                             FontFamily.HELVETICA, 22, Font.UNDERLINE, baseColorRgbh(77, 195, 255), Element.ALIGN_CENTER, false, 0, 0));
                     Image chart = createSvgImg(stringSvgs.get(i));
-                    chart.scalePercent(65F);
+                    chart.scalePercent(90F);
                     chart.setAlignment(Rectangle.ALIGN_CENTER);
                     document.add(chart);
                     PdfPTable table = new PdfPTable(2);
@@ -208,7 +208,7 @@ public final class ReporteChartWebRealizado extends BasePDF {
                     document.add(customParagraph("" + listYears.get(i), FontFamily.HELVETICA, 22, Font.UNDERLINE, baseColorRgbh(77, 195, 255),
                             Element.ALIGN_CENTER, false, 0, 0));
                     Image chart = createSvgImg(stringSvgs.get(i));
-                    chart.scalePercent(65F);
+                    chart.scalePercent(90);
                     chart.setAlignment(Rectangle.ALIGN_CENTER);
                     document.add(chart);
                     PdfPTable table = new PdfPTable(2);
@@ -941,7 +941,6 @@ public final class ReporteChartWebRealizado extends BasePDF {
 
     private String getTextRanked(Stream<Map.Entry<String, InstitutoRecord>> sortedStream, int highestRecord) {
         String results = "";
-        int cont = 0;
         Map<String, InstitutoRecord> newMap = new HashMap<>();
         sortedStream.forEach(entry -> {
             newMap.put(entry.getKey(), entry.getValue());
@@ -950,17 +949,13 @@ public final class ReporteChartWebRealizado extends BasePDF {
             if (results.compareTo("") == 0) {
                 results = entrySet.getKey();
             } else {
-                if (cont < 3) {
+                
                     results = results + "," + entrySet.getKey();
-                }
+                
             }
-            cont++;
         }
-        if (cont > 3) {
-            results = results + "," + (cont - 3) + " más...";
-        } else {
             results = results + ".";
-        }
+        
         results = results + "(" + highestRecord + " constancia(s))";
         return results;
     }

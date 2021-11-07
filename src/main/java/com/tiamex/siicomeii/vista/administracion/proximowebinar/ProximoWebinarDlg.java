@@ -100,12 +100,13 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
             return 0;
         };
         int minWidth = 200;
-        
-        grid.addColumn(ProximoWebinar::getTitulo).setCaption("Titulo").setHidable(false).setMinimumWidth(minWidth);
+        int maxWidth = 300;
+        grid.addColumn(ProximoWebinar::getTitulo).setCaption("Titulo").setHidable(false).setMinimumWidth(minWidth).setMaximumWidth(maxWidth)
+                .setDescriptionGenerator(web->web.getTitulo());
         grid.addColumn(ProximoWebinar::getPonente).setCaption("Ponente").setHidable(true).setHidingToggleCaption("Mostrar Ponente").
-                setMinimumWidth(minWidth);
+                setMinimumWidth(minWidth).setMaximumWidth(maxWidth).setDescriptionGenerator(web->web.getPonente());
         grid.addColumn(ProximoWebinar::getInstitucion).setCaption("Institución").setHidable(true).setHidingToggleCaption("Mostrar Institución")
-                .setMinimumWidth(150);
+                .setMinimumWidth(150).setMaximumWidth(maxWidth).setDescriptionGenerator(web->web.getInstitucion());
         grid.addComponentColumn(this::buildFechaForm).setCaption("Fecha").setMinimumWidth(525).setHidable(true).setHidingToggleCaption("Mostrar Fecha")
                 .setComparator(comparator).setId("dateCol");
         grid.addComponentColumn((ProximoWebinar web) -> {
@@ -118,7 +119,7 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
                 lay.addRow().withAlignment(Alignment.MIDDLE_CENTER).withComponents(new Label("Sin imagen"));
             return lay;
         }).setCaption("Imagen").setHidable(true).setHidden(false).setHidingToggleCaption("Mostrar imagen").setResizable(false)
-                .setMinimumWidth(150);
+                .setMinimumWidth(150).setMaximumWidth(150);
         setCaption("<b>Próximos webinars</b>");
 
         HeaderRow filterHeader = grid.appendHeaderRow();

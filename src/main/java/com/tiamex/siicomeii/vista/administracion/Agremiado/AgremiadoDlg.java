@@ -93,7 +93,7 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
                     panelChart = new agremiadosChart(filterList);
                 }
                 wdw.setHeightUndefined();
-                wdw.setWidth("60%");
+                wdw.setWidth("65%");
                 wdw.setContent(panelChart);
                 ui.addWindow(wdw);
             } catch (Exception ex) {

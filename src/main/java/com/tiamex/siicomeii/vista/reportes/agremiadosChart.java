@@ -32,6 +32,7 @@ import com.vaadin.addon.charts.model.PlotOptionsColumn;
 import com.vaadin.addon.charts.model.PlotOptionsPie;
 import com.vaadin.addon.charts.model.XAxis;
 import com.vaadin.addon.charts.model.YAxis;
+import com.vaadin.addon.charts.model.style.Style;
 import com.vaadin.addon.charts.themes.VaadinTheme;
 import com.vaadin.addon.charts.util.SVGGenerator;
 import com.vaadin.data.HasValue.ValueChangeListener;
@@ -104,7 +105,7 @@ public class agremiadosChart<T> extends Panel {
     List<Agremiado> filteredList = new ArrayList<>();
     HashMap<String, Integer> mapInstitutions;
     LocalDate currentDate = LocalDate.now(ZoneId.systemDefault());
-    final String LABEL_FORMATTER = "'<b>'+ this.point.name +'</b> ('+this.point.y+') : '+ this.percentage.toFixed(2) +'%'";
+    final String LABEL_FORMATTER = "''+ this.point.name +' ('+this.point.y+') : '+ this.percentage.toFixed(2) +'%'";
     NativeSelect<String> selectBy, selectGraph;
 
     public VerticalLayout getMain() {
@@ -409,7 +410,9 @@ public class agremiadosChart<T> extends Panel {
         pChart.setResponsive(true);
         pChart.setCaption("Vista del gráfico");
         pChart.addStyleNames("captionColor");
-        pChart.setContent(getAgremiadoChartPie(listaAg_INST, "instituciones", "Agremiados registrados por institución", true));
+        Chart chartMain = getAgremiadoChartPie(listaAg_INST, "instituciones", "Agremiados registrados por institución", true);
+        chartMain.setWidth(850, Unit.PIXELS);
+        pChart.setContent(chartMain);
         contentChart = new ResponsiveLayout();
         contentChart.setSizeFull(); contentChart.setResponsive(true);
         contentChart.addComponent(pChart);
@@ -420,12 +423,6 @@ public class agremiadosChart<T> extends Panel {
         
         Panel p = new Panel();
         p.setResponsive(true);
-        //p.setContent(getAgremiadoChartPie(listaAg_INST, "instituciones", "Agremiados registrados por institución", true));
-        //contentChart.addComponent(p);
-        //ResponsiveRow rowChart = contentChart.addRow();
-        //rowChart.addColumn().withComponent(getAgremiadoChartPie());
-        //r1.addColumn().withComponent(contentChart).withDisplayRules(12, 12, 10, 10);
-        //r1.addColumn().withComponent(contentChart, ResponsiveColumn.ColumnComponentAlignment.CENTER).withDisplayRules(12, 12, 10, 10);
         Lang lang = new Lang();
         lang.setNoData("No hay datos que mostrar.");
         lang.setPrintChart("Imprimir gráfico");
@@ -504,22 +501,25 @@ public class agremiadosChart<T> extends Panel {
         ReporteChartAgremiado reporte = new ReporteChartAgremiado();
         try {
             if (fullReport) {
+                chart.setWidth(1000, Unit.PIXELS);
                 Configuration exportConfig = chart.getConfiguration();
                 exportConfig.setExporting(false);
                 String svgMain = SVGGenerator.getInstance().generate(exportConfig);
-                String svgGenre = buildChart(ChartType.PIE, "Género", "Agremiados hombres y mujeres registrados", false, listaAg_INST, "genero");
+                String svgGenre = buildChart(ChartType.PIE, "Género", "Agremiados hombres y mujeres registrados", false, listaAg_INST, "genero",false
+                ,true);
                 String svgCountries = buildChart(ChartType.PIE, "Países", "Lugares de procedencia de los agremiados registrados", false,
-                        listaAg_PAIS, "paises");
+                        listaAg_PAIS, "paises",false,true);
                 String svgInst = buildChart(ChartType.PIE, "Instituciones", "Instituciones de procedencia de los agremiados registrados", false,
-                        listaAg_INST, "instituciones");
+                        listaAg_INST, "instituciones",true,false);
                 file = reporte.writePdf("reporte_" + currentDate.toString(), svgMain, svgGenre, svgCountries, svgInst, 300F, 200F, null, false);
             } else {
                 if (!filteredList.isEmpty()) {
-                    String svgGenre = buildChart(ChartType.PIE, "Género", "Agremiados hombres y mujeres registrados", false, filteredList, "genero");
+                    String svgGenre = buildChart(ChartType.PIE, "Género", "Agremiados hombres y mujeres registrados", false, filteredList, "genero",
+                            false,true);
                     String svgCountries = buildChart(ChartType.PIE, "Países", "Lugares de procedencia de los agremiados registrados",
-                            false, getListCountries(filteredList), "paises");
+                            false, getListCountries(filteredList), "paises",true,true);
                     String svgInst = buildChart(ChartType.PIE, "Instituciones", "Instituciones de procedencia de los agremiados registrados",
-                            false, getListInstituto(filteredList), "instituciones");
+                            false, getListInstituto(filteredList), "instituciones",true,false);
                     file = reporte.writePdf("reporte_" + currentDate.toString(), null, svgGenre, svgCountries, svgInst, 300F, 200F, filteredList, true);
                 }
             }
@@ -550,15 +550,17 @@ public class agremiadosChart<T> extends Panel {
 
     // Configuration config,List<Agremiado> data,String seriesName,boolean drillDownData
     private String buildChart(ChartType charType, String titleChart, String subTitleChart, boolean exporting, List<Agremiado> data,
-            String filterBy) {
+            String filterBy,boolean fontSizeSmall,boolean legend) {
         Configuration config = createChart(charType, titleChart, subTitleChart, exporting);
-        plotOptPie(config, true, true, LABEL_FORMATTER, 0);
+        config.getLegend().setEnabled(legend);
+        plotOptPie(config, true, true, LABEL_FORMATTER, 0,fontSizeSmall);
         fillChartDataPie(config, data, titleChart, false, filterBy);
         return SVGGenerator.getInstance().generate(config);
     }
 
     private Configuration createChart(ChartType chartType, String titleChart, String subTitleChart, boolean exporting) {
         chart = new Chart(chartType);
+        chart.setWidth(1000, Unit.PIXELS);
         Configuration config = chart.getConfiguration();
         config.setTitle(titleChart);
         config.setSubTitle(subTitleChart);
@@ -566,11 +568,17 @@ public class agremiadosChart<T> extends Panel {
         return config;
     }
 
-    private void plotOptPie(Configuration config, boolean showInLegend, boolean dtLblEnable, String dtLblFormatter, float conectorPadding) {
+    private void plotOptPie(Configuration config, boolean showInLegend, boolean dtLblEnable, String dtLblFormatter, float conectorPadding
+    ,boolean fontSizeSmall) {
         PlotOptionsPie plotOpt = new PlotOptionsPie();
         plotOpt.setShowInLegend(showInLegend);
         DataLabels dataLabels = new DataLabels();
         dataLabels.setEnabled(dtLblEnable);
+        Style style = new Style();
+        if(fontSizeSmall){
+            style.setFontSize("8");
+            dataLabels.setStyle(style);
+        }
         dataLabels.setFormatter(dtLblFormatter);
         dataLabels.setConnectorPadding(conectorPadding);
         plotOpt.setDataLabels(dataLabels);
@@ -693,7 +701,7 @@ public class agremiadosChart<T> extends Panel {
 
     private Chart getAgremiadoChartPie(List<Agremiado> data, String filterBy, String subTitle, boolean drillDown) {
         Configuration config = createChart(ChartType.PIE, "Agremiados", subTitle, true);
-        plotOptPie(config, true, true, LABEL_FORMATTER, 0);
+        plotOptPie(config, true, true, LABEL_FORMATTER, 0,false);
         fillChartDataPie(config, data, "Agremiados", drillDown, filterBy);
         return chart;
     }
@@ -902,7 +910,7 @@ public class agremiadosChart<T> extends Panel {
             confDrill.setTitle("Agremiados de " + instituciones.get(event.getItemIndex()));
             confDrill.setSubTitle("Agremiados registrados por género de la institción: "
                     + instituciones.get(event.getItemIndex()));
-            plotOptPie(confDrill, true, true, LABEL_FORMATTER, 1);
+            plotOptPie(confDrill, true, true, LABEL_FORMATTER, 1,false);
             chart.setConfiguration(confDrill);
             return drillDownSeries;
         });

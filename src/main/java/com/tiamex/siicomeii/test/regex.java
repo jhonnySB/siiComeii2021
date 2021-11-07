@@ -5,6 +5,7 @@
  */
 package com.tiamex.siicomeii.test;
 
+import com.tiamex.siicomeii.Main;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
@@ -37,6 +38,8 @@ import org.threeten.extra.YearWeek;
 public class regex {
 
     public static void main(String[] args) {
+
+        /*
         String inputText = "1";
         
         try {
