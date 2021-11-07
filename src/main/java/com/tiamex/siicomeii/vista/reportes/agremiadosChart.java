@@ -192,7 +192,7 @@ public class agremiadosChart<T> extends Panel {
                                 setLayoutContentChart(getAgremiadoChartColumn(listaAg_INST, "Agremiados registrados por institución", "Instituciones"));
                                 break;
                             case "País":
-                                System.out.println("column no filter");
+                                
                                 setLayoutContentChart(getAgremiadoChartColumn(listaAg_PAIS, "Agremiados registrados por país", "Países"));
                                 break;
                             case "Género":
@@ -657,7 +657,6 @@ public class agremiadosChart<T> extends Panel {
         try {
             int cont = 0;
             boolean filterByInstituto = (seriesName.compareTo("Instituciones") == 0);
-            System.out.println("filter " + filterByInstituto);
             mapInstitutions = new HashMap<>();
             if (data.size() > 0) {
                 String tempValue = "";
@@ -665,7 +664,6 @@ public class agremiadosChart<T> extends Panel {
                 while (it.hasNext()) {
                     Agremiado a = it.next();
                     String objValue = filterByInstituto ? a.getInstitucion() : a.getObjPais().getNombre();
-                    System.out.println(objValue);
                     if (tempValue.compareToIgnoreCase(objValue) != 0) {
                         if (cont != 0) {
                             mapInstitutions.replace(tempValue, cont);

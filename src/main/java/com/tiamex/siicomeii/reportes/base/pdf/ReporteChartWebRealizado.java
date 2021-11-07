@@ -153,15 +153,16 @@ public final class ReporteChartWebRealizado extends BasePDF {
     }
 
     private void writePdfContentSelected() throws DocumentException, IOException {
-        int sizeList = listMonths.size();
+        
         if (listMonths.isEmpty()) {
             document.add(customParagraph("NO HAY DATOS QUE MOSTRAR DEL AÑO" + year, FontFamily.HELVETICA, 35,
                     Font.BOLD, BaseColor.LIGHT_GRAY, Element.ALIGN_CENTER, false, 0, 0));
         } else {
             try {
+                int sizeList = listMonths.size();
                 document.add(customParagraph("Reporte de los webinars realizados del año " + year, FontFamily.HELVETICA, 20,
                         Font.BOLD, BaseColor.LIGHT_GRAY, Element.ALIGN_CENTER, false, 0, 0));
-                for (int i = 0; i < sizeList; i++) {
+                for (int i = 0; i < listMonths.size(); i++) {
 
                     document.add(customParagraph(Month.of(listMonths.get(i)).getDisplayName(TextStyle.FULL, locale).toUpperCase(),
                             FontFamily.HELVETICA, 22, Font.UNDERLINE, baseColorRgbh(77, 195, 255), Element.ALIGN_CENTER, false, 0, 0));
@@ -196,15 +197,15 @@ public final class ReporteChartWebRealizado extends BasePDF {
     }
 
     private void writePdfContentFull() throws DocumentException, IOException {
-        int sizeList = listYears.size();
         if (listYears.isEmpty()) {
             document.add(customParagraph("NO HAY DATOS QUE MOSTRAR", FontFamily.HELVETICA, 35, Font.BOLD,
                     BaseColor.LIGHT_GRAY, Element.ALIGN_CENTER, false, 0, 0));
         } else {
+            int sizeList = listYears.size();
             try {
                 document.add(customParagraph("Reporte de todos los webinars realizados registrados", FontFamily.HELVETICA, 20,
                         Font.BOLD, BaseColor.LIGHT_GRAY, Element.ALIGN_CENTER, false, 0, 0));
-                for (int i = 0; i < sizeList; i++) {
+                for (int i = 0; i < listYears.size(); i++) {
                     document.add(customParagraph("" + listYears.get(i), FontFamily.HELVETICA, 22, Font.UNDERLINE, baseColorRgbh(77, 195, 255),
                             Element.ALIGN_CENTER, false, 0, 0));
                     Image chart = createSvgImg(stringSvgs.get(i));
