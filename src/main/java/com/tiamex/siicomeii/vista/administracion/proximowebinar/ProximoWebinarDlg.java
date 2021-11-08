@@ -169,10 +169,14 @@ public class ProximoWebinarDlg extends TemplateDlg<ProximoWebinar> {
 
         fechaInicioF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
             if (event.getValue() != null) {
-                filterDate(fechaInicioF);
+                if(fechaFinF.isEmpty()){
+                    filterDate(fechaInicioF);
+                    fechaFinF.setEnabled(true);
+                    btnClear.setEnabled(true);
+                }else{
+                    dataProvider.setFilter(filter());
+                }
                 fechaFinF.setRangeStart(fechaInicioF.getValue().plusDays(1));
-                fechaFinF.setEnabled(true);
-                btnClear.setEnabled(true);
             }
         });
         fechaFinF.addValueChangeListener((HasValue.ValueChangeListener) event -> {

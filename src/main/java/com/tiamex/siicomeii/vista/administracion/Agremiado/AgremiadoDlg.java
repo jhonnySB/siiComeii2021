@@ -202,14 +202,20 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
 
         fechaInicioF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
             if (event.getValue() != null) {
-                filterDate(fechaInicioF);
+                filterList = new ArrayList<>();
+                if(fechaFinF.isEmpty()){
+                    filterDate(fechaInicioF);
+                    fechaFinF.setEnabled(true);
+                    btnClear.setEnabled(true);
+                }else{
+                    dataProvider.setFilter(filter());
+                }
                 fechaFinF.setRangeStart(fechaInicioF.getValue().plusDays(1));
-                fechaFinF.setEnabled(true);
-                btnClear.setEnabled(true);
             }
         });
         fechaFinF.addValueChangeListener((HasValue.ValueChangeListener) event -> {
             if (event.getValue() != null) {
+                filterList = new ArrayList<>();
                 dataProvider.setFilter(filter());
                 fechaInicioF.setRangeEnd(((LocalDate) event.getValue()).minusDays(1));
             }
@@ -244,13 +250,20 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
 
     private SerializablePredicate<Agremiado> filter() {
         SerializablePredicate<Agremiado> columnPredicate;
+        
         columnPredicate = a -> {
+            boolean predicate;
             LocalDateTime fechaInicio = fechaInicioF.getValue().atStartOfDay(ZoneId.systemDefault()).toLocalDateTime();
             LocalDateTime fechaFin = fechaFinF.getValue().atStartOfDay(ZoneId.systemDefault()).toLocalDateTime();
             LocalDateTime newFecha = a.getFechaReg().atTime(0, 0, 0);
             LocalDateTime newFechaIn = fechaInicio.withHour(0).withMinute(0).withSecond(0);
             LocalDateTime newFechaFin = fechaFin.withHour(0).withMinute(0).withSecond(0);
-            return newFechaIn.compareTo(newFecha) * newFecha.compareTo(newFechaFin) >= 0;
+            predicate = newFechaIn.compareTo(newFecha) * newFecha.compareTo(newFechaFin) >= 0;
+            if(predicate){
+                if(!filterList.contains(a))
+                    filterList.add(a);
+            }
+            return predicate;
         };
 
         return columnPredicate;
@@ -263,11 +276,14 @@ public class AgremiadoDlg extends TemplateDlg<Agremiado> {
 
     private void filterDate(DateField fechaInicioF) {
         LocalDate fechaInicio = fechaInicioF.getValue();
-        dataProvider.setFilter((Agremiado::getFechaReg), fecha -> {
-            if (fecha == null) {
-                return false;
+        dataProvider.setFilter(agremiado -> {
+            LocalDate date = agremiado.getFechaReg();
+            if(fechaInicio.compareTo(date)==0){
+                if(!filterList.contains(agremiado))
+                    filterList.add(agremiado);
             }
-            return fechaInicio.compareTo(fecha) == 0;
+                
+            return fechaInicio.compareTo(date) == 0;
         });
 
     }

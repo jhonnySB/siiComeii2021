@@ -215,6 +215,7 @@ public final class ReporteChartAgremiado extends BasePDF {
             document.add(customParagraph("Agremiados por Institución", FontFamily.HELVETICA, 14, Font.NORMAL, baseColorRgbh(77, 195, 255),
                     Element.ALIGN_CENTER, false, 0, 0));
             fitTableI(getInfoI());
+            document.add(BR);
             if (writer.getVerticalPosition(true) < 100) {
                 document.newPage();
             }
@@ -228,6 +229,7 @@ public final class ReporteChartAgremiado extends BasePDF {
 
     private PdfPTable infoAgremiados() {
         PdfPTable table = new PdfPTable(new float[]{3, 2, 2, 1.7F, 1, 1, 1});
+        table.setHeaderRows(2);
         String tempString = "";
         InstitutoGeneralInfo obj;  // mes,año,total
         BaseColor bgColorRow = new BaseColor(237, 237, 237), fontColor = new BaseColor(112, 112, 112);
@@ -612,9 +614,6 @@ public final class ReporteChartAgremiado extends BasePDF {
                 String loopInstituto = a.getObjAgremiado().getInstitucion();
                 LocalDate loopDate = a.getObjWebinarRealizado().getFecha().toLocalDate();
                 cont++;
-                if (cont > highestRecord) {
-                    highestRecord = cont;
-                }
                 if (institutoMap.containsKey(loopInstituto)) {
                     obj = institutoMap.get(loopInstituto);
                     obj.setTotal(obj.getTotal() + 1);
@@ -626,6 +625,9 @@ public final class ReporteChartAgremiado extends BasePDF {
                     cont = 1;
                     obj = new InstitutoRecord(1, loopDate);
                     institutoMap.put(loopInstituto, obj);
+                }
+                if (cont > highestRecord) {
+                    highestRecord = cont;
                 }
             }
             for (Map.Entry<String, InstitutoRecord> entrySet : institutoMap.entrySet()) {
